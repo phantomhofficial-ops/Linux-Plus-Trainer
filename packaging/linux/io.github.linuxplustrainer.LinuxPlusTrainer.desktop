@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=CompTIA Linux+ Study Trainer
+GenericName=Linux+ XK0-006 Study Trainer
+Comment=Interactive CompTIA Linux+ (XK0-006 / V8) CLI, Web, and Sandbox Lab Trainer
+Exec=LinuxPlusTrainer
+Icon=io.github.linuxplustrainer.LinuxPlusTrainer
+Terminal=false
+Categories=Education;Utility;
+Keywords=linux;comptia;xk0-006;bash;terminal;study;
+StartupNotify=true

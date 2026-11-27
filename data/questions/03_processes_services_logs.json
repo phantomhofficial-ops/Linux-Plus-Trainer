@@ -1,0 +1,710 @@
+[
+  {
+    "id": "proc_01",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "beginner",
+    "prompt": "Display all running processes on the system in standard POSIX full-format listing (showing UID, PID, PPID, STIME, TTY, TIME, and CMD).",
+    "choices": [
+      "ps -ef",
+      "ps -e",
+      "ps aux",
+      "ps -p"
+    ],
+    "correct_choice": "ps -ef",
+    "accepted_commands": [
+      "ps -ef",
+      "ps -fe",
+      "ps -e -f",
+      "ps -f -e"
+    ],
+    "hint": "Combine the POSIX ps flags for every process (-e) and full-format listing (-f).",
+    "explanation": "Domain 2.0 (Services and User Management): `ps -ef` combines POSIX flags `-e` (all processes) and `-f` (full format, including PPID for tracing parent-child trees). `ps aux` uses BSD syntax (displaying CPU%/MEM% instead of PPID), and `ps -e` alone omits full columns."
+  },
+  {
+    "id": "proc_02",
+    "domain": "5.0 Troubleshooting",
+    "category": "Processes, Services & Logs",
+    "difficulty": "beginner",
+    "prompt": "Send the default graceful termination signal (SIGTERM / signal 15) to process PID 4321 (as root or process owner).",
+    "choices": [
+      "kill 4321",
+      "kill -9 4321",
+      "kill -1 4321",
+      "kill -19 4321"
+    ],
+    "correct_choice": "kill 4321",
+    "accepted_commands": [
+      "kill 4321",
+      "kill -15 4321",
+      "kill -TERM 4321",
+      "kill -SIGTERM 4321",
+      "kill -s TERM 4321",
+      "kill -s SIGTERM 4321",
+      "kill -s 15 4321",
+      "sudo kill 4321",
+      "sudo kill -15 4321",
+      "sudo kill -TERM 4321",
+      "sudo kill -SIGTERM 4321"
+    ],
+    "hint": "kill sends SIGTERM (15) by default when no signal option is specified.",
+    "explanation": "Domain 5.0 (Troubleshooting): `kill 4321` (equivalent to `kill -15 4321` or `kill -s TERM 4321`) sends `SIGTERM`, allowing the application to flush buffers and exit cleanly. `-9` sends uncatchable `SIGKILL`, `-1` sends `SIGHUP`, and `-19` sends `SIGSTOP`."
+  },
+  {
+    "id": "proc_03",
+    "domain": "5.0 Troubleshooting",
+    "category": "Processes, Services & Logs",
+    "difficulty": "beginner",
+    "prompt": "Forcefully terminate an unresponsive process with PID 8842 (as root) using SIGKILL (signal 9) so the kernel destroys it immediately.",
+    "choices": [
+      "kill -9 8842",
+      "kill -15 8842",
+      "kill -1 8842",
+      "killall 8842"
+    ],
+    "correct_choice": "kill -9 8842",
+    "accepted_commands": [
+      "kill -9 8842",
+      "kill -KILL 8842",
+      "kill -SIGKILL 8842",
+      "kill -s KILL 8842",
+      "kill -s SIGKILL 8842",
+      "kill -s 9 8842",
+      "sudo kill -9 8842",
+      "sudo kill -KILL 8842",
+      "sudo kill -SIGKILL 8842",
+      "sudo kill -s KILL 8842",
+      "sudo kill -s 9 8842"
+    ],
+    "hint": "Pass signal number 9 (or KILL/SIGKILL) to kill before PID 8842.",
+    "explanation": "Domain 5.0 (Troubleshooting): `kill -9 8842` sends `SIGKILL`, which cannot be caught, blocked, or ignored by user-space processes. Use it only after `SIGTERM` (`-15`) fails, as it skips application cleanup. `killall` matches by process name rather than PID."
+  },
+  {
+    "id": "proc_04",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "beginner",
+    "prompt": "Enable the sshd systemd service to start automatically at boot AND start it immediately in a single command (as root).",
+    "choices": [
+      "systemctl enable --now sshd",
+      "systemctl enable sshd",
+      "systemctl start --enable sshd",
+      "systemctl restart sshd"
+    ],
+    "correct_choice": "systemctl enable --now sshd",
+    "accepted_commands": [
+      "systemctl enable --now sshd",
+      "systemctl enable --now sshd.service",
+      "sudo systemctl enable --now sshd",
+      "sudo systemctl enable --now sshd.service"
+    ],
+    "hint": "Combine systemctl enable with the --now flag.",
+    "explanation": "Domain 2.0 (Services and User Management): `systemctl enable --now sshd` creates the boot-target symlinks and immediately activates the unit in a single invocation. Running `systemctl enable sshd` alone leaves the service stopped until reboot, and `--enable` is not a valid flag for `start`."
+  },
+  {
+    "id": "proc_05",
+    "domain": "5.0 Troubleshooting",
+    "category": "Processes, Services & Logs",
+    "difficulty": "beginner",
+    "prompt": "Inspect the current runtime status, PID, memory usage, and most recent journal log lines for the nginx systemd unit.",
+    "choices": [
+      "systemctl status nginx",
+      "systemctl is-enabled nginx",
+      "systemctl show nginx",
+      "service nginx check"
+    ],
+    "correct_choice": "systemctl status nginx",
+    "accepted_commands": [
+      "systemctl status nginx",
+      "systemctl status nginx.service",
+      "sudo systemctl status nginx",
+      "sudo systemctl status nginx.service"
+    ],
+    "hint": "Use the status subcommand of systemctl.",
+    "explanation": "Domain 5.0 (Troubleshooting): `systemctl status nginx` displays loaded unit path, active/sub state, main PID, cgroup tasks, and recent journal lines for troubleshooting. `is-enabled` prints only whether boot startup is configured, while `show` dumps machine-readable properties."
+  },
+  {
+    "id": "proc_06",
+    "domain": "5.0 Troubleshooting",
+    "category": "Processes, Services & Logs",
+    "difficulty": "intermediate",
+    "prompt": "List all systemd units currently in a failed state so you can triage service startup errors.",
+    "choices": [
+      "systemctl --failed",
+      "systemctl list-unit-files --failed",
+      "systemctl status failed",
+      "journalctl --failed"
+    ],
+    "correct_choice": "systemctl --failed",
+    "accepted_commands": [
+      "systemctl --failed",
+      "systemctl list-units --state=failed",
+      "systemctl list-units --failed",
+      "sudo systemctl --failed",
+      "sudo systemctl list-units --state=failed"
+    ],
+    "hint": "Use systemctl with the --failed flag (or list-units --state=failed).",
+    "explanation": "Domain 5.0 (Troubleshooting): `systemctl --failed` (shorthand for `systemctl list-units --state=failed`) reports every active-memory systemd unit in the `failed` state. `list-unit-files` inspects on-disk unit enablement rather than live failed runtime states, and `journalctl` reads logs rather than unit states."
+  },
+  {
+    "id": "proc_07",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "intermediate",
+    "prompt": "Gracefully apply updated configuration files to the running nginx systemd service (as root) without dropping active connections or restarting the master PID.",
+    "choices": [
+      "systemctl reload nginx",
+      "systemctl restart nginx",
+      "systemctl daemon-reload",
+      "systemctl enable nginx"
+    ],
+    "correct_choice": "systemctl reload nginx",
+    "accepted_commands": [
+      "systemctl reload nginx",
+      "systemctl reload nginx.service",
+      "sudo systemctl reload nginx",
+      "sudo systemctl reload nginx.service"
+    ],
+    "hint": "Use the systemctl subcommand that signals a running daemon to re-read its configuration.",
+    "explanation": "Domain 2.0 (Services and User Management): `systemctl reload nginx` sends the service's reload signal (typically `SIGHUP`) so nginx re-reads `/etc/nginx/` without interrupting active connections. `restart` stops and starts the daemon (new PID), and `daemon-reload` refreshes systemd's own `.service` unit files."
+  },
+  {
+    "id": "proc_08",
+    "domain": "5.0 Troubleshooting",
+    "category": "Processes, Services & Logs",
+    "difficulty": "beginner",
+    "prompt": "Stream (follow) new systemd journal log entries in real time specifically for the sshd unit (as root).",
+    "choices": [
+      "journalctl -u sshd -f",
+      "journalctl -u sshd -r",
+      "journalctl -f",
+      "tail -f /etc/ssh/sshd_config"
+    ],
+    "correct_choice": "journalctl -u sshd -f",
+    "accepted_commands": [
+      "journalctl -u sshd -f",
+      "journalctl -f -u sshd",
+      "journalctl -fu sshd",
+      "journalctl -uf sshd",
+      "journalctl -u sshd.service -f",
+      "journalctl -f -u sshd.service",
+      "sudo journalctl -u sshd -f",
+      "sudo journalctl -f -u sshd",
+      "sudo journalctl -u sshd.service -f"
+    ],
+    "hint": "Combine -u <unit> with the follow flag (-f) in journalctl.",
+    "explanation": "Domain 5.0 (Troubleshooting): `journalctl -u sshd -f` filters the systemd journal to unit `sshd` (`-u`) and continuously follows (`-f`) incoming log entries. `-r` reverses chronological order without live streaming, and `journalctl -f` without `-u` mixes logs from all system units."
+  },
+  {
+    "id": "proc_09",
+    "domain": "5.0 Troubleshooting",
+    "category": "Processes, Services & Logs",
+    "difficulty": "intermediate",
+    "prompt": "Display systemd journal messages only from the current system boot filtered to priority err (level 3) and higher severity (as root).",
+    "choices": [
+      "journalctl -b -p err",
+      "journalctl -p info -b",
+      "journalctl -u err -b",
+      "journalctl --since boot -p warn"
+    ],
+    "correct_choice": "journalctl -b -p err",
+    "accepted_commands": [
+      "journalctl -b -p err",
+      "journalctl -p err -b",
+      "journalctl -b -p 3",
+      "journalctl -p 3 -b",
+      "journalctl -bp err",
+      "journalctl -b --priority=err",
+      "sudo journalctl -b -p err",
+      "sudo journalctl -p err -b",
+      "sudo journalctl -b -p 3",
+      "sudo journalctl -p 3 -b"
+    ],
+    "hint": "Use -b for current boot and -p err (or -p 3) for error priority and higher.",
+    "explanation": "Domain 5.0 (Troubleshooting): `journalctl -b -p err` restricts output to the current boot (`-b`) and syslog priority `err` (3) through `emerg` (0). `-p info` includes routine informational noise, and `-u err` looks for a unit named `err`."
+  },
+  {
+    "id": "proc_10",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "beginner",
+    "prompt": "Open the current user's personal crontab schedule safely in the default editor with syntax validation upon saving.",
+    "choices": [
+      "crontab -e",
+      "crontab -l",
+      "crontab -r",
+      "nano /etc/crontab"
+    ],
+    "correct_choice": "crontab -e",
+    "accepted_commands": [
+      "crontab -e"
+    ],
+    "hint": "Use crontab with the edit flag (-e).",
+    "explanation": "Domain 2.0 (Services and User Management): `crontab -e` opens the current user's crontab in `$VISUAL`/`$EDITOR` and validates syntax before installing it. `crontab -l` lists entries, `crontab -r` deletes the user's entire crontab without confirmation, and `/etc/crontab` is the system-wide crontab."
+  },
+  {
+    "id": "proc_11",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "intermediate",
+    "prompt": "List the scheduled cron jobs belonging specifically to the user account webapp (as root) without modifying them.",
+    "choices": [
+      "crontab -u webapp -l",
+      "crontab -l webapp",
+      "crontab -u webapp -e",
+      "ls /var/spool/cron/webapp"
+    ],
+    "correct_choice": "crontab -u webapp -l",
+    "accepted_commands": [
+      "crontab -u webapp -l",
+      "crontab -l -u webapp",
+      "sudo crontab -u webapp -l",
+      "sudo crontab -l -u webapp"
+    ],
+    "hint": "Specify the target user with -u <user> and list with -l.",
+    "explanation": "Domain 2.0 (Services and User Management): `crontab -u webapp -l` instructs `crontab` (executed as root) to display (`-l`) the spool entry for user `webapp` (`-u`). Passing `webapp` without `-u` treats it as a file path, and `-e` opens the editor."
+  },
+  {
+    "id": "proc_12",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "beginner",
+    "prompt": "Stop and immediately start the postgresql systemd service in one command (as root) after changing settings that require a full process restart.",
+    "choices": [
+      "systemctl restart postgresql",
+      "systemctl reload postgresql",
+      "systemctl enable postgresql",
+      "systemctl daemon-reload postgresql"
+    ],
+    "correct_choice": "systemctl restart postgresql",
+    "accepted_commands": [
+      "systemctl restart postgresql",
+      "systemctl restart postgresql.service",
+      "sudo systemctl restart postgresql",
+      "sudo systemctl restart postgresql.service"
+    ],
+    "hint": "Use the systemctl subcommand that stops and restarts the unit.",
+    "explanation": "Domain 2.0 (Services and User Management): `systemctl restart postgresql` stops the running service and starts a fresh process instance. `reload` only signals a running process to re-read configuration without restarting its PID, `enable` configures boot symlinks, and `daemon-reload` takes no unit argument."
+  },
+  {
+    "id": "proc_13",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "beginner",
+    "prompt": "Check specifically whether the apache2 systemd service is configured to start automatically at system boot.",
+    "choices": [
+      "systemctl is-enabled apache2",
+      "systemctl is-active apache2",
+      "systemctl list-units apache2",
+      "systemctl enable apache2"
+    ],
+    "correct_choice": "systemctl is-enabled apache2",
+    "accepted_commands": [
+      "systemctl is-enabled apache2",
+      "systemctl is-enabled apache2.service"
+    ],
+    "hint": "Use the systemctl query subcommand starting with is- that checks boot enablement.",
+    "explanation": "Domain 2.0 (Services and User Management): `systemctl is-enabled apache2` prints `enabled`, `disabled`, or `static` and sets exit code 0 if boot startup is enabled. `is-active` checks whether the service is currently running right now rather than its boot configuration."
+  },
+  {
+    "id": "proc_14",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "beginner",
+    "prompt": "Display the current user's scheduled personal cron jobs on standard output without opening an editor.",
+    "choices": [
+      "crontab -l",
+      "crontab -e",
+      "crontab -r",
+      "cron -l"
+    ],
+    "correct_choice": "crontab -l",
+    "accepted_commands": [
+      "crontab -l"
+    ],
+    "hint": "Use crontab with the list flag (-l).",
+    "explanation": "Domain 2.0 (Services and User Management): `crontab -l` prints the invoking user's crontab entries to stdout. `crontab -e` opens an editor, and `crontab -r` deletes the crontab."
+  },
+  {
+    "id": "proc_15",
+    "domain": "5.0 Troubleshooting",
+    "category": "Processes, Services & Logs",
+    "difficulty": "beginner",
+    "prompt": "Quickly retrieve the Process IDs (PIDs) of all running processes whose name matches sshd.",
+    "choices": [
+      "pgrep sshd",
+      "pkill sshd",
+      "ps -u sshd",
+      "pidof -k sshd"
+    ],
+    "correct_choice": "pgrep sshd",
+    "accepted_commands": [
+      "pgrep sshd",
+      "pgrep -x sshd"
+    ],
+    "hint": "Use the process-grep utility (pgrep).",
+    "explanation": "Domain 5.0 (Troubleshooting): `pgrep sshd` searches running processes by name and outputs matching PIDs without sending signals or requiring `ps | grep`. `pkill sshd` sends termination signals to those processes, and `ps -u sshd` filters by username rather than process name."
+  },
+  {
+    "id": "proc_16",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "intermediate",
+    "prompt": "After editing /etc/systemd/system/worker.service, instruct systemd (as root) to re-read all modified unit configuration files from disk.",
+    "choices": [
+      "systemctl daemon-reload",
+      "systemctl reload worker",
+      "systemctl reset-failed",
+      "systemctl restart systemd"
+    ],
+    "correct_choice": "systemctl daemon-reload",
+    "accepted_commands": [
+      "systemctl daemon-reload",
+      "sudo systemctl daemon-reload"
+    ],
+    "hint": "Use systemctl with the daemon-reload subcommand.",
+    "explanation": "Domain 2.0 (Services and User Management): `systemctl daemon-reload` reloads systemd manager configuration and parses updated `.service`/`.timer` unit files on disk. `systemctl reload <unit>` signals the service daemon itself rather than systemd's unit definitions."
+  },
+  {
+    "id": "proc_17",
+    "domain": "3.0 Security",
+    "category": "Processes, Services & Logs",
+    "difficulty": "intermediate",
+    "prompt": "Completely prevent telnet.socket from being started either manually or as a dependency by symlinking it to /dev/null via systemctl (as root).",
+    "choices": [
+      "systemctl mask telnet.socket",
+      "systemctl disable telnet.socket",
+      "systemctl stop telnet.socket",
+      "systemctl block telnet.socket"
+    ],
+    "correct_choice": "systemctl mask telnet.socket",
+    "accepted_commands": [
+      "systemctl mask telnet.socket",
+      "sudo systemctl mask telnet.socket"
+    ],
+    "hint": "Use the systemctl subcommand stronger than disable that links the unit to /dev/null.",
+    "explanation": "Domain 3.0 (Security): `systemctl mask telnet.socket` creates `/etc/systemd/system/telnet.socket -> /dev/null`, making it impossible to start manually or via socket/target dependencies until `unmask` is run. `disable` only removes boot-target symlinks."
+  },
+  {
+    "id": "proc_18",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "intermediate",
+    "prompt": "List all active systemd timer units along with their next scheduled run time and last execution time.",
+    "choices": [
+      "systemctl list-timers",
+      "systemctl list-jobs",
+      "crontab -l",
+      "systemctl status timers"
+    ],
+    "correct_choice": "systemctl list-timers",
+    "accepted_commands": [
+      "systemctl list-timers",
+      "systemctl list-timers --all"
+    ],
+    "hint": "Use systemctl with list-timers.",
+    "explanation": "Domain 2.0 (Services and User Management): `systemctl list-timers` displays active `.timer` units, `NEXT`, `LEFT`, `LAST`, `PASSED`, and the `.service` unit each timer activates. `list-jobs` only displays currently queued unit transitions."
+  },
+  {
+    "id": "proc_19",
+    "domain": "5.0 Troubleshooting",
+    "category": "Processes, Services & Logs",
+    "difficulty": "intermediate",
+    "prompt": "Query the systemd journal (as root) for logs belonging to the nginx unit recorded since 1 hour ago.",
+    "choices": [
+      "journalctl -u nginx --since \"1 hour ago\"",
+      "journalctl -u nginx --last 1h",
+      "journalctl -u nginx -n 1h",
+      "systemctl logs nginx --since 1h"
+    ],
+    "correct_choice": "journalctl -u nginx --since \"1 hour ago\"",
+    "accepted_commands": [
+      "journalctl -u nginx --since \"1 hour ago\"",
+      "journalctl -u nginx --since '1 hour ago'",
+      "journalctl --since \"1 hour ago\" -u nginx",
+      "journalctl --since '1 hour ago' -u nginx",
+      "journalctl -u nginx.service --since \"1 hour ago\"",
+      "journalctl -u nginx --since=-1h",
+      "sudo journalctl -u nginx --since \"1 hour ago\"",
+      "sudo journalctl -u nginx --since '1 hour ago'"
+    ],
+    "hint": "Combine journalctl -u nginx with --since \"1 hour ago\".",
+    "explanation": "Domain 5.0 (Troubleshooting): `journalctl -u nginx --since \"1 hour ago\"` filters entries to unit `nginx` (`-u`) starting from a relative timestamp (`--since`). `-n` accepts line counts rather than time durations, and `--last` is not a valid flag."
+  },
+  {
+    "id": "proc_20",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "intermediate",
+    "prompt": "Lower the CPU scheduling priority of already-running process PID 5120 (as root) by setting its niceness value to 10.",
+    "choices": [
+      "renice -n 10 -p 5120",
+      "nice -n 10 -p 5120",
+      "renice -n -10 -p 5120",
+      "kill -n 10 5120"
+    ],
+    "correct_choice": "renice -n 10 -p 5120",
+    "accepted_commands": [
+      "renice -n 10 -p 5120",
+      "renice 10 -p 5120",
+      "renice 10 5120",
+      "sudo renice -n 10 -p 5120",
+      "sudo renice 10 -p 5120",
+      "sudo renice 10 5120"
+    ],
+    "hint": "Use renice (not nice, which launches new commands) with niceness 10 and -p 5120.",
+    "explanation": "Domain 2.0 (Services and User Management): `renice -n 10 -p 5120` modifies the niceness of a running PID (`-p`). Positive niceness (`+1` to `+19`) yields CPU priority to higher-priority tasks, whereas `nice` only wraps newly launched processes."
+  },
+  {
+    "id": "proc_21",
+    "domain": "5.0 Troubleshooting",
+    "category": "Processes, Services & Logs",
+    "difficulty": "intermediate",
+    "prompt": "Send SIGTERM (as root) to any running process whose full command line (including arguments) matches \"worker.py --queue=high\" using pkill.",
+    "choices": [
+      "pkill -f \"worker.py --queue=high\"",
+      "pkill \"worker.py --queue=high\"",
+      "killall -f \"worker.py --queue=high\"",
+      "pgrep -f \"worker.py --queue=high\""
+    ],
+    "correct_choice": "pkill -f \"worker.py --queue=high\"",
+    "accepted_commands": [
+      "pkill -f \"worker.py --queue=high\"",
+      "pkill -f 'worker.py --queue=high'",
+      "sudo pkill -f \"worker.py --queue=high\"",
+      "sudo pkill -f 'worker.py --queue=high'"
+    ],
+    "hint": "Pass -f to pkill to match against the full command line rather than just the process name.",
+    "explanation": "Domain 5.0 (Troubleshooting): By default, `pkill` inspects only the 15-character process name (`comm`, e.g., `python3`). Adding `-f` matches the pattern against the entire command-line string and arguments, sending `SIGTERM` cleanly to only the targeted worker."
+  },
+  {
+    "id": "proc_22",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "intermediate",
+    "prompt": "Launch /opt/scripts/migrate.sh in the background immune to hangup signals (SIGHUP) so it continues running after your SSH terminal disconnects.",
+    "choices": [
+      "nohup /opt/scripts/migrate.sh &",
+      "/opt/scripts/migrate.sh &",
+      "bg /opt/scripts/migrate.sh",
+      "fg /opt/scripts/migrate.sh &"
+    ],
+    "correct_choice": "nohup /opt/scripts/migrate.sh &",
+    "accepted_commands": [
+      "nohup /opt/scripts/migrate.sh &"
+    ],
+    "hint": "Prefix the command with nohup and end with &.",
+    "explanation": "Domain 2.0 (Services and User Management): `nohup /opt/scripts/migrate.sh &` ignores `SIGHUP` (sent when a terminal session closes), redirects output to `nohup.out` if attached to a TTY, and puts the job in the background (`&`). Plain `&` without `nohup` (or `disown`) can still receive `SIGHUP` on logout."
+  },
+  {
+    "id": "proc_23",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "hard",
+    "prompt": "Safely create a systemd drop-in override snippet for the nginx service (as root) without editing the vendor unit file in /usr/lib/systemd/system/.",
+    "choices": [
+      "systemctl edit nginx",
+      "systemctl edit --full nginx",
+      "nano /usr/lib/systemd/system/nginx.service",
+      "systemctl override nginx"
+    ],
+    "correct_choice": "systemctl edit nginx",
+    "accepted_commands": [
+      "systemctl edit nginx",
+      "systemctl edit nginx.service",
+      "sudo systemctl edit nginx",
+      "sudo systemctl edit nginx.service"
+    ],
+    "hint": "Use systemctl edit <unit> (without --full) to create a drop-in override.",
+    "explanation": "Domain 2.0 (Services and User Management): `systemctl edit nginx` opens `/etc/systemd/system/nginx.service.d/override.conf` and automatically runs `daemon-reload` on save, preserving overrides across package updates. Editing `/usr/lib/systemd/system/` gets overwritten on upgrades."
+  },
+  {
+    "id": "proc_24",
+    "domain": "5.0 Troubleshooting",
+    "category": "Processes, Services & Logs",
+    "difficulty": "hard",
+    "prompt": "Print the effective systemd unit definition for nginx, including the base unit file AND all active drop-in override snippets merged in order.",
+    "choices": [
+      "systemctl cat nginx",
+      "systemctl show nginx",
+      "systemctl status nginx",
+      "cat /usr/lib/systemd/system/nginx.service"
+    ],
+    "correct_choice": "systemctl cat nginx",
+    "accepted_commands": [
+      "systemctl cat nginx",
+      "systemctl cat nginx.service",
+      "sudo systemctl cat nginx",
+      "sudo systemctl cat nginx.service"
+    ],
+    "hint": "Use the cat subcommand of systemctl.",
+    "explanation": "Domain 5.0 (Troubleshooting): `systemctl cat nginx` prints the full primary unit file followed by every `.conf` drop-in file in `/etc/systemd/system/nginx.service.d/` with path headers—essential when diagnosing overridden `ExecStart` or environment settings."
+  },
+  {
+    "id": "proc_25",
+    "domain": "1.0 System Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "hard",
+    "prompt": "Immediately switch the currently running system (as root) from a graphical desktop into non-graphical multi-user CLI mode (multi-user.target) without changing the boot default.",
+    "choices": [
+      "systemctl isolate multi-user.target",
+      "systemctl set-default multi-user.target",
+      "systemctl start multi-user.target",
+      "systemctl switch multi-user.target"
+    ],
+    "correct_choice": "systemctl isolate multi-user.target",
+    "accepted_commands": [
+      "systemctl isolate multi-user.target",
+      "sudo systemctl isolate multi-user.target"
+    ],
+    "hint": "Use systemctl isolate with multi-user.target.",
+    "explanation": "Domain 1.0 (System Management): `systemctl isolate multi-user.target` activates `multi-user.target` immediately and stops all units not wanted by it (equivalent to SysV `init 3`). `set-default` updates the symlink for future boots without changing the current runtime state."
+  },
+  {
+    "id": "proc_26",
+    "domain": "1.0 System Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "hard",
+    "prompt": "Persistently configure the host (as root) so future reboots boot into multi-user.target (non-graphical CLI) by default.",
+    "choices": [
+      "systemctl set-default multi-user.target",
+      "systemctl isolate multi-user.target",
+      "systemctl enable multi-user.target",
+      "systemctl get-default multi-user.target"
+    ],
+    "correct_choice": "systemctl set-default multi-user.target",
+    "accepted_commands": [
+      "systemctl set-default multi-user.target",
+      "sudo systemctl set-default multi-user.target"
+    ],
+    "hint": "Use systemctl set-default followed by multi-user.target.",
+    "explanation": "Domain 1.0 (System Management): `systemctl set-default multi-user.target` updates `/etc/systemd/system/default.target` to point to `multi-user.target` for all subsequent system boots."
+  },
+  {
+    "id": "proc_27",
+    "domain": "5.0 Troubleshooting",
+    "category": "Processes, Services & Logs",
+    "difficulty": "hard",
+    "prompt": "Diagnose slow system startup by printing an ordered list of all running systemd units ranked from slowest to fastest initialization time.",
+    "choices": [
+      "systemd-analyze blame",
+      "systemd-analyze time",
+      "systemctl --failed",
+      "journalctl -b --time"
+    ],
+    "correct_choice": "systemd-analyze blame",
+    "accepted_commands": [
+      "systemd-analyze blame",
+      "sudo systemd-analyze blame"
+    ],
+    "hint": "Use systemd-analyze with the blame subcommand.",
+    "explanation": "Domain 5.0 (Troubleshooting): `systemd-analyze blame` ranks every unit by its boot initialization duration, quickly exposing hung network waits or slow storage mounts. `systemd-analyze time` prints only overall kernel/initrd/userspace totals."
+  },
+  {
+    "id": "proc_28",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "hard",
+    "prompt": "Reclaim disk space in /var/log/journal (as root) by deleting archived systemd journal files until total journal usage is at most 500M.",
+    "choices": [
+      "journalctl --vacuum-size=500M",
+      "journalctl --rotate 500M",
+      "journalctl --disk-usage=500M",
+      "rm -rf /var/log/journal/*"
+    ],
+    "correct_choice": "journalctl --vacuum-size=500M",
+    "accepted_commands": [
+      "journalctl --vacuum-size=500M",
+      "sudo journalctl --vacuum-size=500M"
+    ],
+    "hint": "Use journalctl with --vacuum-size=500M.",
+    "explanation": "Domain 2.0 (Services and User Management): `journalctl --vacuum-size=500M` safely removes oldest archived journal files until total disk usage falls below 500 MiB without corrupting active journal files."
+  },
+  {
+    "id": "proc_29",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "hard",
+    "prompt": "Send SIGHUP (signal 1) to daemon PID 2410 (as root) using kill so it reloads its configuration without terminating.",
+    "choices": [
+      "kill -HUP 2410",
+      "kill -15 2410",
+      "kill -9 2410",
+      "kill -STOP 2410"
+    ],
+    "correct_choice": "kill -HUP 2410",
+    "accepted_commands": [
+      "kill -HUP 2410",
+      "kill -SIGHUP 2410",
+      "kill -1 2410",
+      "kill -s HUP 2410",
+      "kill -s SIGHUP 2410",
+      "sudo kill -HUP 2410",
+      "sudo kill -SIGHUP 2410",
+      "sudo kill -1 2410"
+    ],
+    "hint": "Send signal -HUP (or -SIGHUP / -1) with kill.",
+    "explanation": "Domain 2.0 (Services and User Management): Daemons conventionally catch `SIGHUP` (signal 1) to re-read configuration files or reopen rotated logs cleanly without dropping connections."
+  },
+  {
+    "id": "proc_30",
+    "domain": "5.0 Troubleshooting",
+    "category": "Processes, Services & Logs",
+    "difficulty": "hard",
+    "prompt": "Execute /usr/local/bin/backup.sh (as root) under the Idle I/O scheduling class (class 3) using ionice so disk-heavy backups never starve production services.",
+    "choices": [
+      "ionice -c 3 /usr/local/bin/backup.sh",
+      "nice -n 3 /usr/local/bin/backup.sh",
+      "ionice -c 1 /usr/local/bin/backup.sh",
+      "renice -c 3 /usr/local/bin/backup.sh"
+    ],
+    "correct_choice": "ionice -c 3 /usr/local/bin/backup.sh",
+    "accepted_commands": [
+      "ionice -c 3 /usr/local/bin/backup.sh",
+      "ionice -c3 /usr/local/bin/backup.sh",
+      "sudo ionice -c 3 /usr/local/bin/backup.sh",
+      "sudo ionice -c3 /usr/local/bin/backup.sh"
+    ],
+    "hint": "Use ionice with -c 3 (Idle class).",
+    "explanation": "Domain 5.0 (Troubleshooting): `ionice -c 3` places the process in the Idle I/O class (0=none, 1=realtime, 2=best-effort, 3=idle), granting disk I/O only when no other process requires the block device. `nice` controls CPU priority rather than disk I/O."
+  },
+  {
+    "id": "proc_31",
+    "domain": "5.0 Troubleshooting",
+    "category": "Processes, Services & Logs",
+    "difficulty": "hard",
+    "prompt": "An application launched from your current Bash shell fails with 'Too many open files'. Raise the current shell's open file descriptor limit to 65535 using ulimit.",
+    "choices": [
+      "ulimit -n 65535",
+      "ulimit -u 65535",
+      "ulimit -f 65535",
+      "sysctl -w ulimit.nofile=65535"
+    ],
+    "correct_choice": "ulimit -n 65535",
+    "accepted_commands": [
+      "ulimit -n 65535"
+    ],
+    "hint": "Use the Bash built-in ulimit with -n (number of open file descriptors).",
+    "explanation": "Domain 5.0 (Troubleshooting): `ulimit -n 65535` sets the `RLIMIT_NOFILE` limit for the shell and child processes (`-u` limits user processes/threads, and `-f` limits max file size in blocks)."
+  },
+  {
+    "id": "proc_32",
+    "domain": "5.0 Troubleshooting",
+    "category": "Processes, Services & Logs",
+    "difficulty": "hard",
+    "prompt": "Attach strace (as root) to already-running hung process PID 3190 to inspect its live Linux system calls and error codes.",
+    "choices": [
+      "strace -p 3190",
+      "ltrace 3190",
+      "strace 3190",
+      "ps -p 3190 --trace"
+    ],
+    "correct_choice": "strace -p 3190",
+    "accepted_commands": [
+      "strace -p 3190",
+      "sudo strace -p 3190"
+    ],
+    "hint": "Pass -p <PID> to strace.",
+    "explanation": "Domain 5.0 (Troubleshooting): `strace -p 3190` attaches to PID 3190 and streams kernel syscalls (`openat`, `read`, `connect`, `futex`) and `errno` returns. Running `strace 3190` without `-p` tries to execute a binary named `3190`."
+  }
+]

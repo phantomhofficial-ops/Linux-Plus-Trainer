@@ -1,0 +1,691 @@
+[
+  {
+    "id": "pkg_01",
+    "domain": "2.0 Services and User Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "beginner",
+    "prompt": "Refresh the local APT package index metadata from configured repositories on Ubuntu/Debian (as root) without upgrading installed packages yet.",
+    "choices": [
+      "apt update",
+      "apt upgrade",
+      "apt install",
+      "dpkg --update"
+    ],
+    "correct_choice": "apt update",
+    "accepted_commands": [
+      "apt update",
+      "sudo apt update",
+      "apt-get update",
+      "sudo apt-get update"
+    ],
+    "hint": "Use apt with the update subcommand.",
+    "explanation": "Domain 2.0 (Services and User Management): `apt update` fetches the latest package lists from repositories in `/etc/apt/sources.list*`. Running `apt update` first ensures `apt install` and `apt upgrade` see current versions and security patches."
+  },
+  {
+    "id": "pkg_02",
+    "domain": "2.0 Services and User Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "beginner",
+    "prompt": "Install the htop package on a RHEL/Rocky/AlmaLinux system using dnf (as root), automatically confirming yes to prompts.",
+    "choices": [
+      "dnf install -y htop",
+      "dnf update -y htop",
+      "rpm -i htop",
+      "dnf search htop"
+    ],
+    "correct_choice": "dnf install -y htop",
+    "accepted_commands": [
+      "dnf install -y htop",
+      "dnf -y install htop",
+      "sudo dnf install -y htop",
+      "sudo dnf -y install htop"
+    ],
+    "hint": "Combine dnf install with -y (assume yes) and package name htop.",
+    "explanation": "Domain 2.0 (Services and User Management): `dnf install -y htop` resolves dependencies from configured repositories and installs `htop` non-interactively (`-y`). `rpm -i` requires a local `.rpm` file and does not fetch dependencies from repositories."
+  },
+  {
+    "id": "pkg_03",
+    "domain": "2.0 Services and User Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "beginner",
+    "prompt": "List ALL Podman containers on the host, including stopped and exited containers as well as currently running ones.",
+    "choices": [
+      "podman ps -a",
+      "podman ps",
+      "podman images -a",
+      "podman logs -a"
+    ],
+    "correct_choice": "podman ps -a",
+    "accepted_commands": [
+      "podman ps -a",
+      "podman ps --all",
+      "podman container ls -a"
+    ],
+    "hint": "Pass the all flag (-a) to podman ps.",
+    "explanation": "Domain 2.0 (Services and User Management): `podman ps` lists only running containers by default; adding `-a` (`--all`) includes exited, created, and stopped containers so you can inspect failures or clean up old containers. `podman images` lists container images rather than container instances."
+  },
+  {
+    "id": "pkg_04",
+    "domain": "2.0 Services and User Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "beginner",
+    "prompt": "Display the stdout and stderr console logs emitted by the Docker container named web-api.",
+    "choices": [
+      "docker logs web-api",
+      "docker ps web-api",
+      "docker inspect web-api",
+      "journalctl -u web-api"
+    ],
+    "correct_choice": "docker logs web-api",
+    "accepted_commands": [
+      "docker logs web-api",
+      "docker container logs web-api",
+      "sudo docker logs web-api",
+      "sudo docker container logs web-api"
+    ],
+    "hint": "Use the logs subcommand of docker.",
+    "explanation": "Domain 2.0 (Services and User Management): `docker logs web-api` fetches the captured stdout/stderr stream from container `web-api` for troubleshooting startup or runtime errors. `docker inspect` dumps JSON container metadata rather than application output."
+  },
+  {
+    "id": "pkg_05",
+    "domain": "1.0 System Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "beginner",
+    "prompt": "Print only the running Linux kernel release version string (for example, 6.8.0-45-generic).",
+    "choices": [
+      "uname -r",
+      "uname -m",
+      "cat /etc/os-release",
+      "lsmod"
+    ],
+    "correct_choice": "uname -r",
+    "accepted_commands": [
+      "uname -r",
+      "uname --kernel-release"
+    ],
+    "hint": "Use uname with the release flag (-r).",
+    "explanation": "Domain 1.0 (System Management): `uname -r` (`--kernel-release`) prints only the kernel release string, which corresponds to `/lib/modules/$(uname -r)`. `uname -m` shows CPU architecture (`x86_64`), and `/etc/os-release` identifies the Linux distribution rather than the kernel version."
+  },
+  {
+    "id": "pkg_06",
+    "domain": "1.0 System Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "beginner",
+    "prompt": "List all kernel modules currently loaded into the running Linux kernel.",
+    "choices": [
+      "lsmod",
+      "modprobe -l",
+      "insmod",
+      "uname -a"
+    ],
+    "correct_choice": "lsmod",
+    "accepted_commands": [
+      "lsmod"
+    ],
+    "hint": "Think 'list modules' as a single five-letter command.",
+    "explanation": "Domain 1.0 (System Management): `lsmod` formats `/proc/modules` into columns showing module name, memory size, and usage count/dependencies. `insmod` loads a module file manually, and `modprobe` loads or removes modules with dependency resolution."
+  },
+  {
+    "id": "pkg_07",
+    "domain": "5.0 Troubleshooting",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "beginner",
+    "prompt": "View kernel ring buffer diagnostic messages (such as hardware, disk, and driver errors) formatted with human-readable timestamps (as root).",
+    "choices": [
+      "dmesg -T",
+      "dmesg -c",
+      "journalctl -r",
+      "lsmod -t"
+    ],
+    "correct_choice": "dmesg -T",
+    "accepted_commands": [
+      "dmesg -T",
+      "dmesg --ctime",
+      "sudo dmesg -T",
+      "sudo dmesg --ctime"
+    ],
+    "hint": "Pass uppercase -T to dmesg for human-readable date/time stamps.",
+    "explanation": "Domain 5.0 (Troubleshooting): `dmesg -T` (`--ctime`) converts raw kernel uptime seconds into human-readable wall-clock timestamps when reviewing hardware or OOM killer events. Beware of `dmesg -c`, which clears the ring buffer after printing."
+  },
+  {
+    "id": "pkg_08",
+    "domain": "5.0 Troubleshooting",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "beginner",
+    "prompt": "Display total, used, free, and available RAM and swap memory in human-readable units (GiB/MiB).",
+    "choices": [
+      "free -h",
+      "df -h",
+      "uptime -h",
+      "vmstat -h"
+    ],
+    "correct_choice": "free -h",
+    "accepted_commands": [
+      "free -h",
+      "free --human"
+    ],
+    "hint": "Use free with the human-readable flag (-h).",
+    "explanation": "Domain 5.0 (Troubleshooting): `free -h` summarizes physical memory (`Mem`) and `Swap` including `buff/cache` and `available` memory in GiB/MiB. `df -h` checks disk filesystem capacity rather than RAM."
+  },
+  {
+    "id": "pkg_09",
+    "domain": "5.0 Troubleshooting",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "beginner",
+    "prompt": "Show how long the system has been running, how many users are logged in, and the 1-, 5-, and 15-minute CPU/I/O load averages in one command.",
+    "choices": [
+      "uptime",
+      "uname -a",
+      "free -h",
+      "last reboot"
+    ],
+    "correct_choice": "uptime",
+    "accepted_commands": [
+      "uptime"
+    ],
+    "hint": "This single six-letter command displays how long the host has been up.",
+    "explanation": "Domain 5.0 (Troubleshooting): `uptime` outputs the current clock time, time since boot, active user count, and 1/5/15-minute load averages—making it a rapid triage check for sudden reboots or CPU saturation."
+  },
+  {
+    "id": "pkg_10",
+    "domain": "5.0 Troubleshooting",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "beginner",
+    "prompt": "Identify which process (name and PID) currently has network port 8080 open (as root) using lsof.",
+    "choices": [
+      "lsof -i :8080",
+      "lsof -p 8080",
+      "lsof /8080",
+      "ss -p 8080"
+    ],
+    "correct_choice": "lsof -i :8080",
+    "accepted_commands": [
+      "lsof -i :8080",
+      "lsof -i:8080",
+      "sudo lsof -i :8080",
+      "sudo lsof -i:8080"
+    ],
+    "hint": "Use lsof with -i and :8080.",
+    "explanation": "Domain 5.0 (Troubleshooting): `lsof -i :8080` lists open Internet sockets (`-i`) bound to port `8080`, revealing the command name, PID, and owning user. `lsof -p 8080` filters by PID 8080 instead of port 8080."
+  },
+  {
+    "id": "pkg_11",
+    "domain": "5.0 Troubleshooting",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "beginner",
+    "prompt": "Use curl to send an HTTP HEAD request and print only the HTTP response status and headers for https://example.com without downloading the body.",
+    "choices": [
+      "curl -I https://example.com",
+      "curl -O https://example.com",
+      "curl -s https://example.com",
+      "wget -I https://example.com"
+    ],
+    "correct_choice": "curl -I https://example.com",
+    "accepted_commands": [
+      "curl -I https://example.com",
+      "curl --head https://example.com"
+    ],
+    "hint": "Pass uppercase -I (or --head) to curl.",
+    "explanation": "Domain 5.0 (Troubleshooting): `curl -I https://example.com` (`--head`) fetches only the HTTP response headers (status code, server, content-type, redirects) without printing the response body. `-O` saves the downloaded file to disk, and `-s` enables silent mode."
+  },
+  {
+    "id": "pkg_12",
+    "domain": "5.0 Troubleshooting",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "beginner",
+    "prompt": "Trace the hop-by-hop Layer 3 network route packets take from your host to example.com to pinpoint where latency or packet drops occur.",
+    "choices": [
+      "traceroute example.com",
+      "ip route example.com",
+      "dig example.com",
+      "ss -r example.com"
+    ],
+    "correct_choice": "traceroute example.com",
+    "accepted_commands": [
+      "traceroute example.com"
+    ],
+    "hint": "Use the diagnostic command named after tracing a network route.",
+    "explanation": "Domain 5.0 (Troubleshooting): `traceroute example.com` increments IP TTL values to reveal each intermediate router hop and its round-trip latency along the path. `ip route` inspects only the local routing table, and `dig` performs DNS lookups."
+  },
+  {
+    "id": "pkg_13",
+    "domain": "2.0 Services and User Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "intermediate",
+    "prompt": "Query the local RPM package database on RHEL/Rocky to identify which installed package owns /etc/ssh/sshd_config.",
+    "choices": [
+      "rpm -qf /etc/ssh/sshd_config",
+      "rpm -ql /etc/ssh/sshd_config",
+      "rpm -qa /etc/ssh/sshd_config",
+      "dnf list /etc/ssh/sshd_config"
+    ],
+    "correct_choice": "rpm -qf /etc/ssh/sshd_config",
+    "accepted_commands": [
+      "rpm -qf /etc/ssh/sshd_config",
+      "rpm -q -f /etc/ssh/sshd_config",
+      "rpm --query --file /etc/ssh/sshd_config"
+    ],
+    "hint": "Combine rpm's query (-q) and file-owner (-f) flags.",
+    "explanation": "Domain 2.0 (Services and User Management): `rpm -qf /etc/ssh/sshd_config` queries (`-q`) which RPM owns a file (`-f`, e.g., `openssh-server`). `-ql` lists files owned by a package name, and `-qa` lists all installed RPM packages."
+  },
+  {
+    "id": "pkg_14",
+    "domain": "2.0 Services and User Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "intermediate",
+    "prompt": "Inspect recent package install, upgrade, and removal transactions in dnf (as root) so you can identify a transaction ID for auditing or rollback.",
+    "choices": [
+      "dnf history",
+      "dnf log",
+      "rpm -qh",
+      "dnf list installed"
+    ],
+    "correct_choice": "dnf history",
+    "accepted_commands": [
+      "dnf history",
+      "dnf history list",
+      "sudo dnf history",
+      "sudo dnf history list"
+    ],
+    "hint": "Use dnf with the history subcommand.",
+    "explanation": "Domain 2.0 (Services and User Management): `dnf history` lists transaction IDs, timestamps, actions, and altered package counts so administrators can inspect (`dnf history info <ID>`) or undo (`dnf history undo <ID>`) problematic updates."
+  },
+  {
+    "id": "pkg_15",
+    "domain": "2.0 Services and User Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "intermediate",
+    "prompt": "Launch a detached Docker container named web from image nginx:latest, publishing host port 8080 to container port 80.",
+    "choices": [
+      "docker run -d --name web -p 8080:80 nginx:latest",
+      "docker run -it --name web -p 80:8080 nginx:latest",
+      "docker start -d --name web -p 8080:80 nginx:latest",
+      "docker run -d --name web -P 8080:80 nginx:latest"
+    ],
+    "correct_choice": "docker run -d --name web -p 8080:80 nginx:latest",
+    "accepted_commands": [
+      "docker run -d --name web -p 8080:80 nginx:latest",
+      "docker run -d -p 8080:80 --name web nginx:latest",
+      "docker run --name web -d -p 8080:80 nginx:latest",
+      "docker run -p 8080:80 -d --name web nginx:latest",
+      "sudo docker run -d --name web -p 8080:80 nginx:latest",
+      "sudo docker run -d -p 8080:80 --name web nginx:latest"
+    ],
+    "hint": "Combine docker run with -d (detached), --name web, and -p 8080:80 (host:container).",
+    "explanation": "Domain 2.0 (Services and User Management): `docker run -d --name web -p 8080:80 nginx:latest` runs in the background (`-d`), assigns container name `web`, and maps host TCP 8080 to container TCP 80 (`-p host:container`). Uppercase `-P` publishes exposed ports randomly."
+  },
+  {
+    "id": "pkg_16",
+    "domain": "2.0 Services and User Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "intermediate",
+    "prompt": "Open an interactive /bin/bash shell with a pseudo-TTY inside the already-running Podman container named api-srv.",
+    "choices": [
+      "podman exec -it api-srv /bin/bash",
+      "podman run -it api-srv /bin/bash",
+      "podman attach -it api-srv /bin/bash",
+      "podman logs -it api-srv /bin/bash"
+    ],
+    "correct_choice": "podman exec -it api-srv /bin/bash",
+    "accepted_commands": [
+      "podman exec -it api-srv /bin/bash",
+      "podman exec -ti api-srv /bin/bash",
+      "podman exec -i -t api-srv /bin/bash",
+      "podman exec -it api-srv bash",
+      "podman exec -ti api-srv bash"
+    ],
+    "hint": "Use podman exec with -it before the container name and shell.",
+    "explanation": "Domain 2.0 (Services and User Management): `podman exec -it api-srv /bin/bash` runs a new interactive (`-i`) TTY (`-t`) Bash session inside the existing running container `api-srv`. `podman run` starts a brand-new container rather than entering an active one."
+  },
+  {
+    "id": "pkg_17",
+    "domain": "2.0 Services and User Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "intermediate",
+    "prompt": "Build a container image tagged myapp:1.0 from the Containerfile/Dockerfile located in the current working directory (.).",
+    "choices": [
+      "docker build -t myapp:1.0 .",
+      "docker create -t myapp:1.0 .",
+      "docker tag myapp:1.0 .",
+      "docker pull -t myapp:1.0 ."
+    ],
+    "correct_choice": "docker build -t myapp:1.0 .",
+    "accepted_commands": [
+      "docker build -t myapp:1.0 .",
+      "docker image build -t myapp:1.0 .",
+      "sudo docker build -t myapp:1.0 ."
+    ],
+    "hint": "Use docker build with -t myapp:1.0 and build context dot (.).",
+    "explanation": "Domain 2.0 (Services and User Management): `docker build -t myapp:1.0 .` reads `./Dockerfile`, builds image layers using `.` as the build context, and tags the resulting image `myapp:1.0` (`-t`)."
+  },
+  {
+    "id": "pkg_18",
+    "domain": "1.0 System Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "intermediate",
+    "prompt": "Load the 8021q VLAN kernel module (as root) along with any dependent modules automatically.",
+    "choices": [
+      "modprobe 8021q",
+      "lsmod 8021q",
+      "insmod 8021q",
+      "rmmod 8021q"
+    ],
+    "correct_choice": "modprobe 8021q",
+    "accepted_commands": [
+      "modprobe 8021q",
+      "sudo modprobe 8021q"
+    ],
+    "hint": "Use the module utility that resolves dependencies automatically.",
+    "explanation": "Domain 1.0 (System Management): `modprobe 8021q` resolves module dependencies via `modules.dep` and loads `8021q` by module name. `insmod` requires an exact `.ko` file path and fails if prerequisites aren't already loaded, while `rmmod` unloads modules."
+  },
+  {
+    "id": "pkg_19",
+    "domain": "5.0 Troubleshooting",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "intermediate",
+    "prompt": "Collect virtual memory, process queue, swap, I/O, and CPU statistics at 2-second intervals for a total of 5 reports using vmstat.",
+    "choices": [
+      "vmstat 2 5",
+      "vmstat -n 2 -c 5",
+      "vmstat 5 2",
+      "free -s 2 5"
+    ],
+    "correct_choice": "vmstat 2 5",
+    "accepted_commands": [
+      "vmstat 2 5"
+    ],
+    "hint": "Syntax is vmstat <interval_seconds> <count>.",
+    "explanation": "Domain 5.0 (Troubleshooting): `vmstat 2 5` prints 5 snapshots spaced 2 seconds apart (`r`/`b` run/blocked queues, `si`/`so` swap I/O, `us`/`sy`/`id`/`wa` CPU percentages). Note the first line always shows averages since boot."
+  },
+  {
+    "id": "pkg_20",
+    "domain": "5.0 Troubleshooting",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "intermediate",
+    "prompt": "Capture network packets on interface eth0 (as root) without resolving hostnames or port names, filtering only for tcp port 53 traffic using tcpdump.",
+    "choices": [
+      "tcpdump -nn -i eth0 tcp port 53",
+      "tcpdump -i eth0 tcp 53",
+      "ss -nn -i eth0 tcp port 53",
+      "tcpdump -p eth0 port 53"
+    ],
+    "correct_choice": "tcpdump -nn -i eth0 tcp port 53",
+    "accepted_commands": [
+      "tcpdump -nn -i eth0 tcp port 53",
+      "tcpdump -i eth0 -nn tcp port 53",
+      "tcpdump -n -i eth0 tcp port 53",
+      "tcpdump -i eth0 -n tcp port 53",
+      "sudo tcpdump -nn -i eth0 tcp port 53",
+      "sudo tcpdump -i eth0 -nn tcp port 53"
+    ],
+    "hint": "Combine -nn (numeric IPs and ports), -i eth0, and BPF filter tcp port 53.",
+    "explanation": "Domain 5.0 (Troubleshooting): `tcpdump -nn -i eth0 tcp port 53` listens on `eth0` (`-i`), suppresses slow DNS/service lookups (`-nn`), and applies a BPF filter for TCP port 53 packets."
+  },
+  {
+    "id": "pkg_21",
+    "domain": "5.0 Troubleshooting",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "intermediate",
+    "prompt": "Use netcat (nc) in zero-I/O scan mode with verbose output to test whether TCP port 5432 is reachable on host 10.0.20.15 without sending application data.",
+    "choices": [
+      "nc -zv 10.0.20.15 5432",
+      "nc -lv 10.0.20.15 5432",
+      "nc -p 5432 10.0.20.15",
+      "ping -p 5432 10.0.20.15"
+    ],
+    "correct_choice": "nc -zv 10.0.20.15 5432",
+    "accepted_commands": [
+      "nc -zv 10.0.20.15 5432",
+      "nc -vz 10.0.20.15 5432",
+      "nc -z -v 10.0.20.15 5432",
+      "nc -v -z 10.0.20.15 5432"
+    ],
+    "hint": "Combine nc flags -z (zero-I/O scan) and -v (verbose) before host and port.",
+    "explanation": "Domain 5.0 (Troubleshooting): `nc -zv 10.0.20.15 5432` performs a TCP three-way handshake to verify port `5432` is open and immediately closes the connection (`-z`) while printing connection status (`-v`). `-l` puts netcat into listening server mode."
+  },
+  {
+    "id": "pkg_22",
+    "domain": "5.0 Troubleshooting",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "intermediate",
+    "prompt": "After an unexpected server crash and reboot, display systemd journal logs specifically from the previous boot session (as root).",
+    "choices": [
+      "journalctl -b -1",
+      "journalctl -b 1",
+      "journalctl --last-boot",
+      "dmesg -b -1"
+    ],
+    "correct_choice": "journalctl -b -1",
+    "accepted_commands": [
+      "journalctl -b -1",
+      "journalctl --boot=-1",
+      "journalctl -b-1",
+      "sudo journalctl -b -1",
+      "sudo journalctl --boot=-1"
+    ],
+    "hint": "Pass boot offset -1 to journalctl -b.",
+    "explanation": "Domain 5.0 (Troubleshooting): `journalctl -b -1` queries persistent journal logs from the boot immediately prior to the current one (`0` is current boot; `-1` is previous boot), letting you inspect kernel panics or service failures leading up to a crash."
+  },
+  {
+    "id": "pkg_23",
+    "domain": "1.0 System Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "hard",
+    "prompt": "After editing /etc/default/grub on a RHEL/Rocky Linux BIOS system (as root), regenerate the GRUB2 boot configuration file at /boot/grub2/grub.cfg.",
+    "choices": [
+      "grub2-mkconfig -o /boot/grub2/grub.cfg",
+      "grub2-install /boot/grub2/grub.cfg",
+      "systemctl reload grub2",
+      "dracut -o /boot/grub2/grub.cfg"
+    ],
+    "correct_choice": "grub2-mkconfig -o /boot/grub2/grub.cfg",
+    "accepted_commands": [
+      "grub2-mkconfig -o /boot/grub2/grub.cfg",
+      "sudo grub2-mkconfig -o /boot/grub2/grub.cfg"
+    ],
+    "hint": "Use grub2-mkconfig with -o followed by /boot/grub2/grub.cfg.",
+    "explanation": "Domain 1.0 (System Management): Editing `/etc/default/grub` has no effect until `grub2-mkconfig -o /boot/grub2/grub.cfg` compiles the kernel arguments and menu entries into `/boot/grub2/grub.cfg`. `grub2-install` writes bootloader binaries to a disk MBR rather than building `grub.cfg`."
+  },
+  {
+    "id": "pkg_24",
+    "domain": "1.0 System Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "hard",
+    "prompt": "Forcefully rebuild the initramfs image for the currently running kernel (as root) using dracut after changing storage or RAID kernel module configuration.",
+    "choices": [
+      "dracut -f",
+      "grub2-mkconfig -f",
+      "mkfs.initrd -f",
+      "modprobe -f initramfs"
+    ],
+    "correct_choice": "dracut -f",
+    "accepted_commands": [
+      "dracut -f",
+      "dracut --force",
+      "sudo dracut -f",
+      "sudo dracut --force"
+    ],
+    "hint": "Use dracut with the force flag (-f).",
+    "explanation": "Domain 1.0 (System Management): `dracut -f` (`--force`) overwrites and regenerates `/boot/initramfs-$(uname -r).img` so updated LVM/RAID/multipath drivers and `/etc/crypttab` entries are available during early boot."
+  },
+  {
+    "id": "pkg_25",
+    "domain": "5.0 Troubleshooting",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "hard",
+    "prompt": "df -h reports /var is 100% full, yet du -sh /var shows plenty of space—indicating a deleted file is still held open by a process. Use lsof (as root) to list open files with a link count below 1.",
+    "choices": [
+      "lsof +L1",
+      "lsof -d 0",
+      "lsof --deleted",
+      "fuser -d /var"
+    ],
+    "correct_choice": "lsof +L1",
+    "accepted_commands": [
+      "lsof +L1",
+      "lsof +L1 /var",
+      "sudo lsof +L1",
+      "sudo lsof +L1 /var"
+    ],
+    "hint": "Pass +L1 to lsof (files with fewer than 1 hard link).",
+    "explanation": "Domain 5.0 (Troubleshooting): When a log file is deleted while still opened by a daemon, its link count drops to 0 (`nlink < 1`) while its disk blocks remain allocated until the process closes the descriptor or restarts. `lsof +L1` reveals the holding PID and `(deleted)` path."
+  },
+  {
+    "id": "pkg_26",
+    "domain": "5.0 Troubleshooting",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "hard",
+    "prompt": "Inspect extended per-block-device disk I/O utilization and latency metrics (%util, await, r/s, w/s) using iostat while hiding idle devices with zero activity.",
+    "choices": [
+      "iostat -xz",
+      "iostat -h",
+      "vmstat -xz",
+      "iotop -xz"
+    ],
+    "correct_choice": "iostat -xz",
+    "accepted_commands": [
+      "iostat -xz",
+      "iostat -zx",
+      "iostat -x -z",
+      "iostat -z -x"
+    ],
+    "hint": "Combine iostat flags -x (extended stats) and -z (omit zero-activity devices).",
+    "explanation": "Domain 5.0 (Troubleshooting): `iostat -xz` displays extended I/O saturation and queue latency columns (`-x`) while omitting unused loop/idle devices (`-z`) to highlight genuine storage bottlenecks."
+  },
+  {
+    "id": "pkg_27",
+    "domain": "5.0 Troubleshooting",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "hard",
+    "prompt": "Capture raw network traffic on interface eth0 (as root) using tcpdump and save the binary packet trace directly to /tmp/capture.pcap for later inspection.",
+    "choices": [
+      "tcpdump -i eth0 -w /tmp/capture.pcap",
+      "tcpdump -i eth0 > /tmp/capture.pcap",
+      "tcpdump -i eth0 -o /tmp/capture.pcap",
+      "tcpdump -r /tmp/capture.pcap -i eth0"
+    ],
+    "correct_choice": "tcpdump -i eth0 -w /tmp/capture.pcap",
+    "accepted_commands": [
+      "tcpdump -i eth0 -w /tmp/capture.pcap",
+      "tcpdump -w /tmp/capture.pcap -i eth0",
+      "sudo tcpdump -i eth0 -w /tmp/capture.pcap",
+      "sudo tcpdump -w /tmp/capture.pcap -i eth0"
+    ],
+    "hint": "Combine -i eth0 with -w <output_pcap>.",
+    "explanation": "Domain 5.0 (Troubleshooting): `tcpdump -i eth0 -w /tmp/capture.pcap` writes raw binary packets (`-w`) instead of decoded text lines (which `>` would capture). `-r` reads an existing `.pcap` file rather than writing one."
+  },
+  {
+    "id": "pkg_28",
+    "domain": "5.0 Troubleshooting",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "hard",
+    "prompt": "Query DNS resolver 8.8.8.8 specifically for the MX records of example.com using dig, printing ONLY the terse answer values with +short.",
+    "choices": [
+      "dig @8.8.8.8 example.com MX +short",
+      "dig 8.8.8.8 example.com MX +short",
+      "dig @8.8.8.8 +short MX",
+      "host -t MX @8.8.8.8 example.com"
+    ],
+    "correct_choice": "dig @8.8.8.8 example.com MX +short",
+    "accepted_commands": [
+      "dig @8.8.8.8 example.com MX +short",
+      "dig @8.8.8.8 example.com mx +short",
+      "dig @8.8.8.8 +short example.com MX",
+      "dig @8.8.8.8 +short example.com mx",
+      "dig example.com MX @8.8.8.8 +short",
+      "dig +short @8.8.8.8 example.com MX"
+    ],
+    "hint": "Combine @8.8.8.8, example.com, MX, and +short with dig.",
+    "explanation": "Domain 5.0 (Troubleshooting): `dig @8.8.8.8 example.com MX +short` isolates external DNS mail-routing verification against `8.8.8.8` while stripping verbose headers for clean scripting or comparison."
+  },
+  {
+    "id": "pkg_29",
+    "domain": "2.0 Services and User Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "hard",
+    "prompt": "Create a custom user-defined bridge container network named backend-net using docker (or podman) so multi-container apps can resolve each other by container name.",
+    "choices": [
+      "docker network create backend-net",
+      "docker net create backend-net",
+      "docker bridge create backend-net",
+      "ip link add backend-net type bridge"
+    ],
+    "correct_choice": "docker network create backend-net",
+    "accepted_commands": [
+      "docker network create backend-net",
+      "podman network create backend-net",
+      "sudo docker network create backend-net",
+      "sudo podman network create backend-net"
+    ],
+    "hint": "Use the network create subcommand on docker or podman.",
+    "explanation": "Domain 2.0 (Services and User Management): User-defined container networks created via `docker network create backend-net` (or `podman network create`) provide embedded container DNS resolution and network isolation compared to the legacy default bridge."
+  },
+  {
+    "id": "pkg_30",
+    "domain": "2.0 Services and User Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "hard",
+    "prompt": "Inspect the host mountpoint path and metadata JSON of persistent container volume pgdata using podman (or docker).",
+    "choices": [
+      "podman volume inspect pgdata",
+      "podman inspect volume pgdata",
+      "podman volume ls pgdata",
+      "podman ps --volume pgdata"
+    ],
+    "correct_choice": "podman volume inspect pgdata",
+    "accepted_commands": [
+      "podman volume inspect pgdata",
+      "docker volume inspect pgdata",
+      "sudo podman volume inspect pgdata",
+      "sudo docker volume inspect pgdata"
+    ],
+    "hint": "Use volume inspect <volume_name> on podman or docker.",
+    "explanation": "Domain 2.0 (Services and User Management): `podman volume inspect pgdata` (or `docker volume inspect`) outputs the volume's driver, labels, creation timestamp, and host `Mountpoint` path for backups or storage audits."
+  },
+  {
+    "id": "pkg_31",
+    "domain": "2.0 Services and User Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "hard",
+    "prompt": "Reclaim disk space from container runtime caches by removing all stopped containers, unused networks, dangling build cache, AND all unused images (not just dangling ones) with docker (or podman).",
+    "choices": [
+      "docker system prune -a",
+      "docker system prune",
+      "docker image rm -a",
+      "docker clean --all"
+    ],
+    "correct_choice": "docker system prune -a",
+    "accepted_commands": [
+      "docker system prune -a",
+      "docker system prune --all",
+      "docker system prune -af",
+      "podman system prune -a",
+      "podman system prune --all",
+      "podman system prune -af",
+      "sudo docker system prune -a",
+      "sudo podman system prune -a"
+    ],
+    "hint": "Add -a (--all) to docker/podman system prune.",
+    "explanation": "Domain 2.0 (Services and User Management): Plain `system prune` only removes untagged dangling images. Adding `-a` (`--all`) also deletes any unused tagged images no longer referenced by an existing container."
+  },
+  {
+    "id": "pkg_32",
+    "domain": "1.0 System Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "hard",
+    "prompt": "Inspect the file path, license, description, dependencies, and configurable kernel parameters of kernel driver module e1000e without loading or unloading it.",
+    "choices": [
+      "modinfo e1000e",
+      "lsmod e1000e",
+      "modprobe -i e1000e",
+      "insmod --info e1000e"
+    ],
+    "correct_choice": "modinfo e1000e",
+    "accepted_commands": [
+      "modinfo e1000e",
+      "sudo modinfo e1000e"
+    ],
+    "hint": "Use the module-information command (modinfo).",
+    "explanation": "Domain 1.0 (System Management): `modinfo e1000e` reads metadata embedded inside the `.ko` kernel module file, printing `filename`, `depends`, `parm` tunable options, and version details without changing loaded kernel state."
+  }
+]

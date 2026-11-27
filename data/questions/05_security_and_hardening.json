@@ -1,0 +1,683 @@
+[
+  {
+    "id": "sec_01",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "beginner",
+    "prompt": "Connect over SSH as user admin to host 10.0.10.25 using custom SSH port 2222.",
+    "choices": [
+      "ssh -p 2222 admin@10.0.10.25",
+      "ssh -P 2222 admin@10.0.10.25",
+      "ssh admin@10.0.10.25:2222",
+      "ssh -u admin -p 2222 10.0.10.25"
+    ],
+    "correct_choice": "ssh -p 2222 admin@10.0.10.25",
+    "accepted_commands": [
+      "ssh -p 2222 admin@10.0.10.25",
+      "ssh admin@10.0.10.25 -p 2222",
+      "ssh -l admin -p 2222 10.0.10.25",
+      "ssh -p 2222 -l admin 10.0.10.25"
+    ],
+    "hint": "ssh uses lowercase -p for port (unlike scp which uses uppercase -P).",
+    "explanation": "Domain 3.0 (Security): `ssh -p 2222 admin@10.0.10.25` connects on TCP port 2222 (`-p`) as user `admin`. Unlike `scp`, `ssh` uses lowercase `-p` (uppercase `-P` is invalid in `ssh`), and colon port syntax (`host:2222`) is not supported by `ssh`."
+  },
+  {
+    "id": "sec_02",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "beginner",
+    "prompt": "Generate a new Ed25519 SSH key pair for key-based authentication.",
+    "choices": [
+      "ssh-keygen -t ed25519",
+      "ssh-copy-id -t ed25519",
+      "ssh -t ed25519",
+      "openssl genrsa -t ed25519"
+    ],
+    "correct_choice": "ssh-keygen -t ed25519",
+    "accepted_commands": [
+      "ssh-keygen -t ed25519"
+    ],
+    "hint": "Use ssh-keygen with the key-type flag (-t).",
+    "explanation": "Domain 3.0 (Security): `ssh-keygen -t ed25519` generates a modern Ed25519 public/private SSH key pair (`~/.ssh/id_ed25519` and `.pub`). `ssh-copy-id` installs an already-generated public key onto a remote server's `~/.ssh/authorized_keys`."
+  },
+  {
+    "id": "sec_03",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "beginner",
+    "prompt": "Securely copy local file backup.sql over SSH to /tmp/backup.sql on remote server 10.0.10.25 as user deploy.",
+    "choices": [
+      "scp backup.sql deploy@10.0.10.25:/tmp/backup.sql",
+      "ssh backup.sql deploy@10.0.10.25:/tmp/backup.sql",
+      "scp deploy@10.0.10.25:/tmp/backup.sql backup.sql",
+      "cp backup.sql deploy@10.0.10.25:/tmp/backup.sql"
+    ],
+    "correct_choice": "scp backup.sql deploy@10.0.10.25:/tmp/backup.sql",
+    "accepted_commands": [
+      "scp backup.sql deploy@10.0.10.25:/tmp/backup.sql",
+      "scp ./backup.sql deploy@10.0.10.25:/tmp/backup.sql",
+      "scp backup.sql deploy@10.0.10.25:/tmp/"
+    ],
+    "hint": "Use scp <source> <user>@<host>:<remote_path>.",
+    "explanation": "Domain 3.0 (Security): `scp backup.sql deploy@10.0.10.25:/tmp/backup.sql` transfers files encrypted over SSH from the local path (source first) to the remote destination (`user@host:path`). Reversing source and destination downloads from the remote server instead."
+  },
+  {
+    "id": "sec_04",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "beginner",
+    "prompt": "Using Uncomplicated Firewall (ufw) on Ubuntu/Debian, allow incoming TCP traffic on port 443 (as root).",
+    "choices": [
+      "ufw allow 443/tcp",
+      "ufw enable 443/tcp",
+      "ufw permit 443/tcp",
+      "ufw open 443/tcp"
+    ],
+    "correct_choice": "ufw allow 443/tcp",
+    "accepted_commands": [
+      "ufw allow 443/tcp",
+      "sudo ufw allow 443/tcp"
+    ],
+    "hint": "Use the allow subcommand of ufw with 443/tcp.",
+    "explanation": "Domain 3.0 (Security): `ufw allow 443/tcp` adds a firewall rule permitting inbound TCP port 443 (HTTPS) traffic. `ufw enable` activates the firewall daemon rather than creating a port rule, and `permit`/`open` are invalid `ufw` actions."
+  },
+  {
+    "id": "sec_05",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "beginner",
+    "prompt": "Using firewalld's CLI tool firewall-cmd, permanently allow the https service in the default zone (as root).",
+    "choices": [
+      "firewall-cmd --permanent --add-service=https",
+      "firewall-cmd --add-service=https",
+      "firewall-cmd --permanent --allow=https",
+      "firewall-cmd --add-port=https --permanent"
+    ],
+    "correct_choice": "firewall-cmd --permanent --add-service=https",
+    "accepted_commands": [
+      "firewall-cmd --permanent --add-service=https",
+      "firewall-cmd --add-service=https --permanent",
+      "sudo firewall-cmd --permanent --add-service=https",
+      "sudo firewall-cmd --add-service=https --permanent"
+    ],
+    "hint": "Combine --permanent and --add-service=https with firewall-cmd.",
+    "explanation": "Domain 3.0 (Security): `firewall-cmd --permanent --add-service=https` writes a persistent rule for `https` (TCP 443) in the default zone so it survives firewall reloads and reboots. Omitting `--permanent` applies the rule only to runtime memory, and `--add-port` expects `port/proto` (e.g., `443/tcp`) rather than a service name."
+  },
+  {
+    "id": "sec_06",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "beginner",
+    "prompt": "Safely edit the /etc/sudoers policy file (as root) using the dedicated tool that locks the file and checks syntax before saving.",
+    "choices": [
+      "visudo",
+      "nano /etc/sudoers",
+      "sudo -e /etc/sudoers",
+      "usermod --sudoers"
+    ],
+    "correct_choice": "visudo",
+    "accepted_commands": [
+      "visudo",
+      "sudo visudo"
+    ],
+    "hint": "This single command invokes your editor with built-in sudoers syntax checking.",
+    "explanation": "Domain 3.0 (Security): `visudo` locks `/etc/sudoers` against simultaneous edits and parses the configuration before committing changes, preventing syntax errors that would break all `sudo` access on the host."
+  },
+  {
+    "id": "sec_07",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "beginner",
+    "prompt": "Print the current SELinux enforcement mode (Enforcing, Permissive, or Disabled) in a single word.",
+    "choices": [
+      "getenforce",
+      "setenforce",
+      "sestatus -v",
+      "ls -Z"
+    ],
+    "correct_choice": "getenforce",
+    "accepted_commands": [
+      "getenforce"
+    ],
+    "hint": "This single command begins with 'get' and checks SELinux enforcement.",
+    "explanation": "Domain 3.0 (Security): `getenforce` outputs the active SELinux state (`Enforcing`, `Permissive`, or `Disabled`). `setenforce` changes between `Enforcing` (`1`) and `Permissive` (`0`), `sestatus` prints multi-line policy status, and `ls -Z` shows file contexts."
+  },
+  {
+    "id": "sec_08",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "beginner",
+    "prompt": "Display the SELinux security context labels on files inside /var/www/html.",
+    "choices": [
+      "ls -Z /var/www/html",
+      "ls -a /var/www/html",
+      "ls -i /var/www/html",
+      "getfacl /var/www/html"
+    ],
+    "correct_choice": "ls -Z /var/www/html",
+    "accepted_commands": [
+      "ls -Z /var/www/html",
+      "ls -lZ /var/www/html",
+      "ls -Zl /var/www/html",
+      "ls -Z /var/www/html/",
+      "ls --context /var/www/html"
+    ],
+    "hint": "Pass the uppercase -Z flag to ls.",
+    "explanation": "Domain 3.0 (Security): `ls -Z /var/www/html` (`--context`) prints each file's SELinux context (`user:role:type:level`, e.g., `httpd_sys_content_t`) for verifying Mandatory Access Control policies. `ls -i` displays inode numbers, and `getfacl` prints POSIX ACLs."
+  },
+  {
+    "id": "sec_09",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "beginner",
+    "prompt": "Compute the SHA-256 cryptographic hash digest of linux-installer.iso in the current directory to verify file integrity.",
+    "choices": [
+      "sha256sum linux-installer.iso",
+      "md5sum linux-installer.iso",
+      "gpg --sha256 linux-installer.iso",
+      "cksum -256 linux-installer.iso"
+    ],
+    "correct_choice": "sha256sum linux-installer.iso",
+    "accepted_commands": [
+      "sha256sum linux-installer.iso",
+      "sha256sum ./linux-installer.iso"
+    ],
+    "hint": "Use the GNU coreutils command named after SHA-256 and sum.",
+    "explanation": "Domain 3.0 (Security): `sha256sum linux-installer.iso` calculates and outputs the 256-bit SHA-2 checksum so you can confirm the ISO wasn't corrupted or tampered with. `md5sum` computes the weaker legacy MD5 hash."
+  },
+  {
+    "id": "sec_10",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "beginner",
+    "prompt": "Inspect all standard permissions and extended POSIX Access Control List (ACL) entries on /srv/shared/report.csv.",
+    "choices": [
+      "getfacl /srv/shared/report.csv",
+      "setfacl -l /srv/shared/report.csv",
+      "ls -l /srv/shared/report.csv",
+      "stat /srv/shared/report.csv"
+    ],
+    "correct_choice": "getfacl /srv/shared/report.csv",
+    "accepted_commands": [
+      "getfacl /srv/shared/report.csv"
+    ],
+    "hint": "Use the 'get file ACL' command.",
+    "explanation": "Domain 3.0 (Security): `getfacl /srv/shared/report.csv` prints owner, group, mask, and every per-user or per-group ACL rule. `ls -l` only shows a `+` sign indicating an ACL exists without listing its entries, and `setfacl` modifies ACLs."
+  },
+  {
+    "id": "sec_11",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "beginner",
+    "prompt": "Grant user auditor read-only (r) POSIX ACL access on /srv/shared/report.csv (as root) using setfacl without changing the file's primary owner or group.",
+    "choices": [
+      "setfacl -m u:auditor:r /srv/shared/report.csv",
+      "setfacl -x u:auditor:r /srv/shared/report.csv",
+      "getfacl -m u:auditor:r /srv/shared/report.csv",
+      "chmod u+r auditor /srv/shared/report.csv"
+    ],
+    "correct_choice": "setfacl -m u:auditor:r /srv/shared/report.csv",
+    "accepted_commands": [
+      "setfacl -m u:auditor:r /srv/shared/report.csv",
+      "setfacl -m u:auditor:r-- /srv/shared/report.csv",
+      "setfacl -m user:auditor:r /srv/shared/report.csv",
+      "sudo setfacl -m u:auditor:r /srv/shared/report.csv",
+      "sudo setfacl -m u:auditor:r-- /srv/shared/report.csv"
+    ],
+    "hint": "Use setfacl with -m (modify) and specification u:auditor:r.",
+    "explanation": "Domain 3.0 (Security): `setfacl -m u:auditor:r /srv/shared/report.csv` modifies (`-m`) the file's ACL to add read (`r`) permission specifically for user `auditor`. `-x` removes an ACL entry rather than adding one."
+  },
+  {
+    "id": "sec_12",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "beginner",
+    "prompt": "Search the SSH daemon configuration file /etc/ssh/sshd_config (as root) using grep to inspect lines containing PermitRootLogin.",
+    "choices": [
+      "grep PermitRootLogin /etc/ssh/sshd_config",
+      "grep /etc/ssh/sshd_config PermitRootLogin",
+      "sshd -g PermitRootLogin",
+      "find /etc/ssh/sshd_config -name PermitRootLogin"
+    ],
+    "correct_choice": "grep PermitRootLogin /etc/ssh/sshd_config",
+    "accepted_commands": [
+      "grep PermitRootLogin /etc/ssh/sshd_config",
+      "grep \"PermitRootLogin\" /etc/ssh/sshd_config",
+      "grep 'PermitRootLogin' /etc/ssh/sshd_config",
+      "grep -i PermitRootLogin /etc/ssh/sshd_config",
+      "grep -i \"PermitRootLogin\" /etc/ssh/sshd_config",
+      "sudo grep PermitRootLogin /etc/ssh/sshd_config",
+      "sudo grep \"PermitRootLogin\" /etc/ssh/sshd_config",
+      "sudo grep -i PermitRootLogin /etc/ssh/sshd_config"
+    ],
+    "hint": "Pass the pattern PermitRootLogin first and the file /etc/ssh/sshd_config second to grep.",
+    "explanation": "Domain 3.0 (Security): `grep PermitRootLogin /etc/ssh/sshd_config` verifies whether root SSH login is hardened (`PermitRootLogin no` or `prohibit-password`). In `grep`, the pattern always precedes the target file path."
+  },
+  {
+    "id": "sec_13",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "intermediate",
+    "prompt": "Install your local default SSH public key onto remote host 10.0.10.25 for user deploy so key-based login replaces password prompts.",
+    "choices": [
+      "ssh-copy-id deploy@10.0.10.25",
+      "ssh-keygen deploy@10.0.10.25",
+      "ssh-add deploy@10.0.10.25",
+      "scp ~/.ssh/id_ed25519 deploy@10.0.10.25:~/"
+    ],
+    "correct_choice": "ssh-copy-id deploy@10.0.10.25",
+    "accepted_commands": [
+      "ssh-copy-id deploy@10.0.10.25"
+    ],
+    "hint": "Use the dedicated OpenSSH helper command named ssh-copy-id.",
+    "explanation": "Domain 3.0 (Security): `ssh-copy-id deploy@10.0.10.25` appends your public key to `~deploy/.ssh/authorized_keys` and ensures strict `0700`/`0600` permissions on the remote `.ssh` directory. Copying the private key (`id_ed25519`) to a server is a security anti-pattern."
+  },
+  {
+    "id": "sec_14",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "intermediate",
+    "prompt": "Temporarily switch SELinux from Enforcing to Permissive mode at runtime (as root) to log policy denials without blocking the service during troubleshooting.",
+    "choices": [
+      "setenforce 0",
+      "setenforce 1",
+      "getenforce 0",
+      "setsebool Permissive"
+    ],
+    "correct_choice": "setenforce 0",
+    "accepted_commands": [
+      "setenforce 0",
+      "setenforce Permissive",
+      "setenforce permissive",
+      "sudo setenforce 0",
+      "sudo setenforce Permissive"
+    ],
+    "hint": "Use setenforce with 0 (or Permissive).",
+    "explanation": "Domain 3.0 (Security): `setenforce 0` sets SELinux to `Permissive` mode immediately until reboot (recording AVC denials in `/var/log/audit/audit.log` without denying access). `setenforce 1` returns SELinux to `Enforcing`."
+  },
+  {
+    "id": "sec_15",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "intermediate",
+    "prompt": "Persistently enable the SELinux boolean httpd_can_network_connect (as root) so Apache/Nginx can initiate outbound proxy connections across reboots.",
+    "choices": [
+      "setsebool -P httpd_can_network_connect on",
+      "setsebool httpd_can_network_connect on",
+      "getsebool -P httpd_can_network_connect on",
+      "chcon -P httpd_can_network_connect on"
+    ],
+    "correct_choice": "setsebool -P httpd_can_network_connect on",
+    "accepted_commands": [
+      "setsebool -P httpd_can_network_connect on",
+      "setsebool -P httpd_can_network_connect 1",
+      "setsebool -P httpd_can_network_connect true",
+      "sudo setsebool -P httpd_can_network_connect on",
+      "sudo setsebool -P httpd_can_network_connect 1"
+    ],
+    "hint": "Pass uppercase -P (persistent) to setsebool before the boolean name and value on.",
+    "explanation": "Domain 3.0 (Security): `setsebool -P httpd_can_network_connect on` updates the SELinux boolean both in runtime policy and permanently in policy store (`-P`). Omitting `-P` reverts the boolean on reboot."
+  },
+  {
+    "id": "sec_16",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "intermediate",
+    "prompt": "Recursively and verbosely restore default SELinux file security contexts across /var/www/html (as root) after moving web files from /tmp.",
+    "choices": [
+      "restorecon -Rv /var/www/html",
+      "chcon -Rv /var/www/html",
+      "semanage -Rv /var/www/html",
+      "setenforce -Rv /var/www/html"
+    ],
+    "correct_choice": "restorecon -Rv /var/www/html",
+    "accepted_commands": [
+      "restorecon -Rv /var/www/html",
+      "restorecon -vR /var/www/html",
+      "restorecon -Rv /var/www/html/",
+      "restorecon -r -v /var/www/html",
+      "sudo restorecon -Rv /var/www/html",
+      "sudo restorecon -vR /var/www/html"
+    ],
+    "hint": "Use restorecon with uppercase -R (recursive) and -v (verbose).",
+    "explanation": "Domain 3.0 (Security): Files moved with `mv` retain their source SELinux context (`user_tmp_t`), causing web server denials. `restorecon -Rv /var/www/html` resets labels recursively (`-R`) according to system policy and logs each relabeled path (`-v`)."
+  },
+  {
+    "id": "sec_17",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "intermediate",
+    "prompt": "Using firewall-cmd, permanently open TCP port 8443 specifically in the public firewalld zone (as root).",
+    "choices": [
+      "firewall-cmd --zone=public --add-port=8443/tcp --permanent",
+      "firewall-cmd --zone=public --add-service=8443/tcp --permanent",
+      "firewall-cmd --zone=public --add-port=8443 --permanent",
+      "ufw --zone=public allow 8443/tcp"
+    ],
+    "correct_choice": "firewall-cmd --zone=public --add-port=8443/tcp --permanent",
+    "accepted_commands": [
+      "firewall-cmd --zone=public --add-port=8443/tcp --permanent",
+      "firewall-cmd --permanent --zone=public --add-port=8443/tcp",
+      "firewall-cmd --add-port=8443/tcp --zone=public --permanent",
+      "sudo firewall-cmd --zone=public --add-port=8443/tcp --permanent",
+      "sudo firewall-cmd --permanent --zone=public --add-port=8443/tcp"
+    ],
+    "hint": "Combine --zone=public, --add-port=8443/tcp, and --permanent.",
+    "explanation": "Domain 3.0 (Security): `firewall-cmd --zone=public --add-port=8443/tcp --permanent` adds a persistent port/protocol rule (`8443/tcp`) to the `public` zone. `--add-port` always requires `/tcp` or `/udp`."
+  },
+  {
+    "id": "sec_18",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "intermediate",
+    "prompt": "Reload firewalld's configuration (as root) after adding permanent rules so those rules immediately take effect in the active runtime firewall without dropping existing connections.",
+    "choices": [
+      "firewall-cmd --reload",
+      "firewall-cmd --permanent",
+      "firewall-cmd --runtime-to-permanent",
+      "systemctl restart firewall-cmd"
+    ],
+    "correct_choice": "firewall-cmd --reload",
+    "accepted_commands": [
+      "firewall-cmd --reload",
+      "sudo firewall-cmd --reload"
+    ],
+    "hint": "Use firewall-cmd with --reload.",
+    "explanation": "Domain 3.0 (Security): `firewall-cmd --reload` applies saved `--permanent` rules into runtime memory while preserving stateful connections. `--runtime-to-permanent` works in the opposite direction, saving temporary runtime rules to disk."
+  },
+  {
+    "id": "sec_19",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "intermediate",
+    "prompt": "Inspect the complete active kernel nftables firewall tables, chains, and rules in one command (as root).",
+    "choices": [
+      "nft list ruleset",
+      "nft show tables",
+      "iptables -L ruleset",
+      "nft --list-all"
+    ],
+    "correct_choice": "nft list ruleset",
+    "accepted_commands": [
+      "nft list ruleset",
+      "sudo nft list ruleset"
+    ],
+    "hint": "Use nft with list ruleset.",
+    "explanation": "Domain 3.0 (Security): `nft list ruleset` prints every configured `nftables` address family, table, chain, hook, and rule currently enforced by the kernel."
+  },
+  {
+    "id": "sec_20",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "intermediate",
+    "prompt": "Display active ufw firewall rules prefixed with rule index numbers (as root) so you can delete a specific rule by number.",
+    "choices": [
+      "ufw status numbered",
+      "ufw list numbered",
+      "ufw status verbose",
+      "ufw show numbered"
+    ],
+    "correct_choice": "ufw status numbered",
+    "accepted_commands": [
+      "ufw status numbered",
+      "sudo ufw status numbered"
+    ],
+    "hint": "Append numbered after ufw status.",
+    "explanation": "Domain 3.0 (Security): `ufw status numbered` outputs `[ 1]`, `[ 2]`, etc. beside each active rule so you can safely remove an individual rule via `ufw delete <number>`. `ufw status verbose` prints logging/defaults without rule numbers."
+  },
+  {
+    "id": "sec_21",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "intermediate",
+    "prompt": "Inspect the TLS certificate /etc/ssl/certs/server.crt using openssl x509 to print ONLY its validity start (notBefore) and expiration (notAfter) dates without dumping the full certificate block.",
+    "choices": [
+      "openssl x509 -in /etc/ssl/certs/server.crt -noout -dates",
+      "openssl x509 -in /etc/ssl/certs/server.crt -dates",
+      "openssl verify -dates /etc/ssl/certs/server.crt",
+      "openssl s_client -in /etc/ssl/certs/server.crt -dates"
+    ],
+    "correct_choice": "openssl x509 -in /etc/ssl/certs/server.crt -noout -dates",
+    "accepted_commands": [
+      "openssl x509 -in /etc/ssl/certs/server.crt -noout -dates",
+      "openssl x509 -in /etc/ssl/certs/server.crt -dates -noout",
+      "openssl x509 -noout -dates -in /etc/ssl/certs/server.crt"
+    ],
+    "hint": "Combine openssl x509 -in <cert> with -noout and -dates.",
+    "explanation": "Domain 3.0 (Security): `openssl x509 -in /etc/ssl/certs/server.crt -noout -dates` parses the X.509 certificate, suppresses the base64 PEM block (`-noout`), and prints `notBefore` and `notAfter` (`-dates`) to check for impending expiration."
+  },
+  {
+    "id": "sec_22",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "intermediate",
+    "prompt": "Encrypt secrets.tar.gz in the current directory using GPG symmetric (passphrase-only) cryptography without requiring an asymmetric recipient key.",
+    "choices": [
+      "gpg -c secrets.tar.gz",
+      "gpg -e secrets.tar.gz",
+      "gpg -d secrets.tar.gz",
+      "gpg --sign secrets.tar.gz"
+    ],
+    "correct_choice": "gpg -c secrets.tar.gz",
+    "accepted_commands": [
+      "gpg -c secrets.tar.gz",
+      "gpg --symmetric secrets.tar.gz"
+    ],
+    "hint": "Pass -c (or --symmetric) to gpg.",
+    "explanation": "Domain 3.0 (Security): `gpg -c secrets.tar.gz` (`--symmetric`) encrypts the archive using a symmetric cipher and passphrase, outputting `secrets.tar.gz.gpg`. `-e` requires an asymmetric public key (`-r recipient`), and `-d` decrypts."
+  },
+  {
+    "id": "sec_23",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "hard",
+    "prompt": "Configure SELinux policy (as root) to allow web servers labeled httpd_t to bind to non-standard TCP port 8081 by adding it to the http_port_t SELinux port type.",
+    "choices": [
+      "semanage port -a -t http_port_t -p tcp 8081",
+      "semanage port -a -t 8081 -p tcp http_port_t",
+      "chcon -t http_port_t 8081/tcp",
+      "setsebool -P http_port_t 8081"
+    ],
+    "correct_choice": "semanage port -a -t http_port_t -p tcp 8081",
+    "accepted_commands": [
+      "semanage port -a -t http_port_t -p tcp 8081",
+      "semanage port -a -p tcp -t http_port_t 8081",
+      "sudo semanage port -a -t http_port_t -p tcp 8081",
+      "sudo semanage port -a -p tcp -t http_port_t 8081"
+    ],
+    "hint": "Use semanage port -a -t <type> -p <proto> <port>.",
+    "explanation": "Domain 3.0 (Security): `semanage port -a -t http_port_t -p tcp 8081` registers TCP 8081 in SELinux policy under `http_port_t` (`-a` add, `-t` type, `-p` protocol) so `nginx`/`httpd` can bind to port 8081 while SELinux remains Enforcing."
+  },
+  {
+    "id": "sec_24",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "hard",
+    "prompt": "Register a persistent SELinux file context rule (as root) assigning type httpd_sys_content_t to the directory regex \"/srv/web(/.*)?\" using semanage fcontext.",
+    "choices": [
+      "semanage fcontext -a -t httpd_sys_content_t \"/srv/web(/.*)?\"",
+      "chcon -t httpd_sys_content_t \"/srv/web(/.*)?\"",
+      "restorecon -a -t httpd_sys_content_t \"/srv/web(/.*)?\"",
+      "semanage fcontext -m -d httpd_sys_content_t /srv/web"
+    ],
+    "correct_choice": "semanage fcontext -a -t httpd_sys_content_t \"/srv/web(/.*)?\"",
+    "accepted_commands": [
+      "semanage fcontext -a -t httpd_sys_content_t \"/srv/web(/.*)?\"",
+      "semanage fcontext -a -t httpd_sys_content_t '/srv/web(/.*)?'",
+      "sudo semanage fcontext -a -t httpd_sys_content_t \"/srv/web(/.*)?\"",
+      "sudo semanage fcontext -a -t httpd_sys_content_t '/srv/web(/.*)?'"
+    ],
+    "hint": "Use semanage fcontext -a -t <type> \"<regex>\".",
+    "explanation": "Domain 3.0 (Security): `semanage fcontext -a -t httpd_sys_content_t \"/srv/web(/.*)?\"` adds the persistent labeling rule into policy (`restorecon -Rv /srv/web` then applies it to disk). Temporary `chcon` changes are wiped out on `restorecon` or filesystem relabels."
+  },
+  {
+    "id": "sec_25",
+    "domain": "5.0 Troubleshooting",
+    "category": "Security & Hardening",
+    "difficulty": "hard",
+    "prompt": "Query the Linux audit subsystem (as root) for recent SELinux AVC denial messages from the past few minutes using ausearch.",
+    "choices": [
+      "ausearch -m avc -ts recent",
+      "ausearch -t avc -m recent",
+      "auditctl -m avc --recent",
+      "journalctl -m avc --recent"
+    ],
+    "correct_choice": "ausearch -m avc -ts recent",
+    "accepted_commands": [
+      "ausearch -m avc -ts recent",
+      "ausearch -m AVC -ts recent",
+      "ausearch -ts recent -m avc",
+      "sudo ausearch -m avc -ts recent",
+      "sudo ausearch -m AVC -ts recent"
+    ],
+    "hint": "Use ausearch with -m avc (message type) and -ts recent (time start).",
+    "explanation": "Domain 5.0 (Troubleshooting): `ausearch -m avc -ts recent` filters `/var/log/audit/audit.log` for SELinux Access Vector Cache (`avc`) denials from the last 10 minutes (`recent`), revealing source/target contexts (`scontext`/`tcontext`) causing service blocks."
+  },
+  {
+    "id": "sec_26",
+    "domain": "5.0 Troubleshooting",
+    "category": "Security & Hardening",
+    "difficulty": "hard",
+    "prompt": "Before reloading sshd after hardening changes, test /etc/ssh/sshd_config for syntax errors (as root) using the sshd binary in configuration-test mode.",
+    "choices": [
+      "sshd -t",
+      "systemctl test sshd",
+      "ssh -t /etc/ssh/sshd_config",
+      "sshd --check-only"
+    ],
+    "correct_choice": "sshd -t",
+    "accepted_commands": [
+      "sshd -t",
+      "/usr/sbin/sshd -t",
+      "sudo sshd -t",
+      "sudo /usr/sbin/sshd -t"
+    ],
+    "hint": "Pass -t (test mode) directly to the sshd daemon binary.",
+    "explanation": "Domain 5.0 (Troubleshooting): `sshd -t` parses `/etc/ssh/sshd_config` (plus `/etc/ssh/sshd_config.d/*.conf`), verifies host keys/directives, and exits nonzero on syntax errors without restarting the running daemon."
+  },
+  {
+    "id": "sec_27",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "hard",
+    "prompt": "After rebuilding server 10.0.10.25 with new SSH host keys, SSH refuses to connect with 'REMOTE HOST IDENTIFICATION HAS CHANGED'. Safely remove the old entry for 10.0.10.25 from your ~/.ssh/known_hosts file.",
+    "choices": [
+      "ssh-keygen -R 10.0.10.25",
+      "ssh-keygen -d 10.0.10.25",
+      "ssh-copy-id -r 10.0.10.25",
+      "ssh -R 10.0.10.25"
+    ],
+    "correct_choice": "ssh-keygen -R 10.0.10.25",
+    "accepted_commands": [
+      "ssh-keygen -R 10.0.10.25"
+    ],
+    "hint": "Use ssh-keygen with uppercase -R <hostname_or_ip>.",
+    "explanation": "Domain 3.0 (Security): `ssh-keygen -R 10.0.10.25` removes matching plaintext and hashed host-key entries from `~/.ssh/known_hosts` cleanly while backing up the previous file (`known_hosts.old`), avoiding risky manual edits."
+  },
+  {
+    "id": "sec_28",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "hard",
+    "prompt": "Using firewall-cmd (as root), permanently add a rich rule to drop all IPv4 traffic sourced from subnet 203.0.113.0/24.",
+    "choices": [
+      "firewall-cmd --permanent --add-rich-rule='rule family=\"ipv4\" source address=\"203.0.113.0/24\" drop'",
+      "firewall-cmd --permanent --drop-source=203.0.113.0/24",
+      "firewall-cmd --permanent --add-rich-rule='ipv4 drop 203.0.113.0/24'",
+      "ufw deny from 203.0.113.0/24 --permanent"
+    ],
+    "correct_choice": "firewall-cmd --permanent --add-rich-rule='rule family=\"ipv4\" source address=\"203.0.113.0/24\" drop'",
+    "accepted_commands": [
+      "firewall-cmd --permanent --add-rich-rule='rule family=\"ipv4\" source address=\"203.0.113.0/24\" drop'",
+      "firewall-cmd --add-rich-rule='rule family=\"ipv4\" source address=\"203.0.113.0/24\" drop' --permanent",
+      "firewall-cmd --permanent --add-rich-rule=\"rule family='ipv4' source address='203.0.113.0/24' drop\"",
+      "sudo firewall-cmd --permanent --add-rich-rule='rule family=\"ipv4\" source address=\"203.0.113.0/24\" drop'",
+      "sudo firewall-cmd --add-rich-rule='rule family=\"ipv4\" source address=\"203.0.113.0/24\" drop' --permanent"
+    ],
+    "hint": "Use --permanent --add-rich-rule='rule family=\"ipv4\" source address=\"203.0.113.0/24\" drop'.",
+    "explanation": "Domain 3.0 (Security): `firewalld` rich rules provide fine-grained source/destination filtering beyond basic service/port rules. Specifying `rule family=\"ipv4\" source address=\"203.0.113.0/24\" drop` with `--permanent` blocks the entire hostile CIDR persistently."
+  },
+  {
+    "id": "sec_29",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "hard",
+    "prompt": "List all currently loaded nftables firewall table names and address families (as root) without printing the full rule body.",
+    "choices": [
+      "nft list tables",
+      "nft list ruleset",
+      "nft show chains",
+      "iptables -t list"
+    ],
+    "correct_choice": "nft list tables",
+    "accepted_commands": [
+      "nft list tables",
+      "sudo nft list tables"
+    ],
+    "hint": "Use nft with list tables.",
+    "explanation": "Domain 3.0 (Security): `nft list tables` outputs only table families and names (e.g., `table inet filter`, `table ip nat`), letting you target subsequent `nft list table inet <name>` inspections cleanly."
+  },
+  {
+    "id": "sec_30",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "hard",
+    "prompt": "Initialize LUKS disk encryption on partition /dev/sdc1 (as root) using cryptsetup before mapping and formatting the encrypted volume.",
+    "choices": [
+      "cryptsetup luksFormat /dev/sdc1",
+      "cryptsetup luksOpen /dev/sdc1",
+      "cryptsetup create /dev/sdc1",
+      "mkfs.luks /dev/sdc1"
+    ],
+    "correct_choice": "cryptsetup luksFormat /dev/sdc1",
+    "accepted_commands": [
+      "cryptsetup luksFormat /dev/sdc1",
+      "sudo cryptsetup luksFormat /dev/sdc1"
+    ],
+    "hint": "Use cryptsetup with the camelCase luksFormat action.",
+    "explanation": "Domain 3.0 (Security): `cryptsetup luksFormat /dev/sdc1` writes the LUKS header and sets up passphrase/key-slot encryption on the block device. Afterward, `cryptsetup luksOpen` unlocks the encrypted device under `/dev/mapper/`."
+  },
+  {
+    "id": "sec_31",
+    "domain": "5.0 Troubleshooting",
+    "category": "Security & Hardening",
+    "difficulty": "hard",
+    "prompt": "Establish a live TLS handshake test connection to remote HTTPS server example.com on port 443 using openssl s_client to inspect its certificate chain and negotiation details.",
+    "choices": [
+      "openssl s_client -connect example.com:443",
+      "openssl x509 -connect example.com:443",
+      "openssl verify -connect example.com:443",
+      "curl -connect example.com:443 --openssl"
+    ],
+    "correct_choice": "openssl s_client -connect example.com:443",
+    "accepted_commands": [
+      "openssl s_client -connect example.com:443"
+    ],
+    "hint": "Use openssl s_client with -connect host:port.",
+    "explanation": "Domain 5.0 (Troubleshooting): `openssl s_client -connect example.com:443` initiates a raw TLS/SSL handshake with the remote socket, exposing certificate chains, SAN/CN mismatches, cipher suites, and TLS version negotiation errors."
+  },
+  {
+    "id": "sec_32",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "hard",
+    "prompt": "Perform a file-integrity verification sweep across ALL installed RPM packages (as root) using rpm to detect modified binaries, permissions, or checksums.",
+    "choices": [
+      "rpm -Va",
+      "rpm -qa",
+      "dnf verify --all",
+      "rpm -qf /"
+    ],
+    "correct_choice": "rpm -Va",
+    "accepted_commands": [
+      "rpm -Va",
+      "rpm -V -a",
+      "rpm --verify -a",
+      "rpm --verify --all",
+      "sudo rpm -Va",
+      "sudo rpm -V -a"
+    ],
+    "hint": "Combine rpm's verify (-V) and all-packages (-a) flags.",
+    "explanation": "Domain 3.0 (Security): `rpm -Va` (`--verify --all`) compares every installed file's size, mode, digest (`5`), owner, and group against the RPM database—flagging tampered system binaries during security incident investigations."
+  }
+]

@@ -1,0 +1,142 @@
+name: Release Multi-OS Installers
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install core dependencies
+        run: pip install -r requirements.txt
+      - name: Run unittest suite
+        run: python -m unittest discover -s tests -v
+
+  build-windows:
+    name: Build Windows Installer
+    needs: test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install packaging dependencies
+        run: pip install -r requirements-packaging.txt
+      - name: Generate application icons
+        run: python packaging/scripts/generate_icons.py
+      - name: Build PyInstaller bundle
+        run: pyinstaller --noconfirm packaging/linux-plus-trainer.spec
+      - name: Build Inno Setup installer
+        shell: pwsh
+        run: |
+          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            choco install innosetup -y --no-progress
+          }
+          & $iscc packaging\windows\installer.iss
+      - name: Upload Windows installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: LinuxPlusTrainer-Setup-Windows
+          path: dist/installer/LinuxPlusTrainer-Setup-Windows.exe
+
+  build-macos:
+    name: Build macOS DMG
+    needs: test
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install packaging dependencies
+        run: pip install -r requirements-packaging.txt
+      - name: Generate application icons
+        run: python packaging/scripts/generate_icons.py
+      - name: Build PyInstaller .app bundle
+        run: pyinstaller --noconfirm packaging/linux-plus-trainer.spec
+      - name: Create DMG image
+        run: |
+          mkdir -p dist/dmg-staging
+          cp -R dist/LinuxPlusTrainer.app dist/dmg-staging/
+          ln -s /Applications dist/dmg-staging/Applications
+          hdiutil create -volname "LinuxPlusTrainer" -srcfolder dist/dmg-staging -ov -format UDZO dist/LinuxPlusTrainer-macOS.dmg
+      - name: Upload macOS DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: LinuxPlusTrainer-macOS
+          path: dist/LinuxPlusTrainer-macOS.dmg
+
+  build-linux:
+    name: Build Linux AppImage
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install system WebKit & AppImage deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgirepository1.0-dev libcairo2-dev gir1.2-webkit2-4.1 fuse libfuse2
+      - name: Install packaging dependencies
+        run: pip install -r requirements-packaging.txt
+      - name: Generate application icons
+        run: python packaging/scripts/generate_icons.py
+      - name: Build PyInstaller bundle
+        run: pyinstaller --noconfirm packaging/linux-plus-trainer.spec
+      - name: Assemble AppDir and build AppImage
+        run: |
+          mkdir -p AppDir/usr/bin AppDir/usr/share/applications AppDir/usr/share/metainfo AppDir/usr/share/icons/hicolor/scalable/apps
+          cp -r dist/LinuxPlusTrainer/* AppDir/usr/bin/
+          cp packaging/linux/io.github.linuxplustrainer.LinuxPlusTrainer.desktop AppDir/io.github.linuxplustrainer.LinuxPlusTrainer.desktop
+          cp packaging/linux/io.github.linuxplustrainer.LinuxPlusTrainer.desktop AppDir/usr/share/applications/
+          cp packaging/linux/io.github.linuxplustrainer.LinuxPlusTrainer.metainfo.xml AppDir/usr/share/metainfo/
+          cp packaging/assets/linux-plus-trainer.svg AppDir/io.github.linuxplustrainer.LinuxPlusTrainer.svg
+          cp packaging/assets/linux-plus-trainer.svg AppDir/usr/share/icons/hicolor/scalable/apps/
+          cp packaging/assets/linux-plus-trainer.png AppDir/.DirIcon
+          cat << 'EOF' > AppDir/AppRun
+          #!/bin/sh
+          HERE="$(dirname "$(readlink -f "$0")")"
+          exec "$HERE/usr/bin/LinuxPlusTrainer" "$@"
+          EOF
+          chmod +x AppDir/AppRun
+          curl -L -o appimagetool https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x appimagetool
+          ARCH=x86_64 ./appimagetool --appimage-extract-and-run AppDir dist/LinuxPlusTrainer-x86_64.AppImage
+      - name: Upload Linux AppImage
+        uses: actions/upload-artifact@v4
+        with:
+          name: LinuxPlusTrainer-x86_64
+          path: dist/LinuxPlusTrainer-x86_64.AppImage
+
+  release:
+    name: Publish GitHub Release
+    needs: [build-windows, build-macos, build-linux]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Attach installers to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/LinuxPlusTrainer-Setup-Windows/LinuxPlusTrainer-Setup-Windows.exe
+            artifacts/LinuxPlusTrainer-macOS/LinuxPlusTrainer-macOS.dmg
+            artifacts/LinuxPlusTrainer-x86_64/LinuxPlusTrainer-x86_64.AppImage

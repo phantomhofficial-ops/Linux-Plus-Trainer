@@ -1,0 +1,665 @@
+[
+  {
+    "id": "auto_01",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "beginner",
+    "prompt": "You wrote a Bash script healthcheck.sh starting with #!/bin/bash. Grant execute permission so it can be run directly as ./healthcheck.sh.",
+    "choices": [
+      "chmod +x healthcheck.sh",
+      "chown +x healthcheck.sh",
+      "bash -x healthcheck.sh",
+      "chmod +r healthcheck.sh"
+    ],
+    "correct_choice": "chmod +x healthcheck.sh",
+    "accepted_commands": [
+      "chmod +x healthcheck.sh",
+      "chmod +x ./healthcheck.sh",
+      "chmod u+x healthcheck.sh",
+      "chmod a+x healthcheck.sh"
+    ],
+    "hint": "Use chmod with +x on healthcheck.sh.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `chmod +x healthcheck.sh` sets the executable (`x`) bit so the kernel can inspect the `#!/bin/bash` shebang and invoke Bash directly via `./healthcheck.sh`. `bash -x` traces script execution rather than changing permissions."
+  },
+  {
+    "id": "auto_02",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "beginner",
+    "prompt": "Print the value of the PATH environment variable in your current Bash shell using echo.",
+    "choices": [
+      "echo $PATH",
+      "echo PATH",
+      "echo '$PATH'",
+      "env PATH"
+    ],
+    "correct_choice": "echo $PATH",
+    "accepted_commands": [
+      "echo $PATH",
+      "echo \"$PATH\"",
+      "echo ${PATH}",
+      "echo \"${PATH}\""
+    ],
+    "hint": "Prefix the variable name with $ so Bash expands it.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `echo $PATH` (or `echo \"$PATH\"`) expands the `PATH` variable and prints its colon-separated executable directories. Omitting `$` prints the literal word `PATH`, and single quotes (`'$PATH'`) suppress variable expansion in Bash."
+  },
+  {
+    "id": "auto_03",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "beginner",
+    "prompt": "Set shell variable APP_ENV to production AND export it so any child scripts or commands launched from this shell inherit it.",
+    "choices": [
+      "export APP_ENV=production",
+      "APP_ENV=production",
+      "set APP_ENV=production",
+      "echo APP_ENV=production"
+    ],
+    "correct_choice": "export APP_ENV=production",
+    "accepted_commands": [
+      "export APP_ENV=production",
+      "export APP_ENV=\"production\"",
+      "export APP_ENV='production'"
+    ],
+    "hint": "Use the Bash built-in keyword export before APP_ENV=production.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `export APP_ENV=production` marks the variable for export to the environment of child processes. Plain `APP_ENV=production` creates only a local shell variable that subshells and child scripts do not inherit."
+  },
+  {
+    "id": "auto_04",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "beginner",
+    "prompt": "Display all exported environment variables currently active in your shell session.",
+    "choices": [
+      "env",
+      "export -n",
+      "which",
+      "echo $*"
+    ],
+    "correct_choice": "env",
+    "accepted_commands": [
+      "env",
+      "printenv"
+    ],
+    "hint": "Use the three-letter command short for environment (or printenv).",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `env` (or `printenv`) prints all key=value pairs in the current process environment. `export -n` removes the export attribute from a variable, and `which` locates executables on `PATH`."
+  },
+  {
+    "id": "auto_05",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "beginner",
+    "prompt": "Initialize a brand-new empty Git repository inside the current working directory.",
+    "choices": [
+      "git init",
+      "git create",
+      "git clone .",
+      "git start"
+    ],
+    "correct_choice": "git init",
+    "accepted_commands": [
+      "git init",
+      "git init ."
+    ],
+    "hint": "Use git with the init subcommand.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `git init` creates the `.git/` metadata directory in the current folder so you can begin tracking changes locally. `git clone` copies an existing remote repository."
+  },
+  {
+    "id": "auto_06",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "beginner",
+    "prompt": "Download a complete local copy of the remote Git repository at https://example.com/ops/infra.git.",
+    "choices": [
+      "git clone https://example.com/ops/infra.git",
+      "git pull https://example.com/ops/infra.git",
+      "git init https://example.com/ops/infra.git",
+      "git fetch https://example.com/ops/infra.git"
+    ],
+    "correct_choice": "git clone https://example.com/ops/infra.git",
+    "accepted_commands": [
+      "git clone https://example.com/ops/infra.git"
+    ],
+    "hint": "Use git clone followed by the repository URL.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `git clone https://example.com/ops/infra.git` creates a new `infra/` directory, fetches full commit history, configures `origin`, and checks out the default branch. `git pull` and `git fetch` update an already-cloned repository."
+  },
+  {
+    "id": "auto_07",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "beginner",
+    "prompt": "Show the current Git branch along with any staged, unstaged modified, and untracked files in your working tree.",
+    "choices": [
+      "git status",
+      "git log",
+      "git branch",
+      "git show"
+    ],
+    "correct_choice": "git status",
+    "accepted_commands": [
+      "git status"
+    ],
+    "hint": "Use git with the status subcommand.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `git status` reports the active branch and summarizes changes in the staging index vs. working directory. `git log` shows commit history, `git branch` lists branches, and `git show` inspects a specific commit."
+  },
+  {
+    "id": "auto_08",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "beginner",
+    "prompt": "Stage the modified file deploy.yml in the current Git repository so it will be included in your next commit.",
+    "choices": [
+      "git add deploy.yml",
+      "git stage-all deploy.yml",
+      "git commit deploy.yml",
+      "git push deploy.yml"
+    ],
+    "correct_choice": "git add deploy.yml",
+    "accepted_commands": [
+      "git add deploy.yml",
+      "git add ./deploy.yml"
+    ],
+    "hint": "Use git add followed by the filename.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `git add deploy.yml` places the updated contents of `deploy.yml` into the Git staging area (index). `git commit` records staged snapshots into history, and `git push` uploads local commits to a remote."
+  },
+  {
+    "id": "auto_09",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "beginner",
+    "prompt": "Record your staged Git changes into commit history with the inline commit message \"Fix firewall port\".",
+    "choices": [
+      "git commit -m \"Fix firewall port\"",
+      "git commit \"Fix firewall port\"",
+      "git add -m \"Fix firewall port\"",
+      "git push -m \"Fix firewall port\""
+    ],
+    "correct_choice": "git commit -m \"Fix firewall port\"",
+    "accepted_commands": [
+      "git commit -m \"Fix firewall port\"",
+      "git commit -m 'Fix firewall port'"
+    ],
+    "hint": "Pass the -m flag to git commit followed by the quoted message.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `git commit -m \"Fix firewall port\"` creates a new commit from the staging index using `-m` to supply the commit message directly without launching an interactive editor."
+  },
+  {
+    "id": "auto_10",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "beginner",
+    "prompt": "Fetch new commits from your configured remote tracking branch and merge them into your current local Git branch in one command.",
+    "choices": [
+      "git pull",
+      "git push",
+      "git fetch",
+      "git status"
+    ],
+    "correct_choice": "git pull",
+    "accepted_commands": [
+      "git pull"
+    ],
+    "hint": "This four-letter git subcommand combines fetch and merge.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `git pull` downloads remote commits (`git fetch`) and integrates them into the current branch (`git merge` by default). `git fetch` alone updates remote-tracking refs without modifying your current local branch."
+  },
+  {
+    "id": "auto_11",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "beginner",
+    "prompt": "Create an isolated Python 3 virtual environment directory named .venv in the current working directory using the standard library venv module.",
+    "choices": [
+      "python3 -m venv .venv",
+      "pip install venv .venv",
+      "python3 venv .venv",
+      "virtualenv -m .venv"
+    ],
+    "correct_choice": "python3 -m venv .venv",
+    "accepted_commands": [
+      "python3 -m venv .venv",
+      "python3 -m venv ./.venv",
+      "python -m venv .venv"
+    ],
+    "hint": "Invoke python3 with -m venv followed by the target directory .venv.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `python3 -m venv .venv` runs Python's built-in `venv` module (`-m`) to build an isolated environment in `.venv` so project `pip` dependencies don't conflict with OS system packages."
+  },
+  {
+    "id": "auto_12",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "beginner",
+    "prompt": "Execute the Ansible playbook site.yml against hosts defined in the inventory file hosts.ini.",
+    "choices": [
+      "ansible-playbook -i hosts.ini site.yml",
+      "ansible -i hosts.ini site.yml",
+      "ansible-playbook -f hosts.ini site.yml",
+      "ansible-inventory -p site.yml hosts.ini"
+    ],
+    "correct_choice": "ansible-playbook -i hosts.ini site.yml",
+    "accepted_commands": [
+      "ansible-playbook -i hosts.ini site.yml",
+      "ansible-playbook site.yml -i hosts.ini",
+      "ansible-playbook --inventory=hosts.ini site.yml",
+      "ansible-playbook --inventory hosts.ini site.yml"
+    ],
+    "hint": "Use ansible-playbook with the -i inventory flag before site.yml.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `ansible-playbook -i hosts.ini site.yml` runs the YAML automation tasks in `site.yml` targeting the inventory specified by `-i hosts.ini` (`--inventory`). Plain `ansible` runs single ad-hoc modules rather than playbooks."
+  },
+  {
+    "id": "auto_13",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "intermediate",
+    "prompt": "Create a new Git branch named feature/tls and switch to it immediately in a single command.",
+    "choices": [
+      "git checkout -b feature/tls",
+      "git branch feature/tls",
+      "git checkout feature/tls",
+      "git merge -b feature/tls"
+    ],
+    "correct_choice": "git checkout -b feature/tls",
+    "accepted_commands": [
+      "git checkout -b feature/tls",
+      "git switch -c feature/tls"
+    ],
+    "hint": "Use git checkout -b (or modern git switch -c) followed by the new branch name.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `git checkout -b feature/tls` (or `git switch -c feature/tls`) creates the new branch pointer and checks it out in one step. `git branch feature/tls` creates the branch but leaves you on your old branch."
+  },
+  {
+    "id": "auto_14",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "intermediate",
+    "prompt": "You are currently checked out on the main branch. Integrate all commits from branch feature/tls into main using Git.",
+    "choices": [
+      "git merge feature/tls",
+      "git pull feature/tls",
+      "git add feature/tls",
+      "git branch -m feature/tls"
+    ],
+    "correct_choice": "git merge feature/tls",
+    "accepted_commands": [
+      "git merge feature/tls"
+    ],
+    "hint": "Use git merge with the source branch name feature/tls.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): Running `git merge feature/tls` while on `main` applies or fast-forwards `feature/tls`'s commit history into `main`. `git branch -m` renames a branch instead of merging."
+  },
+  {
+    "id": "auto_15",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "intermediate",
+    "prompt": "Inspect the exact line-by-line diff of changes that have already been staged in the Git index (ready for the next commit), rather than unstaged working-tree edits.",
+    "choices": [
+      "git diff --staged",
+      "git diff",
+      "git status -d",
+      "git show --index"
+    ],
+    "correct_choice": "git diff --staged",
+    "accepted_commands": [
+      "git diff --staged",
+      "git diff --cached"
+    ],
+    "hint": "Pass --staged (or its alias --cached) to git diff.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): Plain `git diff` compares working tree vs. staging index and shows nothing for staged edits. `git diff --staged` (`--cached`) compares the staging area against `HEAD`."
+  },
+  {
+    "id": "auto_16",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "intermediate",
+    "prompt": "Temporarily shelve your uncommitted tracked modifications in Git so you have a clean working tree to switch branches, saving the changes on the stash stack.",
+    "choices": [
+      "git stash",
+      "git reset --hard",
+      "git clean -fd",
+      "git checkout ."
+    ],
+    "correct_choice": "git stash",
+    "accepted_commands": [
+      "git stash",
+      "git stash push"
+    ],
+    "hint": "Use the git subcommand designed to stash uncommitted work temporarily.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `git stash` saves tracked dirty changes onto a stack and reverts the working tree to `HEAD` (recover later via `git stash pop`). `git reset --hard` and `git checkout .` permanently discard uncommitted tracked changes."
+  },
+  {
+    "id": "auto_17",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "intermediate",
+    "prompt": "Create an annotated Git tag named v1.2.0 on the current HEAD commit with the inline tag message \"Release 1.2.0\".",
+    "choices": [
+      "git tag -a v1.2.0 -m \"Release 1.2.0\"",
+      "git tag v1.2.0",
+      "git commit --tag v1.2.0 -m \"Release 1.2.0\"",
+      "git branch -t v1.2.0 -m \"Release 1.2.0\""
+    ],
+    "correct_choice": "git tag -a v1.2.0 -m \"Release 1.2.0\"",
+    "accepted_commands": [
+      "git tag -a v1.2.0 -m \"Release 1.2.0\"",
+      "git tag -a v1.2.0 -m 'Release 1.2.0'",
+      "git tag -m \"Release 1.2.0\" -a v1.2.0",
+      "git tag -m 'Release 1.2.0' -a v1.2.0"
+    ],
+    "hint": "Pass -a (annotated) and -m \"message\" to git tag.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `git tag -a v1.2.0 -m \"Release 1.2.0\"` creates a full annotated tag object (`-a`) storing tagger, date, and message (`-m`). Lightweight `git tag v1.2.0` omits tagger metadata."
+  },
+  {
+    "id": "auto_18",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "intermediate",
+    "prompt": "Undo the most recent Git commit (HEAD~1) while preserving all of its file changes staged in the index so you can amend or re-commit them.",
+    "choices": [
+      "git reset --soft HEAD~1",
+      "git reset --hard HEAD~1",
+      "git revert --soft HEAD~1",
+      "git clean HEAD~1"
+    ],
+    "correct_choice": "git reset --soft HEAD~1",
+    "accepted_commands": [
+      "git reset --soft HEAD~1",
+      "git reset --soft HEAD^"
+    ],
+    "hint": "Use git reset with --soft HEAD~1.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `git reset --soft HEAD~1` moves `HEAD` back one commit without touching the staging index or working directory. `--hard` discards both staged and working-tree changes."
+  },
+  {
+    "id": "auto_19",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "intermediate",
+    "prompt": "Run the Bash script deploy.sh in execution-trace debug mode so Bash prints every expanded command and argument before executing it.",
+    "choices": [
+      "bash -x deploy.sh",
+      "bash -n deploy.sh",
+      "bash -v deploy.sh",
+      "bash -e deploy.sh"
+    ],
+    "correct_choice": "bash -x deploy.sh",
+    "accepted_commands": [
+      "bash -x deploy.sh",
+      "bash -x ./deploy.sh"
+    ],
+    "hint": "Invoke bash with the xtrace debugging flag (-x).",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `bash -x deploy.sh` enables `xtrace`, printing `+ command` with expanded variables right before each statement runs. `-n` performs syntax checking without execution, and `-e` aborts on nonzero exit codes."
+  },
+  {
+    "id": "auto_20",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "intermediate",
+    "prompt": "Export all installed Python packages and their exact pinned versions in the active virtual environment into requirements.txt using pip.",
+    "choices": [
+      "pip freeze > requirements.txt",
+      "pip list > requirements.txt",
+      "pip install -r requirements.txt",
+      "pip export > requirements.txt"
+    ],
+    "correct_choice": "pip freeze > requirements.txt",
+    "accepted_commands": [
+      "pip freeze > requirements.txt",
+      "pip3 freeze > requirements.txt",
+      "python3 -m pip freeze > requirements.txt"
+    ],
+    "hint": "Redirect the output of pip freeze to requirements.txt.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `pip freeze > requirements.txt` outputs `package==version` lines formatted specifically for reproducible installs via `pip install -r requirements.txt`. `pip list` outputs a human table unsuitable for `-r`."
+  },
+  {
+    "id": "auto_21",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "intermediate",
+    "prompt": "Run an ad-hoc Ansible connectivity test using the ping module against the all host group defined in inventory file hosts.ini.",
+    "choices": [
+      "ansible all -i hosts.ini -m ping",
+      "ansible-playbook all -i hosts.ini -m ping",
+      "ansible all -i hosts.ini -a ping",
+      "ansible ping -i hosts.ini all"
+    ],
+    "correct_choice": "ansible all -i hosts.ini -m ping",
+    "accepted_commands": [
+      "ansible all -i hosts.ini -m ping",
+      "ansible -i hosts.ini all -m ping",
+      "ansible all -m ping -i hosts.ini",
+      "ansible -m ping -i hosts.ini all"
+    ],
+    "hint": "Use ansible <host_pattern> -i <inventory> -m <module>.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `ansible all -i hosts.ini -m ping` invokes Ansible's `ping` module (`-m`) over SSH against `all` managed nodes listed in `hosts.ini` (`-i`), verifying SSH login and remote Python availability."
+  },
+  {
+    "id": "auto_22",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "intermediate",
+    "prompt": "Execute a dry-run of Ansible playbook site.yml against inventory hosts.ini so Ansible reports what changes it WOULD make without modifying target systems.",
+    "choices": [
+      "ansible-playbook -i hosts.ini site.yml --check",
+      "ansible-playbook -i hosts.ini site.yml --dry-run",
+      "ansible-playbook -i hosts.ini site.yml --diff",
+      "ansible-playbook -i hosts.ini site.yml --syntax-check"
+    ],
+    "correct_choice": "ansible-playbook -i hosts.ini site.yml --check",
+    "accepted_commands": [
+      "ansible-playbook -i hosts.ini site.yml --check",
+      "ansible-playbook --check -i hosts.ini site.yml",
+      "ansible-playbook -i hosts.ini --check site.yml",
+      "ansible-playbook -i hosts.ini site.yml -C",
+      "ansible-playbook -C -i hosts.ini site.yml"
+    ],
+    "hint": "Pass --check (or -C) to ansible-playbook.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `ansible-playbook -i hosts.ini site.yml --check` (`-C`) runs in Check Mode, simulating module changes without altering managed hosts. `--syntax-check` only parses YAML syntax without connecting to hosts."
+  },
+  {
+    "id": "auto_23",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "hard",
+    "prompt": "You are checked out on a feature branch. Replay all commits from your current branch linearly on top of the latest main branch using git rebase.",
+    "choices": [
+      "git rebase main",
+      "git merge --linear main",
+      "git reset --onto main",
+      "git cherry-pick main"
+    ],
+    "correct_choice": "git rebase main",
+    "accepted_commands": [
+      "git rebase main"
+    ],
+    "hint": "Use git rebase followed by the target upstream branch main.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `git rebase main` moves your feature branch commits onto the tip of `main` by reapplying each commit sequentially, producing a clean linear history without extra merge commits."
+  },
+  {
+    "id": "auto_24",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "hard",
+    "prompt": "Copy only the specific hotfix commit hash a1b2c3d from another branch onto your currently checked-out branch without merging the entire branch.",
+    "choices": [
+      "git cherry-pick a1b2c3d",
+      "git merge a1b2c3d",
+      "git checkout a1b2c3d",
+      "git rebase a1b2c3d"
+    ],
+    "correct_choice": "git cherry-pick a1b2c3d",
+    "accepted_commands": [
+      "git cherry-pick a1b2c3d"
+    ],
+    "hint": "Use git cherry-pick followed by commit SHA a1b2c3d.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `git cherry-pick a1b2c3d` applies the diff introduced by commit `a1b2c3d` as a new commit on the active branch, ideal for backporting isolated fixes."
+  },
+  {
+    "id": "auto_25",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "hard",
+    "prompt": "Safely undo already-pushed commit 9f8e7d6 on a shared branch by creating a NEW inverse commit that reverses its changes without rewriting public history.",
+    "choices": [
+      "git revert 9f8e7d6",
+      "git reset --hard 9f8e7d6",
+      "git rm 9f8e7d6",
+      "git rebase -d 9f8e7d6"
+    ],
+    "correct_choice": "git revert 9f8e7d6",
+    "accepted_commands": [
+      "git revert 9f8e7d6",
+      "git revert --no-edit 9f8e7d6"
+    ],
+    "hint": "Use git revert (safe for shared/pushed history).",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `git revert 9f8e7d6` records a new commit containing the exact opposite patch, preserving shared commit history rather than force-rewriting it via `git reset`."
+  },
+  {
+    "id": "auto_26",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "hard",
+    "prompt": "After an accidental git reset --hard dropped a commit from your branch, display Git's local HEAD reference movement log to locate the lost commit hash.",
+    "choices": [
+      "git reflog",
+      "git log --lost",
+      "git status --history",
+      "git fsck --head"
+    ],
+    "correct_choice": "git reflog",
+    "accepted_commands": [
+      "git reflog",
+      "git reflog show"
+    ],
+    "hint": "Use the git command that records local reference updates (ref + log).",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `git reflog` records every local move of `HEAD` and branch tips (commits, checkouts, rebases, resets), allowing recovery of unreachable commits before garbage collection."
+  },
+  {
+    "id": "auto_27",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "hard",
+    "prompt": "Display a compact single-line-per-commit ASCII branch topology graph across ALL branches and tags in your Git repository.",
+    "choices": [
+      "git log --oneline --graph --all",
+      "git log --short --tree",
+      "git branch --graph --all",
+      "git show --oneline --all"
+    ],
+    "correct_choice": "git log --oneline --graph --all",
+    "accepted_commands": [
+      "git log --oneline --graph --all",
+      "git log --oneline --all --graph",
+      "git log --graph --oneline --all",
+      "git log --graph --all --oneline",
+      "git log --all --oneline --graph",
+      "git log --all --graph --oneline"
+    ],
+    "hint": "Combine git log with --oneline, --graph, and --all.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `git log --oneline --graph --all` renders abbreviated commit hashes/subjects (`--oneline`) alongside ASCII branch/merge lines (`--graph`) across every ref (`--all`)."
+  },
+  {
+    "id": "auto_28",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "hard",
+    "prompt": "Forcefully remove all untracked files AND untracked directories from your Git working tree using git clean.",
+    "choices": [
+      "git clean -fd",
+      "git clean -f",
+      "git reset --hard",
+      "git rm -rf ."
+    ],
+    "correct_choice": "git clean -fd",
+    "accepted_commands": [
+      "git clean -fd",
+      "git clean -df",
+      "git clean -f -d",
+      "git clean -d -f"
+    ],
+    "hint": "Combine -f (force) and -d (untracked directories) with git clean.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `git clean -fd` deletes untracked files (`-f`) as well as untracked directories (`-d`), whereas `git reset --hard` only reverts tracked files and leaves untracked artifacts behind."
+  },
+  {
+    "id": "auto_29",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "hard",
+    "prompt": "Encrypt sensitive variable file vars/secrets.yml in place using Ansible Vault so it can be safely committed to Git.",
+    "choices": [
+      "ansible-vault encrypt vars/secrets.yml",
+      "ansible-playbook --encrypt vars/secrets.yml",
+      "ansible-vault seal vars/secrets.yml",
+      "ansible-config encrypt vars/secrets.yml"
+    ],
+    "correct_choice": "ansible-vault encrypt vars/secrets.yml",
+    "accepted_commands": [
+      "ansible-vault encrypt vars/secrets.yml"
+    ],
+    "hint": "Use ansible-vault with the encrypt subcommand.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `ansible-vault encrypt vars/secrets.yml` encrypts the YAML file with AES256 so secrets can reside safely in version control (decrypted at runtime via `--ask-vault-pass` or `--vault-password-file`)."
+  },
+  {
+    "id": "auto_30",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "hard",
+    "prompt": "Run Ansible playbook site.yml with inventory hosts.ini, executing ONLY tasks labeled with the tag firewall.",
+    "choices": [
+      "ansible-playbook -i hosts.ini site.yml --tags firewall",
+      "ansible-playbook -i hosts.ini site.yml --only firewall",
+      "ansible-playbook -i hosts.ini site.yml --limit firewall",
+      "ansible-playbook -i hosts.ini site.yml --filter firewall"
+    ],
+    "correct_choice": "ansible-playbook -i hosts.ini site.yml --tags firewall",
+    "accepted_commands": [
+      "ansible-playbook -i hosts.ini site.yml --tags firewall",
+      "ansible-playbook -i hosts.ini --tags firewall site.yml",
+      "ansible-playbook --tags firewall -i hosts.ini site.yml",
+      "ansible-playbook -i hosts.ini site.yml --tags=firewall",
+      "ansible-playbook -i hosts.ini site.yml -t firewall",
+      "ansible-playbook -t firewall -i hosts.ini site.yml"
+    ],
+    "hint": "Pass --tags firewall (or -t firewall) to ansible-playbook.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `--tags firewall` (`-t`) runs only plays/tasks tagged `firewall`, skipping unrelated deployment steps. `--limit` filters target hosts rather than task tags."
+  },
+  {
+    "id": "auto_31",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "hard",
+    "prompt": "Execute Ansible playbook site.yml using inventory hosts.ini while restricting execution strictly to the single host web02.example.com.",
+    "choices": [
+      "ansible-playbook -i hosts.ini site.yml --limit web02.example.com",
+      "ansible-playbook -i hosts.ini site.yml --host web02.example.com",
+      "ansible-playbook -i hosts.ini site.yml --tags web02.example.com",
+      "ansible-playbook -i hosts.ini site.yml --target web02.example.com"
+    ],
+    "correct_choice": "ansible-playbook -i hosts.ini site.yml --limit web02.example.com",
+    "accepted_commands": [
+      "ansible-playbook -i hosts.ini site.yml --limit web02.example.com",
+      "ansible-playbook --limit web02.example.com -i hosts.ini site.yml",
+      "ansible-playbook -i hosts.ini --limit web02.example.com site.yml",
+      "ansible-playbook -i hosts.ini site.yml --limit=web02.example.com",
+      "ansible-playbook -i hosts.ini site.yml -l web02.example.com",
+      "ansible-playbook -l web02.example.com -i hosts.ini site.yml"
+    ],
+    "hint": "Pass --limit <host> (or -l <host>) to ansible-playbook.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `ansible-playbook -i hosts.ini site.yml --limit web02.example.com` (`-l`) restricts playbook execution to the named host or group subset without editing the inventory file."
+  },
+  {
+    "id": "auto_32",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "hard",
+    "prompt": "Check Bash script deploy.sh for syntax errors (unclosed quotes, missing fi/done) WITHOUT executing any of its commands.",
+    "choices": [
+      "bash -n deploy.sh",
+      "bash -x deploy.sh",
+      "bash -c deploy.sh",
+      "shellcheck -n deploy.sh"
+    ],
+    "correct_choice": "bash -n deploy.sh",
+    "accepted_commands": [
+      "bash -n deploy.sh",
+      "bash -n ./deploy.sh"
+    ],
+    "hint": "Pass -n (noexec) to bash.",
+    "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `bash -n deploy.sh` (`noexec`) parses the script and reports syntax errors without running any commands. `bash -x` actually executes the script in trace mode."
+  }
+]

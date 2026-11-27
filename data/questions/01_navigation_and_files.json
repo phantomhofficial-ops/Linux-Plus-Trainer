@@ -1,0 +1,754 @@
+[
+  {
+    "id": "nav_01",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "beginner",
+    "prompt": "You moved from /etc/nginx/sites-available into /var/log/nginx to check logs. What single Bash command switches directly back to your previous working directory?",
+    "choices": [
+      "cd -",
+      "cd ..",
+      "cd ~",
+      "cd /"
+    ],
+    "correct_choice": "cd -",
+    "accepted_commands": [
+      "cd -",
+      "cd \"$OLDPWD\"",
+      "cd $OLDPWD"
+    ],
+    "hint": "Use the hyphen shorthand with cd that references $OLDPWD.",
+    "explanation": "Domain 1.0 (System Management): `cd -` switches to the previous working directory stored in `$OLDPWD` and prints its path. `cd ..` only moves up one parent level, `cd ~` goes to your home directory, and `cd /` jumps to the filesystem root."
+  },
+  {
+    "id": "nav_02",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "beginner",
+    "prompt": "Display a long-format listing of /etc/skel that includes hidden dotfiles (including . and ..) and shows file sizes in human-readable units (KiB/MiB).",
+    "choices": [
+      "ls -lah /etc/skel",
+      "ls -l /etc/skel",
+      "ls -lh /etc/skel",
+      "ls -laS /etc/skel"
+    ],
+    "correct_choice": "ls -lah /etc/skel",
+    "accepted_commands": [
+      "ls -lah /etc/skel",
+      "ls -alh /etc/skel",
+      "ls -lha /etc/skel",
+      "ls -hal /etc/skel",
+      "ls -hla /etc/skel",
+      "ls -ahl /etc/skel",
+      "ls -l -a -h /etc/skel",
+      "ls -a -l -h /etc/skel",
+      "ls -lah /etc/skel/",
+      "ls -alh /etc/skel/"
+    ],
+    "hint": "Combine the ls flags for long format (-l), all files including dotfiles (-a), and human-readable sizes (-h).",
+    "explanation": "Domain 1.0 (System Management): `ls -lah /etc/skel` uses `-l` for detailed permissions/ownership/timestamps, `-a` to show hidden dotfiles beginning with `.` (such as `.bashrc`), and `-h` for human-readable sizes (`K`, `M`, `G`). `-S` sorts by size rather than making sizes human-readable."
+  },
+  {
+    "id": "nav_03",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "intermediate",
+    "prompt": "Search recursively under /var/log (as root) for regular files whose filenames end with .log and whose size is strictly greater than 50 MiB.",
+    "choices": [
+      "find /var/log -type f -name \"*.log\" -size +50M",
+      "find /var/log -type d -name \"*.log\" -size +50M",
+      "find /var/log -type f -name \"*.log\" -size 50M",
+      "grep -r \"*.log\" /var/log"
+    ],
+    "correct_choice": "find /var/log -type f -name \"*.log\" -size +50M",
+    "accepted_commands": [
+      "find /var/log -type f -name \"*.log\" -size +50M",
+      "find /var/log -type f -name '*.log' -size +50M",
+      "find /var/log -name \"*.log\" -type f -size +50M",
+      "find /var/log -name '*.log' -type f -size +50M",
+      "find /var/log -type f -size +50M -name \"*.log\"",
+      "find /var/log -type f -size +50M -name '*.log'",
+      "sudo find /var/log -type f -name \"*.log\" -size +50M",
+      "sudo find /var/log -type f -name '*.log' -size +50M"
+    ],
+    "hint": "Use find with -type f, -name \"*.log\", and -size with a + prefix and M suffix.",
+    "explanation": "Domain 1.0 (System Management): `find /var/log -type f -name \"*.log\" -size +50M` filters for regular files (`-type f`), matches the glob `*.log` (`-name`), and checks for sizes larger than 50 mebibytes (`+50M`). Omitting `+` (`-size 50M`) matches only files of exactly 50 MiB, while `-type d` matches directories."
+  },
+  {
+    "id": "nav_04",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "beginner",
+    "prompt": "Create an archive copy (as root) of the entire /etc/nginx directory at /backup/nginx, recursively preserving permissions, ownership, timestamps, and symbolic links.",
+    "choices": [
+      "cp -a /etc/nginx /backup/nginx",
+      "cp -r /etc/nginx /backup/nginx",
+      "cp -f /etc/nginx /backup/nginx",
+      "mv -r /etc/nginx /backup/nginx"
+    ],
+    "correct_choice": "cp -a /etc/nginx /backup/nginx",
+    "accepted_commands": [
+      "cp -a /etc/nginx /backup/nginx",
+      "cp -a /etc/nginx/ /backup/nginx",
+      "cp -dpR /etc/nginx /backup/nginx",
+      "sudo cp -a /etc/nginx /backup/nginx",
+      "sudo cp -dpR /etc/nginx /backup/nginx"
+    ],
+    "hint": "Use the archive flag with cp (-a) instead of plain -r.",
+    "explanation": "Domain 1.0 (System Management): `cp -a` (archive mode, equivalent to `-dR --preserve=all` in GNU coreutils / `-dpR` in POSIX conventions) recursively copies directories while preserving permissions, ownership, timestamps, and symbolic links without dereferencing them. Plain `cp -r` does not preserve ownership or timestamps."
+  },
+  {
+    "id": "nav_05",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "beginner",
+    "prompt": "Move /tmp/report.draft to /srv/reports/report.final while ensuring that if /srv/reports/report.final already exists, it will NOT be overwritten.",
+    "choices": [
+      "mv -n /tmp/report.draft /srv/reports/report.final",
+      "mv -f /tmp/report.draft /srv/reports/report.final",
+      "mv -v /tmp/report.draft /srv/reports/report.final",
+      "cp -n /tmp/report.draft /srv/reports/report.final"
+    ],
+    "correct_choice": "mv -n /tmp/report.draft /srv/reports/report.final",
+    "accepted_commands": [
+      "mv -n /tmp/report.draft /srv/reports/report.final",
+      "mv --no-clobber /tmp/report.draft /srv/reports/report.final",
+      "sudo mv -n /tmp/report.draft /srv/reports/report.final"
+    ],
+    "hint": "Look for the no-clobber flag on mv.",
+    "explanation": "Domain 1.0 (System Management): `mv -n` (`--no-clobber`) prevents `mv` from overwriting an existing destination file. `mv -f` forces overwriting without prompting, `mv -v` only enables verbose output, and `cp -n` copies instead of moving."
+  },
+  {
+    "id": "nav_06",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "beginner",
+    "prompt": "Recursively and forcefully delete the directory /tmp/build_artifacts and all of its contents without interactive confirmation prompts.",
+    "choices": [
+      "rm -rf /tmp/build_artifacts",
+      "rmdir /tmp/build_artifacts",
+      "rm -f /tmp/build_artifacts",
+      "rm -ri /tmp/build_artifacts"
+    ],
+    "correct_choice": "rm -rf /tmp/build_artifacts",
+    "accepted_commands": [
+      "rm -rf /tmp/build_artifacts",
+      "rm -fr /tmp/build_artifacts",
+      "rm -r -f /tmp/build_artifacts",
+      "rm -f -r /tmp/build_artifacts",
+      "rm -Rf /tmp/build_artifacts",
+      "rm -rf /tmp/build_artifacts/",
+      "rm -fr /tmp/build_artifacts/"
+    ],
+    "hint": "Combine the recursive (-r) and force (-f) flags on rm.",
+    "explanation": "Domain 1.0 (System Management): `rm -rf /tmp/build_artifacts` combines `-r` (recursive directory traversal) and `-f` (force removal without confirmation prompts or errors for nonexistent files). `rmdir` only removes empty directories, `rm -f` alone fails on directories, and `-i` prompts before every removal."
+  },
+  {
+    "id": "nav_07",
+    "domain": "2.0 Services and User Management",
+    "category": "Navigation & File Management",
+    "difficulty": "beginner",
+    "prompt": "Create a symbolic (soft) link (as root) at /usr/local/bin/python-app that points to /opt/app/run.py.",
+    "choices": [
+      "ln -s /opt/app/run.py /usr/local/bin/python-app",
+      "ln -s /usr/local/bin/python-app /opt/app/run.py",
+      "ln /opt/app/run.py /usr/local/bin/python-app",
+      "cp -s /usr/local/bin/python-app /opt/app/run.py"
+    ],
+    "correct_choice": "ln -s /opt/app/run.py /usr/local/bin/python-app",
+    "accepted_commands": [
+      "ln -s /opt/app/run.py /usr/local/bin/python-app",
+      "ln -sf /opt/app/run.py /usr/local/bin/python-app",
+      "sudo ln -s /opt/app/run.py /usr/local/bin/python-app",
+      "sudo ln -sf /opt/app/run.py /usr/local/bin/python-app"
+    ],
+    "hint": "With ln -s, the existing target file comes first and the new symlink path comes second.",
+    "explanation": "Domain 2.0 (Services and User Management): `ln -s TARGET LINK_NAME` creates a symbolic link (`-s`) pointing `/usr/local/bin/python-app` to `/opt/app/run.py`. Reversing the argument order breaks the command, and omitting `-s` attempts to create a hard link instead of a symlink."
+  },
+  {
+    "id": "nav_08",
+    "domain": "2.0 Services and User Management",
+    "category": "Navigation & File Management",
+    "difficulty": "intermediate",
+    "prompt": "Create a hard link (as root) at /backup/hosts.bak that shares the exact same inode as /etc/hosts (assume both paths reside on the same filesystem).",
+    "choices": [
+      "ln /etc/hosts /backup/hosts.bak",
+      "ln -s /etc/hosts /backup/hosts.bak",
+      "ln /backup/hosts.bak /etc/hosts",
+      "cp -l /backup/hosts.bak /etc/hosts"
+    ],
+    "correct_choice": "ln /etc/hosts /backup/hosts.bak",
+    "accepted_commands": [
+      "ln /etc/hosts /backup/hosts.bak",
+      "sudo ln /etc/hosts /backup/hosts.bak"
+    ],
+    "hint": "Hard links are the default behavior of ln when -s is omitted.",
+    "explanation": "Domain 2.0 (Services and User Management): `ln /etc/hosts /backup/hosts.bak` creates an additional directory entry pointing directly to the inode of `/etc/hosts`. Unlike symbolic links (`ln -s`), hard links share the same inode and link count and must reside within the same filesystem."
+  },
+  {
+    "id": "nav_09",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "beginner",
+    "prompt": "Search /var/log/auth.log (as root) for lines matching the pattern error case-insensitively and prefix each matching line with its line number.",
+    "choices": [
+      "grep -in \"error\" /var/log/auth.log",
+      "grep -rn \"error\" /var/log/auth.log",
+      "grep -vn \"error\" /var/log/auth.log",
+      "grep -ic \"error\" /var/log/auth.log"
+    ],
+    "correct_choice": "grep -in \"error\" /var/log/auth.log",
+    "accepted_commands": [
+      "grep -in \"error\" /var/log/auth.log",
+      "grep -ni \"error\" /var/log/auth.log",
+      "grep -in 'error' /var/log/auth.log",
+      "grep -ni 'error' /var/log/auth.log",
+      "grep -in error /var/log/auth.log",
+      "grep -ni error /var/log/auth.log",
+      "grep -i -n \"error\" /var/log/auth.log",
+      "grep -i -n error /var/log/auth.log",
+      "sudo grep -in \"error\" /var/log/auth.log",
+      "sudo grep -in error /var/log/auth.log"
+    ],
+    "hint": "Combine the grep flags for case-insensitive matching (-i) and line numbers (-n).",
+    "explanation": "Domain 1.0 (System Management): `grep -in \"error\" /var/log/auth.log` uses `-i` to ignore case (`error`, `Error`, `ERROR`) and `-n` to print the 1-based line number before each match. `-v` inverts matches, `-c` only prints a count, and `-r` recurses directories without case folding."
+  },
+  {
+    "id": "nav_10",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "beginner",
+    "prompt": "Read the contents of /etc/passwd with cat and pipe stdout into wc to print only the total line count.",
+    "choices": [
+      "cat /etc/passwd | wc -l",
+      "cat /etc/passwd > wc -l",
+      "cat /etc/passwd | wc -c",
+      "wc -w /etc/passwd"
+    ],
+    "correct_choice": "cat /etc/passwd | wc -l",
+    "accepted_commands": [
+      "cat /etc/passwd | wc -l",
+      "cat /etc/passwd|wc -l"
+    ],
+    "hint": "Use the pipe operator (|) between cat /etc/passwd and wc with the line-count flag.",
+    "explanation": "Domain 1.0 (System Management): `cat /etc/passwd | wc -l` uses the POSIX pipe (`|`) to send standard output from `cat` into standard input of `wc -l`, which counts newline characters (lines). `>` redirects stdout to a file named `wc` rather than piping to a command, while `wc -c` counts bytes and `wc -w` counts words."
+  },
+  {
+    "id": "nav_11",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "intermediate",
+    "prompt": "Run /usr/local/bin/backup.sh (as root), redirecting stdout to overwrite /var/log/backup.log and redirecting stderr (FD 2) to the same destination as stdout (FD 1) using standard POSIX shell syntax.",
+    "choices": [
+      "/usr/local/bin/backup.sh > /var/log/backup.log 2>&1",
+      "/usr/local/bin/backup.sh 2>&1 > /var/log/backup.log",
+      "/usr/local/bin/backup.sh >> /var/log/backup.log 2>&1",
+      "/usr/local/bin/backup.sh 2> /var/log/backup.log"
+    ],
+    "correct_choice": "/usr/local/bin/backup.sh > /var/log/backup.log 2>&1",
+    "accepted_commands": [
+      "/usr/local/bin/backup.sh > /var/log/backup.log 2>&1",
+      "/usr/local/bin/backup.sh 1> /var/log/backup.log 2>&1",
+      "/usr/local/bin/backup.sh >/var/log/backup.log 2>&1",
+      "sudo /usr/local/bin/backup.sh > /var/log/backup.log 2>&1"
+    ],
+    "hint": "Redirect FD 1 first with > file, then duplicate FD 1 onto FD 2 with 2>&1.",
+    "explanation": "Domain 1.0 (System Management): POSIX shells evaluate redirections left to right. `> /var/log/backup.log 2>&1` points stdout (FD 1) to `/var/log/backup.log` (truncating/overwriting it) and then points stderr (FD 2) to the updated FD 1 target. Placing `2>&1` before `> file` sends stderr to the terminal instead, and `>>` appends rather than overwriting."
+  },
+  {
+    "id": "nav_12",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "beginner",
+    "prompt": "Print the full absolute path of your current working directory in Bash.",
+    "choices": [
+      "pwd",
+      "ls -d",
+      "cd .",
+      "dirname ."
+    ],
+    "correct_choice": "pwd",
+    "accepted_commands": [
+      "pwd",
+      "pwd -L",
+      "pwd -P"
+    ],
+    "hint": "This three-letter POSIX built-in stands for 'print working directory'.",
+    "explanation": "Domain 1.0 (System Management): `pwd` prints the absolute pathname of the current working directory (`-L` shows the logical symlink path; `-P` resolves physical symlinks). `cd .` changes to the current directory without output, and `dirname .` only prints `.`."
+  },
+  {
+    "id": "nav_13",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "beginner",
+    "prompt": "Create the directory path /srv/apps/api/logs (as root) in a single command, automatically creating any missing parent directories without failing if directories already exist.",
+    "choices": [
+      "mkdir -p /srv/apps/api/logs",
+      "mkdir -r /srv/apps/api/logs",
+      "mkdir /srv/apps/api/logs",
+      "touch -p /srv/apps/api/logs"
+    ],
+    "correct_choice": "mkdir -p /srv/apps/api/logs",
+    "accepted_commands": [
+      "mkdir -p /srv/apps/api/logs",
+      "mkdir --parents /srv/apps/api/logs",
+      "mkdir -p /srv/apps/api/logs/",
+      "sudo mkdir -p /srv/apps/api/logs",
+      "sudo mkdir --parents /srv/apps/api/logs",
+      "sudo mkdir -p /srv/apps/api/logs/"
+    ],
+    "hint": "Pass the parent-creation flag (-p) to mkdir.",
+    "explanation": "Domain 1.0 (System Management): `mkdir -p /srv/apps/api/logs` (`--parents`) creates any nonexistent parent directories along the path and succeeds silently if the directory already exists. `mkdir` without `-p` fails if `/srv/apps/api` is missing, and `-r` is not a valid `mkdir` flag."
+  },
+  {
+    "id": "nav_14",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "beginner",
+    "prompt": "Display only the final 20 lines of /var/log/syslog (as root) without continuously following new entries.",
+    "choices": [
+      "tail -n 20 /var/log/syslog",
+      "head -n 20 /var/log/syslog",
+      "tail -f 20 /var/log/syslog",
+      "cat -20 /var/log/syslog"
+    ],
+    "correct_choice": "tail -n 20 /var/log/syslog",
+    "accepted_commands": [
+      "tail -n 20 /var/log/syslog",
+      "tail -20 /var/log/syslog",
+      "tail --lines=20 /var/log/syslog",
+      "sudo tail -n 20 /var/log/syslog",
+      "sudo tail -20 /var/log/syslog"
+    ],
+    "hint": "Use tail with -n followed by the line count 20.",
+    "explanation": "Domain 1.0 (System Management): `tail -n 20 /var/log/syslog` prints the last 20 lines of the file (default is 10 lines). `head -n 20` prints the first 20 lines, `tail -f` follows new writes indefinitely and treats `20` as a filename, and `cat` has no `-20` option."
+  },
+  {
+    "id": "nav_15",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "beginner",
+    "prompt": "Using echo and POSIX redirection, append the exact text Backup complete as a new line at the end of /tmp/status.log without overwriting existing file contents.",
+    "choices": [
+      "echo \"Backup complete\" >> /tmp/status.log",
+      "echo \"Backup complete\" > /tmp/status.log",
+      "echo \"Backup complete\" | /tmp/status.log",
+      "echo \"Backup complete\" 2> /tmp/status.log"
+    ],
+    "correct_choice": "echo \"Backup complete\" >> /tmp/status.log",
+    "accepted_commands": [
+      "echo \"Backup complete\" >> /tmp/status.log",
+      "echo 'Backup complete' >> /tmp/status.log",
+      "echo Backup complete >> /tmp/status.log"
+    ],
+    "hint": "Use the double-chevron append redirection operator (>>).",
+    "explanation": "Domain 1.0 (System Management): `>>` opens `/tmp/status.log` in append mode so `echo`'s output is added at the end rather than truncating the file. Single `>` overwrites the entire file, `|` expects an executable command rather than a data file, and `2>` redirects stderr instead of stdout."
+  },
+  {
+    "id": "nav_16",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "intermediate",
+    "prompt": "Using find with -exec (as root), delete all regular files under /var/tmp whose modification time is strictly older than 30 days.",
+    "choices": [
+      "find /var/tmp -type f -mtime +30 -exec rm {} \\;",
+      "find /var/tmp -type f -mtime -30 -exec rm {} \\;",
+      "find /var/tmp -type d -mtime +30 -exec rm {} \\;",
+      "rm -rf /var/tmp/* -mtime +30"
+    ],
+    "correct_choice": "find /var/tmp -type f -mtime +30 -exec rm {} \\;",
+    "accepted_commands": [
+      "find /var/tmp -type f -mtime +30 -exec rm {} \\;",
+      "find /var/tmp -type f -mtime +30 -exec rm {} +",
+      "find /var/tmp -mtime +30 -type f -exec rm {} \\;",
+      "find /var/tmp -mtime +30 -type f -exec rm {} +",
+      "find /var/tmp -type f -mtime +30 -exec rm -f {} \\;",
+      "find /var/tmp -type f -mtime +30 -exec rm -f {} +",
+      "sudo find /var/tmp -type f -mtime +30 -exec rm {} \\;",
+      "sudo find /var/tmp -type f -mtime +30 -exec rm {} +"
+    ],
+    "hint": "Use -type f, -mtime +30 (plus for older than), and -exec rm {} \\; (or +).",
+    "explanation": "Domain 1.0 (System Management): `find /var/tmp -type f -mtime +30 -exec rm {} \\;` matches regular files (`-type f`) modified more than 30 days ago (`+30`) and runs `rm` on each matched path (`{}`). `-mtime -30` matches files newer than 30 days."
+  },
+  {
+    "id": "nav_17",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "intermediate",
+    "prompt": "Recursively search /etc (as root) using extended regular expressions and print line numbers for every line matching ERROR or CRITICAL.",
+    "choices": [
+      "grep -rnE \"ERROR|CRITICAL\" /etc",
+      "grep -rn \"ERROR|CRITICAL\" /etc",
+      "grep -rE \"ERROR&CRITICAL\" /etc",
+      "find /etc -name \"ERROR|CRITICAL\""
+    ],
+    "correct_choice": "grep -rnE \"ERROR|CRITICAL\" /etc",
+    "accepted_commands": [
+      "grep -rnE \"ERROR|CRITICAL\" /etc",
+      "grep -rnE 'ERROR|CRITICAL' /etc",
+      "grep -Enr \"ERROR|CRITICAL\" /etc",
+      "grep -Enr 'ERROR|CRITICAL' /etc",
+      "grep -rEn \"ERROR|CRITICAL\" /etc",
+      "grep -r -n -E \"ERROR|CRITICAL\" /etc",
+      "sudo grep -rnE \"ERROR|CRITICAL\" /etc",
+      "sudo grep -rnE 'ERROR|CRITICAL' /etc"
+    ],
+    "hint": "Combine recursive (-r), line-number (-n), and extended-regex (-E) flags with grep.",
+    "explanation": "Domain 1.0 (System Management): `grep -rnE \"ERROR|CRITICAL\" /etc` enables recursive traversal (`-r`), 1-based line numbers (`-n`), and POSIX Extended Regular Expressions (`-E`) so `|` acts as alternation rather than a literal pipe character."
+  },
+  {
+    "id": "nav_18",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "intermediate",
+    "prompt": "Use sed to perform an in-place global substitution (as root) replacing every occurrence of http:// with https:// inside /etc/app/app.conf.",
+    "choices": [
+      "sed -i 's|http://|https://|g' /etc/app/app.conf",
+      "sed 's|http://|https://|g' /etc/app/app.conf",
+      "sed -i 's|http://|https://|' /etc/app/app.conf",
+      "awk -i 's/http:/https:/g' /etc/app/app.conf"
+    ],
+    "correct_choice": "sed -i 's|http://|https://|g' /etc/app/app.conf",
+    "accepted_commands": [
+      "sed -i 's|http://|https://|g' /etc/app/app.conf",
+      "sed -i \"s|http://|https://|g\" /etc/app/app.conf",
+      "sed -i 's/http:\\/\\//https:\\/\\//g' /etc/app/app.conf",
+      "sed -i \"s/http:\\/\\//https:\\/\\//g\" /etc/app/app.conf",
+      "sudo sed -i 's|http://|https://|g' /etc/app/app.conf",
+      "sudo sed -i \"s|http://|https://|g\" /etc/app/app.conf"
+    ],
+    "hint": "Use sed -i with an alternate delimiter (such as |) and the g flag for global replacement.",
+    "explanation": "Domain 1.0 (System Management): `sed -i 's|http://|https://|g' /etc/app/app.conf` edits the file in place (`-i`), uses `|` as the substitution delimiter to avoid escaping slashes, and appends `g` to replace all matches on each line rather than just the first."
+  },
+  {
+    "id": "nav_19",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "intermediate",
+    "prompt": "Use awk with a colon field delimiter to print only the first field (username) from every line in /etc/passwd.",
+    "choices": [
+      "awk -F: '{print $1}' /etc/passwd",
+      "awk -d: '{print $1}' /etc/passwd",
+      "awk -F: '{print $0}' /etc/passwd",
+      "cut -F: -f1 /etc/passwd"
+    ],
+    "correct_choice": "awk -F: '{print $1}' /etc/passwd",
+    "accepted_commands": [
+      "awk -F: '{print $1}' /etc/passwd",
+      "awk -F ':' '{print $1}' /etc/passwd",
+      "awk -F \":\" '{print $1}' /etc/passwd",
+      "awk -F: '{ print $1 }' /etc/passwd",
+      "awk -F ':' '{ print $1 }' /etc/passwd"
+    ],
+    "hint": "Specify the field separator with -F: and print $1 inside single quotes.",
+    "explanation": "Domain 1.0 (System Management): `awk -F: '{print $1}' /etc/passwd` sets the input field separator to `:` (`-F:`) and prints the first column (`$1`) of every record. `$0` prints the entire line, while `cut` uses `-d` rather than `-F`."
+  },
+  {
+    "id": "nav_20",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "intermediate",
+    "prompt": "Read /var/log/ips.txt, sort its lines so identical IP addresses are adjacent, and pipe into uniq to display each unique IP prefixed by its occurrence count.",
+    "choices": [
+      "sort /var/log/ips.txt | uniq -c",
+      "uniq -c /var/log/ips.txt",
+      "sort -c /var/log/ips.txt | uniq",
+      "cat /var/log/ips.txt | wc -c"
+    ],
+    "correct_choice": "sort /var/log/ips.txt | uniq -c",
+    "accepted_commands": [
+      "sort /var/log/ips.txt | uniq -c",
+      "sort /var/log/ips.txt|uniq -c"
+    ],
+    "hint": "sort must precede uniq -c because uniq only collapses adjacent duplicates.",
+    "explanation": "Domain 1.0 (System Management): `uniq` only deduplicates consecutive matching lines, so `sort /var/log/ips.txt | uniq -c` groups identical entries together before `uniq -c` counts (`-c`) each unique value."
+  },
+  {
+    "id": "nav_21",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "intermediate",
+    "prompt": "Synchronize the contents of local directory /srv/www/ over SSH to backup@10.0.5.20:/backup/www/ using rsync in archive mode with verbose output and transfer compression.",
+    "choices": [
+      "rsync -avz /srv/www/ backup@10.0.5.20:/backup/www/",
+      "rsync -rvz /srv/www/ backup@10.0.5.20:/backup/www/",
+      "scp -avz /srv/www/ backup@10.0.5.20:/backup/www/",
+      "rsync -avz backup@10.0.5.20:/backup/www/ /srv/www/"
+    ],
+    "correct_choice": "rsync -avz /srv/www/ backup@10.0.5.20:/backup/www/",
+    "accepted_commands": [
+      "rsync -avz /srv/www/ backup@10.0.5.20:/backup/www/",
+      "rsync -vaz /srv/www/ backup@10.0.5.20:/backup/www/",
+      "rsync -azv /srv/www/ backup@10.0.5.20:/backup/www/",
+      "rsync -a -v -z /srv/www/ backup@10.0.5.20:/backup/www/"
+    ],
+    "hint": "Combine rsync flags -a (archive), -v (verbose), and -z (compress).",
+    "explanation": "Domain 1.0 (System Management): `rsync -avz /srv/www/ backup@10.0.5.20:/backup/www/` preserves permissions, symlinks, ownership, and timestamps (`-a`), logs transferred files (`-v`), and compresses payload data in transit (`-z`). Note the trailing slash on `/srv/www/` syncs its contents directly into `/backup/www/`."
+  },
+  {
+    "id": "nav_22",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "intermediate",
+    "prompt": "Run df -h and pipe its output into tee (as root) so the report both prints to the terminal and appends to /var/log/disk_audit.log.",
+    "choices": [
+      "df -h | tee -a /var/log/disk_audit.log",
+      "df -h >> tee /var/log/disk_audit.log",
+      "df -h | tee /var/log/disk_audit.log",
+      "df -h > /var/log/disk_audit.log 2>&1"
+    ],
+    "correct_choice": "df -h | tee -a /var/log/disk_audit.log",
+    "accepted_commands": [
+      "df -h | tee -a /var/log/disk_audit.log",
+      "df -h | sudo tee -a /var/log/disk_audit.log"
+    ],
+    "hint": "Pipe into tee with its append flag (-a).",
+    "explanation": "Domain 1.0 (System Management): `tee` duplicates stdin to both stdout and one or more files. Adding `-a` (`--append`) appends to `/var/log/disk_audit.log` instead of overwriting it, while `>` suppresses terminal display."
+  },
+  {
+    "id": "nav_23",
+    "domain": "2.0 Services and User Management",
+    "category": "Navigation & File Management",
+    "difficulty": "intermediate",
+    "prompt": "Atomically replace existing directory symlink /var/www/current (as root) so it points to /var/www/releases/v2 without following the old symlink target.",
+    "choices": [
+      "ln -sfn /var/www/releases/v2 /var/www/current",
+      "ln -sf /var/www/releases/v2 /var/www/current",
+      "ln -fn /var/www/releases/v2 /var/www/current",
+      "mv -s /var/www/releases/v2 /var/www/current"
+    ],
+    "correct_choice": "ln -sfn /var/www/releases/v2 /var/www/current",
+    "accepted_commands": [
+      "ln -sfn /var/www/releases/v2 /var/www/current",
+      "ln -snf /var/www/releases/v2 /var/www/current",
+      "ln -nsf /var/www/releases/v2 /var/www/current",
+      "sudo ln -sfn /var/www/releases/v2 /var/www/current",
+      "sudo ln -snf /var/www/releases/v2 /var/www/current",
+      "sudo ln -nsf /var/www/releases/v2 /var/www/current"
+    ],
+    "hint": "Combine -s (symbolic), -f (force overwrite), and -n (--no-dereference) on ln.",
+    "explanation": "Domain 2.0 (Services and User Management): When `/var/www/current` is already a symlink to a directory, plain `ln -sf` follows it and places a nested symlink inside the old release directory. Adding `-n` (`--no-dereference`) treats `/var/www/current` as a file and replaces the symlink cleanly."
+  },
+  {
+    "id": "nav_24",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "hard",
+    "prompt": "Find all regular files ending in .tmp under /srv/uploads and delete them via xargs using NUL-delimited output so filenames containing spaces or newlines are handled safely.",
+    "choices": [
+      "find /srv/uploads -type f -name \"*.tmp\" -print0 | xargs -0 rm",
+      "find /srv/uploads -type f -name \"*.tmp\" | xargs rm",
+      "find /srv/uploads -type f -name \"*.tmp\" -print0 | xargs rm -0",
+      "find /srv/uploads -name \"*.tmp\" -print0 | xargs -I rm"
+    ],
+    "correct_choice": "find /srv/uploads -type f -name \"*.tmp\" -print0 | xargs -0 rm",
+    "accepted_commands": [
+      "find /srv/uploads -type f -name \"*.tmp\" -print0 | xargs -0 rm",
+      "find /srv/uploads -type f -name '*.tmp' -print0 | xargs -0 rm",
+      "find /srv/uploads -type f -name \"*.tmp\" -print0 | xargs -0 rm -f",
+      "find /srv/uploads -type f -name '*.tmp' -print0 | xargs -0 rm -f",
+      "find /srv/uploads -name \"*.tmp\" -type f -print0 | xargs -0 rm",
+      "sudo find /srv/uploads -type f -name \"*.tmp\" -print0 | xargs -0 rm"
+    ],
+    "hint": "Pair find's -print0 action with xargs -0.",
+    "explanation": "Domain 1.0 (System Management): `-print0` terminates each found pathname with an ASCII NUL (`\\0`) byte, and `xargs -0` splits stdin on NUL bytes rather than spaces or newlines, preventing word-splitting bugs and injection on special filenames."
+  },
+  {
+    "id": "nav_25",
+    "domain": "3.0 Security",
+    "category": "Navigation & File Management",
+    "difficulty": "hard",
+    "prompt": "Locate all regular files under /var/www (as root) that have the world-writable permission bit set (-0002) and strip that bit in batches using find -exec ... +.",
+    "choices": [
+      "find /var/www -type f -perm -0002 -exec chmod o-w {} +",
+      "find /var/www -type f -perm 0002 -exec chmod a-w {} +",
+      "find /var/www -type f -perm -0002 -exec chmod g-w {} \\;",
+      "chmod -R o-w /var/www"
+    ],
+    "correct_choice": "find /var/www -type f -perm -0002 -exec chmod o-w {} +",
+    "accepted_commands": [
+      "find /var/www -type f -perm -0002 -exec chmod o-w {} +",
+      "find /var/www -type f -perm -002 -exec chmod o-w {} +",
+      "find /var/www -type f -perm -o=w -exec chmod o-w {} +",
+      "find /var/www -perm -0002 -type f -exec chmod o-w {} +",
+      "sudo find /var/www -type f -perm -0002 -exec chmod o-w {} +",
+      "sudo find /var/www -type f -perm -002 -exec chmod o-w {} +"
+    ],
+    "hint": "Use -perm -0002 (minus means at least that bit) and -exec chmod o-w {} +.",
+    "explanation": "Domain 3.0 (Security): `find /var/www -type f -perm -0002 -exec chmod o-w {} +` finds files where the other-write bit (`0002`) is set regardless of other bits (`-` prefix) and passes matched paths in batches (`+`) to `chmod o-w` without touching directories."
+  },
+  {
+    "id": "nav_26",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "hard",
+    "prompt": "Create an exact mirror of /srv/data/ to backup@10.0.5.20:/backup/data/ using rsync in archive, verbose, compressed mode while deleting any extraneous files on the destination.",
+    "choices": [
+      "rsync -avz --delete /srv/data/ backup@10.0.5.20:/backup/data/",
+      "rsync -avz --remove-source-files /srv/data/ backup@10.0.5.20:/backup/data/",
+      "rsync -avz --clean /srv/data/ backup@10.0.5.20:/backup/data/",
+      "scp -r --delete /srv/data/ backup@10.0.5.20:/backup/data/"
+    ],
+    "correct_choice": "rsync -avz --delete /srv/data/ backup@10.0.5.20:/backup/data/",
+    "accepted_commands": [
+      "rsync -avz --delete /srv/data/ backup@10.0.5.20:/backup/data/",
+      "rsync --delete -avz /srv/data/ backup@10.0.5.20:/backup/data/",
+      "rsync -vaz --delete /srv/data/ backup@10.0.5.20:/backup/data/",
+      "rsync -azv --delete /srv/data/ backup@10.0.5.20:/backup/data/"
+    ],
+    "hint": "Add --delete to rsync -avz.",
+    "explanation": "Domain 1.0 (System Management): `--delete` tells `rsync` to remove files in `/backup/data/` that no longer exist in `/srv/data/`. `--remove-source-files` instead deletes files from the source host after transfer."
+  },
+  {
+    "id": "nav_27",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "hard",
+    "prompt": "Create a gzip-compressed tar archive (as root) at /backup/app.tar.gz of /opt/app while excluding all directories or files matching node_modules.",
+    "choices": [
+      "tar --exclude=node_modules -czf /backup/app.tar.gz /opt/app",
+      "tar --ignore=node_modules -czf /backup/app.tar.gz /opt/app",
+      "tar -czf /backup/app.tar.gz /opt/app --skip=node_modules",
+      "tar -xzf /backup/app.tar.gz --exclude=node_modules /opt/app"
+    ],
+    "correct_choice": "tar --exclude=node_modules -czf /backup/app.tar.gz /opt/app",
+    "accepted_commands": [
+      "tar --exclude=node_modules -czf /backup/app.tar.gz /opt/app",
+      "tar --exclude='node_modules' -czf /backup/app.tar.gz /opt/app",
+      "tar --exclude=\"node_modules\" -czf /backup/app.tar.gz /opt/app",
+      "tar -czf /backup/app.tar.gz --exclude=node_modules /opt/app",
+      "sudo tar --exclude=node_modules -czf /backup/app.tar.gz /opt/app",
+      "sudo tar -czf /backup/app.tar.gz --exclude=node_modules /opt/app"
+    ],
+    "hint": "Pass --exclude=node_modules to tar -czf.",
+    "explanation": "Domain 1.0 (System Management): `tar --exclude=node_modules -czf /backup/app.tar.gz /opt/app` skips matching paths during archiving, saving significant backup space and I/O. GNU `tar` honors `--exclude=` placed either before or after `-czf`."
+  },
+  {
+    "id": "nav_28",
+    "domain": "3.0 Security",
+    "category": "Navigation & File Management",
+    "difficulty": "hard",
+    "prompt": "Set the ext4 immutable attribute on /etc/resolv.conf (as root) so neither NetworkManager nor root can modify, rename, or unlink it until the attribute is cleared.",
+    "choices": [
+      "chattr +i /etc/resolv.conf",
+      "chmod 000 /etc/resolv.conf",
+      "lsattr +i /etc/resolv.conf",
+      "chattr -i /etc/resolv.conf"
+    ],
+    "correct_choice": "chattr +i /etc/resolv.conf",
+    "accepted_commands": [
+      "chattr +i /etc/resolv.conf",
+      "sudo chattr +i /etc/resolv.conf"
+    ],
+    "hint": "Use chattr with +i (immutable).",
+    "explanation": "Domain 3.0 (Security): `chattr +i /etc/resolv.conf` enables the filesystem immutable (`i`) flag, blocking writes, appends, renames, and deletion even by `root` (and preventing DHCP clients from overwriting custom DNS settings). `chmod 000` does not block `root`."
+  },
+  {
+    "id": "nav_29",
+    "domain": "5.0 Troubleshooting",
+    "category": "Navigation & File Management",
+    "difficulty": "hard",
+    "prompt": "Even as root, editing /etc/hosts fails with 'Operation not permitted' despite 0644 permissions. Inspect the file's extended filesystem attributes.",
+    "choices": [
+      "lsattr /etc/hosts",
+      "chattr /etc/hosts",
+      "stat /etc/hosts",
+      "getfacl /etc/hosts"
+    ],
+    "correct_choice": "lsattr /etc/hosts",
+    "accepted_commands": [
+      "lsattr /etc/hosts",
+      "sudo lsattr /etc/hosts"
+    ],
+    "hint": "Use the list-attributes companion command to chattr.",
+    "explanation": "Domain 5.0 (Troubleshooting): `lsattr /etc/hosts` reveals kernel filesystem flags such as `i` (immutable) or `a` (append-only), which explain why `root` receives `EPERM` despite standard DAC permissions."
+  },
+  {
+    "id": "nav_30",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "hard",
+    "prompt": "Using awk on /etc/passwd (colon-delimited), print ONLY the username ($1) for regular accounts whose numeric UID ($3) is greater than or equal to 1000.",
+    "choices": [
+      "awk -F: '$3 >= 1000 {print $1}' /etc/passwd",
+      "awk -F: '{if ($1 >= 1000) print $3}' /etc/passwd",
+      "awk -F: '$3 > 1000 {print $0}' /etc/passwd",
+      "grep -E '^.*:[0-9]{4,}:' /etc/passwd"
+    ],
+    "correct_choice": "awk -F: '$3 >= 1000 {print $1}' /etc/passwd",
+    "accepted_commands": [
+      "awk -F: '$3 >= 1000 {print $1}' /etc/passwd",
+      "awk -F ':' '$3 >= 1000 {print $1}' /etc/passwd",
+      "awk -F: '$3 >= 1000 { print $1 }' /etc/passwd",
+      "awk -F ':' '$3 >= 1000 { print $1 }' /etc/passwd",
+      "awk -F: '$3>=1000 {print $1}' /etc/passwd"
+    ],
+    "hint": "Use awk -F: with pattern '$3 >= 1000 {print $1}'.",
+    "explanation": "Domain 1.0 (System Management): In `/etc/passwd`, field `$1` is username and `$3` is UID. `awk -F: '$3 >= 1000 {print $1}' /etc/passwd` evaluates the numeric comparison on `$3` before running `{print $1}`."
+  },
+  {
+    "id": "nav_31",
+    "domain": "5.0 Troubleshooting",
+    "category": "Navigation & File Management",
+    "difficulty": "hard",
+    "prompt": "Compare /etc/nginx/nginx.conf.orig against /etc/nginx/nginx.conf in unified diff format (3 lines of context with +/- markers).",
+    "choices": [
+      "diff -u /etc/nginx/nginx.conf.orig /etc/nginx/nginx.conf",
+      "diff -c /etc/nginx/nginx.conf.orig /etc/nginx/nginx.conf",
+      "cmp -u /etc/nginx/nginx.conf.orig /etc/nginx/nginx.conf",
+      "comm -u /etc/nginx/nginx.conf.orig /etc/nginx/nginx.conf"
+    ],
+    "correct_choice": "diff -u /etc/nginx/nginx.conf.orig /etc/nginx/nginx.conf",
+    "accepted_commands": [
+      "diff -u /etc/nginx/nginx.conf.orig /etc/nginx/nginx.conf",
+      "diff --unified /etc/nginx/nginx.conf.orig /etc/nginx/nginx.conf"
+    ],
+    "hint": "Pass -u (--unified) to diff.",
+    "explanation": "Domain 5.0 (Troubleshooting): `diff -u` produces unified patch-style output showing added (`+`), removed (`-`), and surrounding context lines, making config drift immediately readable."
+  },
+  {
+    "id": "nav_32",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "hard",
+    "prompt": "Create a raw sector-by-sector disk image of /dev/sda1 saved to /backup/boot.img (as root) using dd with a 4M block size.",
+    "choices": [
+      "dd if=/dev/sda1 of=/backup/boot.img bs=4M",
+      "dd of=/dev/sda1 if=/backup/boot.img bs=4M",
+      "cp /dev/sda1 /backup/boot.img bs=4M",
+      "dd src=/dev/sda1 dst=/backup/boot.img bs=4M"
+    ],
+    "correct_choice": "dd if=/dev/sda1 of=/backup/boot.img bs=4M",
+    "accepted_commands": [
+      "dd if=/dev/sda1 of=/backup/boot.img bs=4M",
+      "dd bs=4M if=/dev/sda1 of=/backup/boot.img",
+      "sudo dd if=/dev/sda1 of=/backup/boot.img bs=4M",
+      "sudo dd bs=4M if=/dev/sda1 of=/backup/boot.img"
+    ],
+    "hint": "Use dd with if= (input file), of= (output file), and bs=4M.",
+    "explanation": "Domain 1.0 (System Management): `dd if=/dev/sda1 of=/backup/boot.img bs=4M` reads raw blocks from `if=` and writes to `of=` in 4 MiB chunks (`bs=4M`). Reversing `if=` and `of=` would overwrite the live `/dev/sda1` partition."
+  },
+  {
+    "id": "nav_33",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "hard",
+    "prompt": "Execute /opt/bin/cleanup.sh using standard POSIX shell redirection so both stdout (FD 1) and stderr (FD 2) are completely discarded to /dev/null.",
+    "choices": [
+      "/opt/bin/cleanup.sh > /dev/null 2>&1",
+      "/opt/bin/cleanup.sh 2>&1 > /dev/null",
+      "/opt/bin/cleanup.sh > /dev/null 2>",
+      "/opt/bin/cleanup.sh | /dev/null"
+    ],
+    "correct_choice": "/opt/bin/cleanup.sh > /dev/null 2>&1",
+    "accepted_commands": [
+      "/opt/bin/cleanup.sh > /dev/null 2>&1",
+      "/opt/bin/cleanup.sh >/dev/null 2>&1",
+      "/opt/bin/cleanup.sh 1> /dev/null 2>&1",
+      "/opt/bin/cleanup.sh 1>/dev/null 2>&1",
+      "sudo /opt/bin/cleanup.sh > /dev/null 2>&1"
+    ],
+    "hint": "Redirect stdout to /dev/null first, then duplicate FD 1 onto FD 2 with 2>&1.",
+    "explanation": "Domain 1.0 (System Management): POSIX redirections evaluate left to right. `> /dev/null 2>&1` redirects FD 1 to `/dev/null` and then copies FD 1 to FD 2, silencing both streams cleanly in `/bin/sh` as well as Bash."
+  }
+]

@@ -1,0 +1,696 @@
+[
+  {
+    "id": "perm_01",
+    "domain": "2.0 Services and User Management",
+    "category": "Permissions & User Management",
+    "difficulty": "beginner",
+    "prompt": "Using octal notation, set the permissions on /opt/scripts/deploy.sh (as root) to rwxr-x--- (read/write/execute for owner, read/execute for group, no permissions for others).",
+    "choices": [
+      "chmod 750 /opt/scripts/deploy.sh",
+      "chmod 755 /opt/scripts/deploy.sh",
+      "chmod 640 /opt/scripts/deploy.sh",
+      "chmod 740 /opt/scripts/deploy.sh"
+    ],
+    "correct_choice": "chmod 750 /opt/scripts/deploy.sh",
+    "accepted_commands": [
+      "chmod 750 /opt/scripts/deploy.sh",
+      "chmod 0750 /opt/scripts/deploy.sh",
+      "sudo chmod 750 /opt/scripts/deploy.sh",
+      "sudo chmod 0750 /opt/scripts/deploy.sh"
+    ],
+    "hint": "Sum r=4, w=2, x=1 per triad: rwx = 7, r-x = 5, --- = 0.",
+    "explanation": "Domain 2.0 (Services and User Management): In octal permissions, `r=4`, `w=2`, and `x=1`. Thus `rwx` = `4+2+1 = 7` (owner), `r-x` = `4+0+1 = 5` (group), and `---` = `0` (others), yielding `chmod 750 /opt/scripts/deploy.sh`."
+  },
+  {
+    "id": "perm_02",
+    "domain": "2.0 Services and User Management",
+    "category": "Permissions & User Management",
+    "difficulty": "beginner",
+    "prompt": "Using symbolic notation, add execute permission strictly for the file owner on backup.sh in the current directory without altering group or other permissions.",
+    "choices": [
+      "chmod u+x backup.sh",
+      "chmod +x backup.sh",
+      "chmod a+x backup.sh",
+      "chmod g+x backup.sh"
+    ],
+    "correct_choice": "chmod u+x backup.sh",
+    "accepted_commands": [
+      "chmod u+x backup.sh",
+      "chmod u+x ./backup.sh"
+    ],
+    "hint": "Specify the user/owner scope letter (u) with +x.",
+    "explanation": "Domain 2.0 (Services and User Management): `chmod u+x backup.sh` adds the execute (`x`) bit only for the user/owner (`u`). Using `+x` or `a+x` affects user, group, and others (subject to umask for bare `+x`), while `g+x` modifies only the group."
+  },
+  {
+    "id": "perm_03",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "intermediate",
+    "prompt": "Configure the SGID (Set Group ID) bit on the shared directory /srv/project (as root) using symbolic mode so newly created files inside inherit the directory's group.",
+    "choices": [
+      "chmod g+s /srv/project",
+      "chmod u+s /srv/project",
+      "chmod o+t /srv/project",
+      "chmod 1770 /srv/project"
+    ],
+    "correct_choice": "chmod g+s /srv/project",
+    "accepted_commands": [
+      "chmod g+s /srv/project",
+      "chmod g+s /srv/project/",
+      "sudo chmod g+s /srv/project",
+      "sudo chmod g+s /srv/project/"
+    ],
+    "hint": "Use chmod with the group scope (g) and the special permission letter s.",
+    "explanation": "Domain 3.0 (Security): `chmod g+s /srv/project` sets the SGID bit (`2000`) on the directory so new files and subdirectories inherit `/srv/project`'s group ownership. `u+s` sets SUID (`4000`), while `o+t` and `1xxx` set the sticky bit (`1000`)."
+  },
+  {
+    "id": "perm_04",
+    "domain": "2.0 Services and User Management",
+    "category": "Permissions & User Management",
+    "difficulty": "beginner",
+    "prompt": "Recursively change both the user owner and group owner of /var/www/html and everything beneath it (as root) to www-data.",
+    "choices": [
+      "chown -R www-data:www-data /var/www/html",
+      "chown www-data:www-data /var/www/html",
+      "chmod -R www-data:www-data /var/www/html",
+      "chgrp -R www-data /var/www/html"
+    ],
+    "correct_choice": "chown -R www-data:www-data /var/www/html",
+    "accepted_commands": [
+      "chown -R www-data:www-data /var/www/html",
+      "chown -R www-data:www-data /var/www/html/",
+      "sudo chown -R www-data:www-data /var/www/html",
+      "sudo chown -R www-data:www-data /var/www/html/"
+    ],
+    "hint": "Use chown with the uppercase recursive flag -R and user:group syntax.",
+    "explanation": "Domain 2.0 (Services and User Management): `chown -R www-data:www-data /var/www/html` recursively (`-R`) updates both user ownership and group ownership. Omitting `-R` changes only `/var/www/html` itself, `chgrp` changes only the group, and `chmod` changes permission bits rather than ownership."
+  },
+  {
+    "id": "perm_05",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "intermediate",
+    "prompt": "Set the current shell's umask value so newly created regular files receive permissions 640 (rw-r-----) and newly created directories receive permissions 750 (rwxr-x---).",
+    "choices": [
+      "umask 027",
+      "umask 022",
+      "umask 750",
+      "umask 640"
+    ],
+    "correct_choice": "umask 027",
+    "accepted_commands": [
+      "umask 027",
+      "umask 0027"
+    ],
+    "hint": "Subtract desired permissions from default base masks: 666 - 640 and 777 - 750.",
+    "explanation": "Domain 3.0 (Security): `umask` masks out permission bits from default creation modes (`666` for files, `777` for directories). Subtracting `750` from `777` (and masking `027` from `666`) leaves `640` for files and `750` for directories. `umask 022` yields `644`/`755`, whereas `umask 750` strips owner permissions."
+  },
+  {
+    "id": "perm_06",
+    "domain": "2.0 Services and User Management",
+    "category": "Permissions & User Management",
+    "difficulty": "beginner",
+    "prompt": "Create a new local user account named alex (as root), automatically creating their home directory and explicitly setting their default login shell to /bin/bash.",
+    "choices": [
+      "useradd -m -s /bin/bash alex",
+      "useradd -s /bin/bash alex",
+      "usermod -m -s /bin/bash alex",
+      "useradd -d /bin/bash -m alex"
+    ],
+    "correct_choice": "useradd -m -s /bin/bash alex",
+    "accepted_commands": [
+      "useradd -m -s /bin/bash alex",
+      "useradd -s /bin/bash -m alex",
+      "useradd -ms /bin/bash alex",
+      "sudo useradd -m -s /bin/bash alex",
+      "sudo useradd -s /bin/bash -m alex",
+      "sudo useradd -ms /bin/bash alex"
+    ],
+    "hint": "Use useradd with -m to create the home directory and -s to set the login shell.",
+    "explanation": "Domain 2.0 (Services and User Management): `useradd -m -s /bin/bash alex` creates the account `alex`, `-m` creates `/home/alex` populated from `/etc/skel`, and `-s /bin/bash` sets the login shell field in `/etc/passwd`. Omitting `-m` can leave the user without a home directory on many distributions, and `usermod` only alters existing accounts."
+  },
+  {
+    "id": "perm_07",
+    "domain": "2.0 Services and User Management",
+    "category": "Permissions & User Management",
+    "difficulty": "beginner",
+    "prompt": "Add existing user alex to the supplementary group docker (as root) while preserving all of alex's existing supplementary group memberships.",
+    "choices": [
+      "usermod -aG docker alex",
+      "usermod -G docker alex",
+      "usermod -g docker alex",
+      "groupadd -a alex docker"
+    ],
+    "correct_choice": "usermod -aG docker alex",
+    "accepted_commands": [
+      "usermod -aG docker alex",
+      "usermod -a -G docker alex",
+      "usermod -G docker -a alex",
+      "sudo usermod -aG docker alex",
+      "sudo usermod -a -G docker alex",
+      "sudo usermod -G docker -a alex"
+    ],
+    "hint": "Always combine -a (append) with -G (supplementary groups) in usermod.",
+    "explanation": "Domain 2.0 (Services and User Management): `usermod -aG docker alex` appends (`-a`) `docker` to the user's supplementary groups (`-G`) without removing existing ones. Running `usermod -G docker alex` without `-a` overwrites and drops all prior supplementary groups, while `-g` changes the primary group."
+  },
+  {
+    "id": "perm_08",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "beginner",
+    "prompt": "Immediately lock the password of user account tempadmin (as root) using passwd so password-based login is disabled.",
+    "choices": [
+      "passwd -l tempadmin",
+      "passwd -u tempadmin",
+      "passwd -d tempadmin",
+      "userdel -l tempadmin"
+    ],
+    "correct_choice": "passwd -l tempadmin",
+    "accepted_commands": [
+      "passwd -l tempadmin",
+      "sudo passwd -l tempadmin",
+      "usermod -L tempadmin",
+      "sudo usermod -L tempadmin"
+    ],
+    "hint": "Use passwd with the lowercase lock flag (-l).",
+    "explanation": "Domain 3.0 (Security): `passwd -l tempadmin` prepends `!` to the encrypted password hash in `/etc/shadow`, disabling password authentication for `tempadmin`. `passwd -u` unlocks an account, `passwd -d` deletes the password (allowing empty-password login if permitted), and `userdel` removes accounts."
+  },
+  {
+    "id": "perm_09",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "intermediate",
+    "prompt": "Display a short summary of the password status and aging attributes (locked/set, last change, min/max days) for user alex (as root).",
+    "choices": [
+      "passwd -S alex",
+      "passwd -l alex",
+      "passwd -e alex",
+      "id alex"
+    ],
+    "correct_choice": "passwd -S alex",
+    "accepted_commands": [
+      "passwd -S alex",
+      "sudo passwd -S alex"
+    ],
+    "hint": "Use passwd with the uppercase status flag (-S).",
+    "explanation": "Domain 3.0 (Security): `passwd -S alex` outputs password status (`P` usable, `L` locked, `NP` no password) plus last-change and aging fields from `/etc/shadow`. `passwd -e` forces immediate password expiration, `-l` locks the account, and `id` shows UID/GID/group membership rather than password status."
+  },
+  {
+    "id": "perm_10",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "beginner",
+    "prompt": "List all commands and privileges that the current user is permitted (or forbidden) to execute via sudo.",
+    "choices": [
+      "sudo -l",
+      "sudo -i",
+      "sudo -v",
+      "cat /etc/sudoers"
+    ],
+    "correct_choice": "sudo -l",
+    "accepted_commands": [
+      "sudo -l",
+      "sudo --list"
+    ],
+    "hint": "Use sudo with the list flag (-l).",
+    "explanation": "Domain 3.0 (Security): `sudo -l` (`--list`) queries the `/etc/sudoers` policy for the invoking user and lists allowed/forbidden commands. `sudo -i` starts an interactive root login shell, `sudo -v` refreshes the credential timestamp, and regular users lack permission to read `/etc/sudoers` directly."
+  },
+  {
+    "id": "perm_11",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "intermediate",
+    "prompt": "Execute the command whoami specifically under the identity of user postgres using sudo.",
+    "choices": [
+      "sudo -u postgres whoami",
+      "sudo -g postgres whoami",
+      "su - postgres whoami",
+      "sudo whoami postgres"
+    ],
+    "correct_choice": "sudo -u postgres whoami",
+    "accepted_commands": [
+      "sudo -u postgres whoami",
+      "sudo --user=postgres whoami",
+      "sudo --user postgres whoami"
+    ],
+    "hint": "Pass -u <username> to sudo before the command to execute.",
+    "explanation": "Domain 3.0 (Security): `sudo -u postgres whoami` uses `-u` (`--user`) to run `whoami` as the `postgres` account instead of `root`. `-g` switches only the primary group, and `su - postgres whoami` passes `whoami` as an argument to the shell rather than executing it unless `-c` is used."
+  },
+  {
+    "id": "perm_12",
+    "domain": "2.0 Services and User Management",
+    "category": "Permissions & User Management",
+    "difficulty": "beginner",
+    "prompt": "Display the numeric UID, primary GID, and all supplementary group IDs and names for user account alex.",
+    "choices": [
+      "id alex",
+      "who alex",
+      "whoami alex",
+      "users alex"
+    ],
+    "correct_choice": "id alex",
+    "accepted_commands": [
+      "id alex"
+    ],
+    "hint": "Use the two-letter identity inspection utility followed by the username.",
+    "explanation": "Domain 2.0 (Services and User Management): `id alex` queries account databases and prints `uid=...`, `gid=...`, and `groups=...` for `alex`. `who` and `users` show currently logged-in sessions without taking arbitrary account queries, and `whoami` accepts no username argument."
+  },
+  {
+    "id": "perm_13",
+    "domain": "2.0 Services and User Management",
+    "category": "Permissions & User Management",
+    "difficulty": "beginner",
+    "prompt": "Create a new local user group named developers on the system (as root).",
+    "choices": [
+      "groupadd developers",
+      "useradd -g developers",
+      "groupmod -n developers",
+      "adduser --group developers"
+    ],
+    "correct_choice": "groupadd developers",
+    "accepted_commands": [
+      "groupadd developers",
+      "sudo groupadd developers"
+    ],
+    "hint": "Use the standard POSIX/shadow-utils command to add a new group.",
+    "explanation": "Domain 2.0 (Services and User Management): `groupadd developers` creates a new entry in `/etc/group` (and `/etc/gshadow`) with the next available GID. `groupmod` modifies an existing group, while `useradd` creates user accounts rather than standalone groups."
+  },
+  {
+    "id": "perm_14",
+    "domain": "2.0 Services and User Management",
+    "category": "Permissions & User Management",
+    "difficulty": "beginner",
+    "prompt": "Delete the local user account oldintern AND remove their home directory and mail spool in one command (as root).",
+    "choices": [
+      "userdel -r oldintern",
+      "userdel oldintern",
+      "usermod -r oldintern",
+      "passwd -d oldintern"
+    ],
+    "correct_choice": "userdel -r oldintern",
+    "accepted_commands": [
+      "userdel -r oldintern",
+      "userdel --remove oldintern",
+      "sudo userdel -r oldintern",
+      "sudo userdel --remove oldintern"
+    ],
+    "hint": "Pass the remove flag (-r) to userdel.",
+    "explanation": "Domain 2.0 (Services and User Management): `userdel -r oldintern` removes the account from `/etc/passwd`, `/etc/shadow`, and `/etc/group` while also deleting `/home/oldintern` and the mail spool (`-r` / `--remove`). Without `-r`, the home directory remains orphaned on disk."
+  },
+  {
+    "id": "perm_15",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "beginner",
+    "prompt": "Using octal notation, set permissions on private SSH key /home/alex/.ssh/id_ed25519 so only the file owner has read and write access (rw-------) and group/others have none.",
+    "choices": [
+      "chmod 600 /home/alex/.ssh/id_ed25519",
+      "chmod 644 /home/alex/.ssh/id_ed25519",
+      "chmod 700 /home/alex/.ssh/id_ed25519",
+      "chmod 444 /home/alex/.ssh/id_ed25519"
+    ],
+    "correct_choice": "chmod 600 /home/alex/.ssh/id_ed25519",
+    "accepted_commands": [
+      "chmod 600 /home/alex/.ssh/id_ed25519",
+      "chmod 0600 /home/alex/.ssh/id_ed25519",
+      "sudo chmod 600 /home/alex/.ssh/id_ed25519",
+      "sudo chmod 0600 /home/alex/.ssh/id_ed25519"
+    ],
+    "hint": "In octal, rw- = 4 + 2 = 6 and --- = 0.",
+    "explanation": "Domain 3.0 (Security): OpenSSH refuses to use private keys that are readable by group or others. `chmod 600` sets owner read+write (`4+2=6`) and zero permissions (`0`) for group and others. `644` exposes the key to local users, and `700` unnecessarily adds execute permission."
+  },
+  {
+    "id": "perm_16",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "intermediate",
+    "prompt": "Using 4-digit octal notation, configure /srv/dropoff (as root) with full rwxrwxrwx permissions plus the sticky bit so users can only delete or rename files they own.",
+    "choices": [
+      "chmod 1777 /srv/dropoff",
+      "chmod 2777 /srv/dropoff",
+      "chmod 4777 /srv/dropoff",
+      "chmod 0777 /srv/dropoff"
+    ],
+    "correct_choice": "chmod 1777 /srv/dropoff",
+    "accepted_commands": [
+      "chmod 1777 /srv/dropoff",
+      "chmod 1777 /srv/dropoff/",
+      "sudo chmod 1777 /srv/dropoff",
+      "sudo chmod 1777 /srv/dropoff/"
+    ],
+    "hint": "In 4-digit octal mode, sticky bit = 1, SGID = 2, and SUID = 4.",
+    "explanation": "Domain 3.0 (Security): `chmod 1777 /srv/dropoff` sets the sticky bit (`1`) alongside `777`, just like `/tmp`. Even though all users can write to `/srv/dropoff`, only a file's owner, directory owner, or root can unlink files inside. `2xxx` sets SGID and `4xxx` sets SUID."
+  },
+  {
+    "id": "perm_17",
+    "domain": "2.0 Services and User Management",
+    "category": "Permissions & User Management",
+    "difficulty": "intermediate",
+    "prompt": "Using 4-digit octal notation, set /srv/engineering (as root) to rwxrwxr-x with the SGID special permission bit enabled so new files inherit the directory's group.",
+    "choices": [
+      "chmod 2775 /srv/engineering",
+      "chmod 1775 /srv/engineering",
+      "chmod 4775 /srv/engineering",
+      "chmod 0775 /srv/engineering"
+    ],
+    "correct_choice": "chmod 2775 /srv/engineering",
+    "accepted_commands": [
+      "chmod 2775 /srv/engineering",
+      "chmod 2775 /srv/engineering/",
+      "sudo chmod 2775 /srv/engineering",
+      "sudo chmod 2775 /srv/engineering/"
+    ],
+    "hint": "Prefix 775 with the SGID octal digit (2).",
+    "explanation": "Domain 2.0 (Services and User Management): `chmod 2775 /srv/engineering` combines the SGID bit (`2`) with `rwxrwxr-x` (`775`). On directories, SGID forces newly created files and subdirectories to inherit the parent directory's group ownership."
+  },
+  {
+    "id": "perm_18",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "intermediate",
+    "prompt": "Using symbolic notation, enable the SUID (Set User ID) bit on /usr/local/bin/netdiag (as root) so it executes with its file owner's effective UID.",
+    "choices": [
+      "chmod u+s /usr/local/bin/netdiag",
+      "chmod g+s /usr/local/bin/netdiag",
+      "chmod o+t /usr/local/bin/netdiag",
+      "chmod a+s /usr/local/bin/netdiag"
+    ],
+    "correct_choice": "chmod u+s /usr/local/bin/netdiag",
+    "accepted_commands": [
+      "chmod u+s /usr/local/bin/netdiag",
+      "sudo chmod u+s /usr/local/bin/netdiag"
+    ],
+    "hint": "Use chmod with user scope (u) and +s.",
+    "explanation": "Domain 3.0 (Security): `chmod u+s /usr/local/bin/netdiag` sets the SUID bit (`4000`) on the binary. `g+s` sets SGID (`2000`), `o+t` sets the sticky bit (`1000`), and `a+s` sets both SUID and SGID."
+  },
+  {
+    "id": "perm_19",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "intermediate",
+    "prompt": "Enforce a password expiration policy (as root) requiring user alex to change their password at least every 90 days using chage.",
+    "choices": [
+      "chage -M 90 alex",
+      "chage -m 90 alex",
+      "chage -E 90 alex",
+      "passwd -M 90 alex"
+    ],
+    "correct_choice": "chage -M 90 alex",
+    "accepted_commands": [
+      "chage -M 90 alex",
+      "chage --maxdays 90 alex",
+      "sudo chage -M 90 alex",
+      "sudo chage --maxdays 90 alex"
+    ],
+    "hint": "chage uses uppercase -M for maximum password age in days.",
+    "explanation": "Domain 3.0 (Security): `chage -M 90 alex` updates the maximum days (`-M` / `--maxdays`) between password changes in `/etc/shadow`. Lowercase `-m` sets minimum days before a password may be changed again, and `-E` sets an account expiration date."
+  },
+  {
+    "id": "perm_20",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "intermediate",
+    "prompt": "Configure user account contractor1 (as root) using chage so the entire account automatically expires on 2026-12-31.",
+    "choices": [
+      "chage -E 2026-12-31 contractor1",
+      "chage -M 2026-12-31 contractor1",
+      "chage -I 2026-12-31 contractor1",
+      "usermod -d 2026-12-31 contractor1"
+    ],
+    "correct_choice": "chage -E 2026-12-31 contractor1",
+    "accepted_commands": [
+      "chage -E 2026-12-31 contractor1",
+      "chage --expiredate 2026-12-31 contractor1",
+      "sudo chage -E 2026-12-31 contractor1",
+      "sudo chage --expiredate 2026-12-31 contractor1"
+    ],
+    "hint": "Use chage with uppercase -E followed by YYYY-MM-DD and the username.",
+    "explanation": "Domain 3.0 (Security): `chage -E 2026-12-31 contractor1` (`--expiredate`) sets the date after which `contractor1` can no longer log in via any authentication method. `-I` sets inactive grace days after password expiration, and `-M` sets max password age."
+  },
+  {
+    "id": "perm_21",
+    "domain": "2.0 Services and User Management",
+    "category": "Permissions & User Management",
+    "difficulty": "intermediate",
+    "prompt": "Query NSS (Name Service Switch) databases—supporting both /etc/group and central LDAP/SSSD entries—to inspect the members and GID of group wheel.",
+    "choices": [
+      "getent group wheel",
+      "id -g wheel",
+      "groups wheel",
+      "cat /etc/group wheel"
+    ],
+    "correct_choice": "getent group wheel",
+    "accepted_commands": [
+      "getent group wheel"
+    ],
+    "hint": "Use getent with the database name group followed by wheel.",
+    "explanation": "Domain 2.0 (Services and User Management): `getent group wheel` resolves `wheel` through `/etc/nsswitch.conf` (checking local `/etc/group` as well as network directories like LDAP/SSSD). `groups` and `id` look up user accounts rather than group entries."
+  },
+  {
+    "id": "perm_22",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "intermediate",
+    "prompt": "Audit the sudo privileges granted specifically to another user named alex (as root) without switching into alex's shell.",
+    "choices": [
+      "sudo -l -U alex",
+      "sudo -l alex",
+      "sudo -u alex -l",
+      "visudo -c alex"
+    ],
+    "correct_choice": "sudo -l -U alex",
+    "accepted_commands": [
+      "sudo -l -U alex",
+      "sudo -U alex -l",
+      "sudo -lU alex"
+    ],
+    "hint": "Combine sudo -l with uppercase -U <username>.",
+    "explanation": "Domain 3.0 (Security): `sudo -l -U alex` inspects `/etc/sudoers` and lists what commands user `alex` is allowed to run (`-U` specifies the target user to query for `-l`). `-u alex` instead attempts to run a command as `alex`."
+  },
+  {
+    "id": "perm_23",
+    "domain": "2.0 Services and User Management",
+    "category": "Permissions & User Management",
+    "difficulty": "hard",
+    "prompt": "Set a default POSIX ACL (as root) on shared directory /srv/shared so all future files and subdirectories created inside automatically inherit rwx ACL access for group devs.",
+    "choices": [
+      "setfacl -m d:g:devs:rwx /srv/shared",
+      "setfacl -m g:devs:rwx /srv/shared",
+      "setfacl -R u:devs:rwx /srv/shared",
+      "chmod g+s,g+rwx /srv/shared"
+    ],
+    "correct_choice": "setfacl -m d:g:devs:rwx /srv/shared",
+    "accepted_commands": [
+      "setfacl -m d:g:devs:rwx /srv/shared",
+      "setfacl -d -m g:devs:rwx /srv/shared",
+      "setfacl -m default:g:devs:rwx /srv/shared",
+      "setfacl -m d:g:devs:rwx /srv/shared/",
+      "sudo setfacl -m d:g:devs:rwx /srv/shared",
+      "sudo setfacl -d -m g:devs:rwx /srv/shared"
+    ],
+    "hint": "Prefix the ACL rule with d: (or pass -d) in setfacl -m.",
+    "explanation": "Domain 2.0 (Services and User Management): `setfacl -m d:g:devs:rwx /srv/shared` (or `-d -m g:devs:rwx`) creates a default ACL (`d:`) on the directory so newly created items inherit `rwx` permissions for group `devs`."
+  },
+  {
+    "id": "perm_24",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "hard",
+    "prompt": "Strip ALL extended POSIX ACL entries from /srv/shared/report.csv (as root), reverting it cleanly to standard base owner/group/other permissions.",
+    "choices": [
+      "setfacl -b /srv/shared/report.csv",
+      "setfacl -x /srv/shared/report.csv",
+      "setfacl -d /srv/shared/report.csv",
+      "chmod 644 /srv/shared/report.csv"
+    ],
+    "correct_choice": "setfacl -b /srv/shared/report.csv",
+    "accepted_commands": [
+      "setfacl -b /srv/shared/report.csv",
+      "setfacl --remove-all /srv/shared/report.csv",
+      "sudo setfacl -b /srv/shared/report.csv",
+      "sudo setfacl --remove-all /srv/shared/report.csv"
+    ],
+    "hint": "Pass -b (--remove-all) to setfacl.",
+    "explanation": "Domain 3.0 (Security): `setfacl -b` (`--remove-all`) removes every extended ACL and default ACL entry from the target path, leaving only standard POSIX mode bits. `-x` removes a single specified entry, and `-k` removes only default ACLs."
+  },
+  {
+    "id": "perm_25",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "hard",
+    "prompt": "Non-interactively validate the syntax of drop-in sudoers file /etc/sudoers.d/devops (as root) using visudo without opening an editor.",
+    "choices": [
+      "visudo -cf /etc/sudoers.d/devops",
+      "visudo -e /etc/sudoers.d/devops",
+      "sudo -c /etc/sudoers.d/devops",
+      "visudo -t /etc/sudoers.d/devops"
+    ],
+    "correct_choice": "visudo -cf /etc/sudoers.d/devops",
+    "accepted_commands": [
+      "visudo -cf /etc/sudoers.d/devops",
+      "visudo -c -f /etc/sudoers.d/devops",
+      "sudo visudo -cf /etc/sudoers.d/devops",
+      "sudo visudo -c -f /etc/sudoers.d/devops"
+    ],
+    "hint": "Combine visudo's check (-c) and file (-f) flags.",
+    "explanation": "Domain 3.0 (Security): `visudo -cf /etc/sudoers.d/devops` checks (`-c`) a specific sudoers drop-in file (`-f`) and prints `parsed OK` or exact syntax error lines, preventing lockouts in CI or automated deployments."
+  },
+  {
+    "id": "perm_26",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "hard",
+    "prompt": "Harden service account svc_metrics (as root) by setting its login shell to /sbin/nologin so interactive SSH or console logins are denied.",
+    "choices": [
+      "usermod -s /sbin/nologin svc_metrics",
+      "useradd -s /sbin/nologin svc_metrics",
+      "passwd -s /sbin/nologin svc_metrics",
+      "chsh -l /sbin/nologin svc_metrics"
+    ],
+    "correct_choice": "usermod -s /sbin/nologin svc_metrics",
+    "accepted_commands": [
+      "usermod -s /sbin/nologin svc_metrics",
+      "usermod -s /usr/sbin/nologin svc_metrics",
+      "usermod --shell /sbin/nologin svc_metrics",
+      "sudo usermod -s /sbin/nologin svc_metrics",
+      "sudo usermod -s /usr/sbin/nologin svc_metrics"
+    ],
+    "hint": "Use usermod with -s /sbin/nologin on svc_metrics.",
+    "explanation": "Domain 3.0 (Security): `usermod -s /sbin/nologin svc_metrics` changes the account's shell field in `/etc/passwd` to `/sbin/nologin`, which prints an unavailable-account message and exits immediately on login attempts while still allowing systemd services or `sudo -u` to run."
+  },
+  {
+    "id": "perm_27",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "hard",
+    "prompt": "Force user alex's current password to expire immediately (as root) so alex must set a new password upon their very next login.",
+    "choices": [
+      "passwd -e alex",
+      "passwd -l alex",
+      "passwd -d alex",
+      "chage -M 0 alex"
+    ],
+    "correct_choice": "passwd -e alex",
+    "accepted_commands": [
+      "passwd -e alex",
+      "passwd --expire alex",
+      "chage -d 0 alex",
+      "sudo passwd -e alex",
+      "sudo chage -d 0 alex"
+    ],
+    "hint": "Pass -e (--expire) to passwd.",
+    "explanation": "Domain 3.0 (Security): `passwd -e alex` (equivalent to `chage -d 0 alex`) resets the last-changed date in `/etc/shadow` to epoch 0, forcing a password change at next login without locking the account."
+  },
+  {
+    "id": "perm_28",
+    "domain": "5.0 Troubleshooting",
+    "category": "Permissions & User Management",
+    "difficulty": "hard",
+    "prompt": "User alex is locked out after multiple failed SSH password attempts handled by pam_faillock. Clear alex's failed authentication counter (as root) using faillock.",
+    "choices": [
+      "faillock --user alex --reset",
+      "passwd -u alex",
+      "pam_tally2 --clear alex",
+      "usermod -U alex"
+    ],
+    "correct_choice": "faillock --user alex --reset",
+    "accepted_commands": [
+      "faillock --user alex --reset",
+      "faillock --reset --user alex",
+      "sudo faillock --user alex --reset",
+      "sudo faillock --reset --user alex"
+    ],
+    "hint": "Pass --user alex and --reset to faillock.",
+    "explanation": "Domain 5.0 (Troubleshooting): `faillock --user alex --reset` clears the PAM failure records stored in `/var/run/faillock/alex`. `passwd -u` and `usermod -U` only remove `!` from `/etc/shadow` and do not reset `pam_faillock` lockouts."
+  },
+  {
+    "id": "perm_29",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "hard",
+    "prompt": "Audit the entire filesystem from / for regular files that have the SUID special permission bit set (-4000), redirecting permission-denied errors to /dev/null.",
+    "choices": [
+      "find / -type f -perm -4000 2>/dev/null",
+      "find / -type f -perm 2000 2>/dev/null",
+      "find / -type f -perm -1000 2>/dev/null",
+      "ls -laR / | grep SUID"
+    ],
+    "correct_choice": "find / -type f -perm -4000 2>/dev/null",
+    "accepted_commands": [
+      "find / -type f -perm -4000 2>/dev/null",
+      "find / -type f -perm -4000 2> /dev/null",
+      "find / -type f -perm /4000 2>/dev/null",
+      "find / -type f -perm -u=s 2>/dev/null",
+      "find / -perm -4000 -type f 2>/dev/null",
+      "sudo find / -type f -perm -4000 2>/dev/null"
+    ],
+    "hint": "Combine find / -type f -perm -4000 with 2>/dev/null.",
+    "explanation": "Domain 3.0 (Security): `find / -type f -perm -4000 2>/dev/null` detects all SUID binaries (`4000`) for privilege-escalation auditing while suppressing `/proc` or inaccessible-directory stderr noise. `2000` checks SGID and `1000` checks the sticky bit."
+  },
+  {
+    "id": "perm_30",
+    "domain": "2.0 Services and User Management",
+    "category": "Permissions & User Management",
+    "difficulty": "hard",
+    "prompt": "Remove user alex from the supplementary group docker (as root) using gpasswd without disturbing alex's other group memberships.",
+    "choices": [
+      "gpasswd -d alex docker",
+      "groupdel alex docker",
+      "usermod -d docker alex",
+      "gpasswd -r alex docker"
+    ],
+    "correct_choice": "gpasswd -d alex docker",
+    "accepted_commands": [
+      "gpasswd -d alex docker",
+      "gpasswd --delete alex docker",
+      "sudo gpasswd -d alex docker",
+      "sudo gpasswd --delete alex docker"
+    ],
+    "hint": "Use gpasswd -d <user> <group>.",
+    "explanation": "Domain 2.0 (Services and User Management): `gpasswd -d alex docker` removes `alex` cleanly from `docker` without needing to re-specify every remaining group (avoiding `usermod -G` pitfalls). `-r` removes a group password rather than a user."
+  },
+  {
+    "id": "perm_31",
+    "domain": "2.0 Services and User Management",
+    "category": "Permissions & User Management",
+    "difficulty": "hard",
+    "prompt": "Recursively update ONLY the group ownership of /srv/reports and all contents beneath it (as root) to analysts using chgrp, leaving all user owners intact.",
+    "choices": [
+      "chgrp -R analysts /srv/reports",
+      "chown -R analysts /srv/reports",
+      "chmod -R g+analysts /srv/reports",
+      "chgrp analysts /srv/reports"
+    ],
+    "correct_choice": "chgrp -R analysts /srv/reports",
+    "accepted_commands": [
+      "chgrp -R analysts /srv/reports",
+      "chgrp -R analysts /srv/reports/",
+      "sudo chgrp -R analysts /srv/reports",
+      "sudo chgrp -R analysts /srv/reports/"
+    ],
+    "hint": "Use chgrp with uppercase -R.",
+    "explanation": "Domain 2.0 (Services and User Management): `chgrp -R analysts /srv/reports` recursively updates group ownership while keeping existing file user owners untouched. `chown -R analysts` without a leading colon (`:analysts`) would overwrite the user owner instead."
+  },
+  {
+    "id": "perm_32",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "hard",
+    "prompt": "Change ownership of symbolic link /var/www/current ITSELF (as root) to www-data:www-data without dereferencing or modifying the target directory it points to.",
+    "choices": [
+      "chown -h www-data:www-data /var/www/current",
+      "chown www-data:www-data /var/www/current",
+      "chown -L www-data:www-data /var/www/current",
+      "chmod -h www-data:www-data /var/www/current"
+    ],
+    "correct_choice": "chown -h www-data:www-data /var/www/current",
+    "accepted_commands": [
+      "chown -h www-data:www-data /var/www/current",
+      "chown --no-dereference www-data:www-data /var/www/current",
+      "sudo chown -h www-data:www-data /var/www/current",
+      "sudo chown --no-dereference www-data:www-data /var/www/current"
+    ],
+    "hint": "Pass -h (--no-dereference) to chown.",
+    "explanation": "Domain 3.0 (Security): By default `chown` follows symlinks and changes the target object. `chown -h` (`--no-dereference`) applies `www-data:www-data` ownership to the symlink inode itself."
+  }
+]

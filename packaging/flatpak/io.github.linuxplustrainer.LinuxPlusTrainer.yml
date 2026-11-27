@@ -1,0 +1,39 @@
+app-id: io.github.linuxplustrainer.LinuxPlusTrainer
+runtime: org.freedesktop.Platform
+runtime-version: '24.08'
+sdk: org.freedesktop.Sdk
+command: LinuxPlusTrainer
+finish-args:
+  - --share=network
+  - --share=ipc
+  - --socket=x11
+  - --socket=wayland
+  - --device=dri
+
+modules:
+  - name: python-deps
+    buildsystem: simple
+    build-commands:
+      - pip3 install --verbose --exists-action=i --no-index --find-links="file://${PWD}" --prefix=${FLATPAK_DEST} rich flask
+    sources:
+      - type: dir
+        path: ../..
+
+  - name: linux-plus-trainer
+    buildsystem: simple
+    build-commands:
+      - install -d /app/share/linux-plus-trainer
+      - cp -r app.py desktop_app.py engine.py labs.py paths.py sandbox.py web_app.py /app/share/linux-plus-trainer/
+      - cp -r data templates static /app/share/linux-plus-trainer/
+      - |
+        cat << 'EOF' > /app/bin/LinuxPlusTrainer
+        #!/bin/sh
+        exec python3 /app/share/linux-plus-trainer/app.py --desktop "$@"
+        EOF
+      - chmod 755 /app/bin/LinuxPlusTrainer
+      - install -Dm644 packaging/linux/io.github.linuxplustrainer.LinuxPlusTrainer.desktop /app/share/applications/io.github.linuxplustrainer.LinuxPlusTrainer.desktop
+      - install -Dm644 packaging/linux/io.github.linuxplustrainer.LinuxPlusTrainer.metainfo.xml /app/share/metainfo/io.github.linuxplustrainer.LinuxPlusTrainer.metainfo.xml
+      - install -Dm644 packaging/assets/linux-plus-trainer.svg /app/share/icons/hicolor/scalable/apps/io.github.linuxplustrainer.LinuxPlusTrainer.svg
+    sources:
+      - type: dir
+        path: ../..

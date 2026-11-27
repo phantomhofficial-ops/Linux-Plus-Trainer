@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "linux-plus-trainer"
+version = "1.0.0"
+description = "Interactive CompTIA Linux+ (XK0-006 / V8) CLI, Web, and Desktop study trainer with hands-on Bash sandbox labs."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+  { name = "Linux+ Trainer Contributors" },
+]
+keywords = ["comptia", "linux+", "xk0-006", "bash", "study", "cli", "flask"]
+dependencies = [
+  "rich>=13.0.0",
+  "flask>=3.0.0",
+]
+
+[project.optional-dependencies]
+desktop = [
+  "pywebview>=5.0",
+]
+packaging = [
+  "pywebview>=5.0",
+  "pyinstaller>=6.0",
+  "pillow>=10.0",
+]
+
+[project.scripts]
+linuxplus = "app:main"
+
+[tool.setuptools]
+py-modules = [
+  "app",
+  "desktop_app",
+  "engine",
+  "labs",
+  "paths",
+  "sandbox",
+  "web_app",
+]
+
+[tool.setuptools.package-data]
+"*" = [
+  "data/questions/*.json",
+  "templates/*.html",
+  "static/*",
+]

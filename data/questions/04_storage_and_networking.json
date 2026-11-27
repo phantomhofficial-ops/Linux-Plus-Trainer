@@ -1,0 +1,786 @@
+[
+  {
+    "id": "stor_01",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "beginner",
+    "prompt": "List all block devices along with their filesystem types (FSTYPE), labels, UUIDs, and mountpoints so you can prepare an /etc/fstab entry.",
+    "choices": [
+      "lsblk -f",
+      "lsblk -m",
+      "fdisk -l",
+      "df -h"
+    ],
+    "correct_choice": "lsblk -f",
+    "accepted_commands": [
+      "lsblk -f",
+      "lsblk --fs"
+    ],
+    "hint": "Use lsblk with the filesystem info flag (-f).",
+    "explanation": "Domain 1.0 (System Management): `lsblk -f` (`--fs`) outputs block device trees including `FSTYPE`, `LABEL`, `UUID`, and `MOUNTPOINTS`—vital for persistent `/etc/fstab` configuration. `lsblk -m` displays permissions/owner, `fdisk -l` prints partition tables without UUIDs, and `df` only shows mounted filesystems."
+  },
+  {
+    "id": "stor_02",
+    "domain": "5.0 Troubleshooting",
+    "category": "Storage & Networking",
+    "difficulty": "beginner",
+    "prompt": "Check disk space usage across all currently mounted filesystems in human-readable units (GiB/MiB) while also displaying each filesystem's type (ext4, xfs, tmpfs).",
+    "choices": [
+      "df -hT",
+      "df -h",
+      "df -i",
+      "du -hT"
+    ],
+    "correct_choice": "df -hT",
+    "accepted_commands": [
+      "df -hT",
+      "df -Th",
+      "df -h -T",
+      "df -T -h"
+    ],
+    "hint": "Combine df's human-readable flag (-h) with uppercase -T for filesystem type.",
+    "explanation": "Domain 5.0 (Troubleshooting): `df -hT` reports mounted filesystem capacity/usage in human-readable powers of 1024 (`-h`) alongside the `Type` column (`-T`, e.g., `ext4`, `xfs`). `df -h` omits filesystem type, `df -i` checks inode exhaustion, and `du` summarizes directory trees rather than mounted filesystems."
+  },
+  {
+    "id": "stor_03",
+    "domain": "5.0 Troubleshooting",
+    "category": "Storage & Networking",
+    "difficulty": "intermediate",
+    "prompt": "An application fails with 'No space left on device' even though df -h shows plenty of free gigabytes. Check inode utilization across all mounted filesystems.",
+    "choices": [
+      "df -i",
+      "df -hT",
+      "du -sh /",
+      "lsblk -i"
+    ],
+    "correct_choice": "df -i",
+    "accepted_commands": [
+      "df -i",
+      "df --inodes"
+    ],
+    "hint": "Pass the inode flag (-i) to df.",
+    "explanation": "Domain 5.0 (Troubleshooting): Creating millions of tiny files can exhaust 100% of a filesystem's inodes before disk blocks fill up. `df -i` displays total, used, free, and percentage `IUse%` per mounted filesystem so you can confirm inode exhaustion."
+  },
+  {
+    "id": "stor_04",
+    "domain": "5.0 Troubleshooting",
+    "category": "Storage & Networking",
+    "difficulty": "beginner",
+    "prompt": "Display only a single summary line showing the total human-readable disk space consumed by the /var/log directory (as root).",
+    "choices": [
+      "du -sh /var/log",
+      "du -ah /var/log",
+      "df -sh /var/log",
+      "ls -lh /var/log"
+    ],
+    "correct_choice": "du -sh /var/log",
+    "accepted_commands": [
+      "du -sh /var/log",
+      "du -hs /var/log",
+      "du -s -h /var/log",
+      "du -h -s /var/log",
+      "du -sh /var/log/",
+      "sudo du -sh /var/log",
+      "sudo du -hs /var/log"
+    ],
+    "hint": "Combine du's summarize flag (-s) and human-readable flag (-h).",
+    "explanation": "Domain 5.0 (Troubleshooting): `du -sh /var/log` calculates recursive directory usage and collapses it to one total line (`-s`) in human-readable units (`-h`). `du -ah` prints every individual file and subdirectory, `df` reports the whole filesystem instead of a directory, and `ls -lh` only shows directory metadata size."
+  },
+  {
+    "id": "stor_05",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "beginner",
+    "prompt": "Manually mount the formatted block device /dev/sdb1 onto the existing mountpoint directory /mnt/data (as root).",
+    "choices": [
+      "mount /dev/sdb1 /mnt/data",
+      "mount /mnt/data /dev/sdb1",
+      "umount /dev/sdb1 /mnt/data",
+      "mount -a /dev/sdb1"
+    ],
+    "correct_choice": "mount /dev/sdb1 /mnt/data",
+    "accepted_commands": [
+      "mount /dev/sdb1 /mnt/data",
+      "mount /dev/sdb1 /mnt/data/",
+      "sudo mount /dev/sdb1 /mnt/data",
+      "sudo mount /dev/sdb1 /mnt/data/"
+    ],
+    "hint": "The syntax is mount <device> <mountpoint>.",
+    "explanation": "Domain 1.0 (System Management): `mount /dev/sdb1 /mnt/data` attaches the filesystem on `/dev/sdb1` to the `/mnt/data` directory. Device always precedes mountpoint; reversing them fails unless defined in `/etc/fstab`."
+  },
+  {
+    "id": "stor_06",
+    "domain": "5.0 Troubleshooting",
+    "category": "Storage & Networking",
+    "difficulty": "intermediate",
+    "prompt": "After adding a new entry to /etc/fstab, mount all filesystems listed in /etc/fstab (except those marked noauto) in one command (as root) to verify syntax before rebooting.",
+    "choices": [
+      "mount -a",
+      "mount -f",
+      "mount -r",
+      "systemctl daemon-reload"
+    ],
+    "correct_choice": "mount -a",
+    "accepted_commands": [
+      "mount -a",
+      "mount --all",
+      "sudo mount -a",
+      "sudo mount --all"
+    ],
+    "hint": "Use mount with the 'all' flag (-a).",
+    "explanation": "Domain 5.0 (Troubleshooting): `mount -a` mounts every filesystem defined in `/etc/fstab` (excluding `noauto`) and immediately surfaces syntax, UUID, or missing-mountpoint errors before a reboot leaves the system in emergency mode. `mount -f` fakes mounting without calling the mount syscall, and `-r` mounts read-only."
+  },
+  {
+    "id": "stor_07",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "beginner",
+    "prompt": "Create a gzip-compressed tar archive (as root) at /backup/etc.tar.gz containing the /etc directory.",
+    "choices": [
+      "tar -czf /backup/etc.tar.gz /etc",
+      "tar -xzf /backup/etc.tar.gz /etc",
+      "tar -cjf /backup/etc.tar.gz /etc",
+      "tar -tzf /backup/etc.tar.gz /etc"
+    ],
+    "correct_choice": "tar -czf /backup/etc.tar.gz /etc",
+    "accepted_commands": [
+      "tar -czf /backup/etc.tar.gz /etc",
+      "tar czf /backup/etc.tar.gz /etc",
+      "tar -cvzf /backup/etc.tar.gz /etc",
+      "tar -czvf /backup/etc.tar.gz /etc",
+      "tar -c -z -f /backup/etc.tar.gz /etc",
+      "sudo tar -czf /backup/etc.tar.gz /etc",
+      "sudo tar -cvzf /backup/etc.tar.gz /etc",
+      "sudo tar -czvf /backup/etc.tar.gz /etc"
+    ],
+    "hint": "Use tar flags -c (create), -z (gzip), and -f (archive filename), followed by the output archive and source directory.",
+    "explanation": "Domain 1.0 (System Management): `tar -czf /backup/etc.tar.gz /etc` creates (`-c`) a gzip-compressed (`-z`) archive file (`-f`) named `/backup/etc.tar.gz` from `/etc`. `-x` extracts, `-j` uses bzip2 rather than gzip, and `-t` only lists archive contents."
+  },
+  {
+    "id": "stor_08",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "intermediate",
+    "prompt": "Extract the gzip-compressed archive app.tar.gz (in the current directory) directly into the target directory /opt/app (as root).",
+    "choices": [
+      "tar -xzf app.tar.gz -C /opt/app",
+      "tar -czf app.tar.gz -C /opt/app",
+      "tar -xzf /opt/app app.tar.gz",
+      "tar -tzf app.tar.gz -C /opt/app"
+    ],
+    "correct_choice": "tar -xzf app.tar.gz -C /opt/app",
+    "accepted_commands": [
+      "tar -xzf app.tar.gz -C /opt/app",
+      "tar xzf app.tar.gz -C /opt/app",
+      "tar -xzvf app.tar.gz -C /opt/app",
+      "tar -xvzf app.tar.gz -C /opt/app",
+      "tar -C /opt/app -xzf app.tar.gz",
+      "tar -xzf app.tar.gz --directory=/opt/app",
+      "sudo tar -xzf app.tar.gz -C /opt/app",
+      "sudo tar -xzvf app.tar.gz -C /opt/app",
+      "sudo tar -C /opt/app -xzf app.tar.gz"
+    ],
+    "hint": "Use -x (extract), -z (gzip), -f <archive>, and uppercase -C <destination_dir>.",
+    "explanation": "Domain 1.0 (System Management): `tar -xzf app.tar.gz -C /opt/app` extracts (`-x`) the gzipped archive (`-z`) specified by `-f app.tar.gz` after changing into `/opt/app` (`-C`). `-c` would overwrite the archive instead of extracting, and `-t` only lists contents."
+  },
+  {
+    "id": "stor_09",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "beginner",
+    "prompt": "Display the IPv4 and IPv6 addresses assigned solely to network interface eth0 using the modern iproute2 utility.",
+    "choices": [
+      "ip addr show eth0",
+      "ip route show eth0",
+      "ip link set eth0",
+      "ss -i eth0"
+    ],
+    "correct_choice": "ip addr show eth0",
+    "accepted_commands": [
+      "ip addr show eth0",
+      "ip a show eth0",
+      "ip address show eth0",
+      "ip addr show dev eth0",
+      "ip a show dev eth0",
+      "ip address show dev eth0",
+      "ip a s eth0",
+      "ip addr s eth0"
+    ],
+    "hint": "Use the ip command with the addr object, show action, and interface eth0.",
+    "explanation": "Domain 1.0 (System Management): `ip addr show eth0` (or shorthand `ip a show eth0`) displays Layer 2 MAC and Layer 3 IPv4/IPv6 addresses for `eth0`. `ip route` inspects routing tables, `ip link set` modifies link state, and `ss` inspects sockets rather than interface IP configuration."
+  },
+  {
+    "id": "stor_10",
+    "domain": "5.0 Troubleshooting",
+    "category": "Storage & Networking",
+    "difficulty": "beginner",
+    "prompt": "Display the kernel's active IPv4 routing table (including default gateway) using the iproute2 ip utility.",
+    "choices": [
+      "ip route",
+      "ip addr",
+      "ip link",
+      "ip neigh"
+    ],
+    "correct_choice": "ip route",
+    "accepted_commands": [
+      "ip route",
+      "ip route show",
+      "ip r",
+      "ip r show"
+    ],
+    "hint": "Use the route object of the ip command.",
+    "explanation": "Domain 5.0 (Troubleshooting): `ip route` (or `ip route show` / `ip r`) prints kernel routing table entries including the `default via` gateway and subnet routes. `ip addr` lists interface IPs, `ip link` shows Layer 2 interface state, and `ip neigh` shows the ARP/NDP neighbor cache."
+  },
+  {
+    "id": "stor_11",
+    "domain": "5.0 Troubleshooting",
+    "category": "Storage & Networking",
+    "difficulty": "intermediate",
+    "prompt": "List all listening TCP and UDP network sockets using ss while displaying numeric port numbers instead of service names.",
+    "choices": [
+      "ss -tuln",
+      "ss -tun",
+      "ss -tul",
+      "ss -an"
+    ],
+    "correct_choice": "ss -tuln",
+    "accepted_commands": [
+      "ss -tuln",
+      "ss -tlun",
+      "ss -tnlu",
+      "ss -tnul",
+      "ss -tunl",
+      "ss -utln",
+      "ss -utnl",
+      "ss -ultn",
+      "ss -ulnt",
+      "ss -untl",
+      "ss -unlt",
+      "ss -ltun",
+      "ss -ltnu",
+      "ss -lutn",
+      "ss -lunt",
+      "ss -lntu",
+      "ss -lnut",
+      "ss -ntul",
+      "ss -ntlu",
+      "ss -nutl",
+      "ss -nult",
+      "ss -nltu",
+      "ss -nlut",
+      "ss -t -u -l -n",
+      "ss -l -t -u -n"
+    ],
+    "hint": "Combine ss flags -t (TCP), -u (UDP), -l (listening), and -n (numeric ports).",
+    "explanation": "Domain 5.0 (Troubleshooting): `ss -tuln` shows TCP (`-t`) and UDP (`-u`) sockets in the `LISTEN` state (`-l`) with numeric IP/port numbers (`-n`) rather than resolved DNS/service names. `ss -tun` displays established non-listening sockets, `ss -tul` resolves port names, and `ss -an` dumps all states and address families."
+  },
+  {
+    "id": "stor_12",
+    "domain": "5.0 Troubleshooting",
+    "category": "Storage & Networking",
+    "difficulty": "intermediate",
+    "prompt": "Query the specific DNS server 8.8.8.8 directly using dig to look up the MX (mail exchanger) records for example.com.",
+    "choices": [
+      "dig @8.8.8.8 example.com MX",
+      "dig 8.8.8.8 example.com MX",
+      "dig @8.8.8.8 MX",
+      "host -a 8.8.8.8 example.com"
+    ],
+    "correct_choice": "dig @8.8.8.8 example.com MX",
+    "accepted_commands": [
+      "dig @8.8.8.8 example.com MX",
+      "dig @8.8.8.8 example.com mx",
+      "dig example.com MX @8.8.8.8",
+      "dig example.com mx @8.8.8.8",
+      "dig @8.8.8.8 -t MX example.com",
+      "dig @8.8.8.8 -t mx example.com"
+    ],
+    "hint": "Prefix the target DNS server IP with @ in dig, then supply the domain and record type MX.",
+    "explanation": "Domain 5.0 (Troubleshooting): `dig @8.8.8.8 example.com MX` bypasses `/etc/resolv.conf` by sending the DNS query to `8.8.8.8` (`@server`) for `example.com`'s `MX` records. Omitting `@` causes `dig` to treat `8.8.8.8` as a domain name to query."
+  },
+  {
+    "id": "stor_13",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "beginner",
+    "prompt": "Safely unmount the filesystem currently mounted at /mnt/data (as root) before detaching the drive.",
+    "choices": [
+      "umount /mnt/data",
+      "unmount /mnt/data",
+      "mount -u /mnt/data",
+      "eject /mnt/data"
+    ],
+    "correct_choice": "umount /mnt/data",
+    "accepted_commands": [
+      "umount /mnt/data",
+      "umount /mnt/data/",
+      "sudo umount /mnt/data",
+      "sudo umount /mnt/data/"
+    ],
+    "hint": "Note the spelling: there is no 'n' after 'u' in the Linux unmount command.",
+    "explanation": "Domain 1.0 (System Management): `umount /mnt/data` flushes pending writes and detaches the filesystem mounted on `/mnt/data`. Linux spells the command `umount` (not `unmount`), and `mount` has no `-u` unmount option."
+  },
+  {
+    "id": "stor_14",
+    "domain": "5.0 Troubleshooting",
+    "category": "Storage & Networking",
+    "difficulty": "beginner",
+    "prompt": "Send exactly 4 ICMP echo requests to 192.168.1.1 and then stop automatically.",
+    "choices": [
+      "ping -c 4 192.168.1.1",
+      "ping -n 4 192.168.1.1",
+      "ping -t 4 192.168.1.1",
+      "ping 192.168.1.1"
+    ],
+    "correct_choice": "ping -c 4 192.168.1.1",
+    "accepted_commands": [
+      "ping -c 4 192.168.1.1",
+      "ping 192.168.1.1 -c 4",
+      "ping -c4 192.168.1.1"
+    ],
+    "hint": "Use ping with the count flag (-c).",
+    "explanation": "Domain 5.0 (Troubleshooting): Unlike Windows, Linux `ping` runs continuously until interrupted unless `-c <count>` is passed. `ping -c 4 192.168.1.1` sends 4 ICMP Echo Requests and prints summary packet-loss/RTT statistics. `-n` disables DNS resolution, and `-t` sets IP TTL."
+  },
+  {
+    "id": "stor_15",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "beginner",
+    "prompt": "List all filenames inside the gzip-compressed archive /backup/etc.tar.gz without extracting any files to disk.",
+    "choices": [
+      "tar -tzf /backup/etc.tar.gz",
+      "tar -xzf /backup/etc.tar.gz",
+      "tar -czf /backup/etc.tar.gz",
+      "tar -dzf /backup/etc.tar.gz"
+    ],
+    "correct_choice": "tar -tzf /backup/etc.tar.gz",
+    "accepted_commands": [
+      "tar -tzf /backup/etc.tar.gz",
+      "tar tzf /backup/etc.tar.gz",
+      "tar -tvzf /backup/etc.tar.gz",
+      "tar -ztvf /backup/etc.tar.gz",
+      "tar -t -z -f /backup/etc.tar.gz",
+      "sudo tar -tzf /backup/etc.tar.gz"
+    ],
+    "hint": "Combine tar's list flag (-t), gzip flag (-z), and archive file flag (-f).",
+    "explanation": "Domain 1.0 (System Management): `tar -tzf /backup/etc.tar.gz` lists (`-t`) the table of contents of a gzipped (`-z`) archive file (`-f`) safely without modifying files on disk. `-x` extracts and `-c` creates/overwrites an archive."
+  },
+  {
+    "id": "stor_16",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "beginner",
+    "prompt": "Persistently change the system hostname to prod-db01 using systemd's hostnamectl utility (as root).",
+    "choices": [
+      "hostnamectl set-hostname prod-db01",
+      "hostname prod-db01",
+      "hostnamectl hostname prod-db01",
+      "sysctl kernel.hostname=prod-db01"
+    ],
+    "correct_choice": "hostnamectl set-hostname prod-db01",
+    "accepted_commands": [
+      "hostnamectl set-hostname prod-db01",
+      "sudo hostnamectl set-hostname prod-db01"
+    ],
+    "hint": "Use hostnamectl with the set-hostname subcommand.",
+    "explanation": "Domain 1.0 (System Management): `hostnamectl set-hostname prod-db01` updates both the live kernel hostname and `/etc/hostname` so the change persists across reboots. `hostname prod-db01` and `sysctl` only change the runtime hostname until the next reboot."
+  },
+  {
+    "id": "stor_17",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "intermediate",
+    "prompt": "Create a 10 GiB LVM logical volume named lv_logs inside the existing volume group vg_data (as root).",
+    "choices": [
+      "lvcreate -L 10G -n lv_logs vg_data",
+      "lvcreate -l 10G -n lv_logs vg_data",
+      "vgcreate -L 10G lv_logs vg_data",
+      "lvextend -L 10G -n lv_logs vg_data"
+    ],
+    "correct_choice": "lvcreate -L 10G -n lv_logs vg_data",
+    "accepted_commands": [
+      "lvcreate -L 10G -n lv_logs vg_data",
+      "lvcreate -n lv_logs -L 10G vg_data",
+      "sudo lvcreate -L 10G -n lv_logs vg_data",
+      "sudo lvcreate -n lv_logs -L 10G vg_data"
+    ],
+    "hint": "Use lvcreate with uppercase -L for size in GiB, -n for LV name, and vg_data last.",
+    "explanation": "Domain 1.0 (System Management): `lvcreate -L 10G -n lv_logs vg_data` allocates a 10 GiB (`-L`) logical volume named `lv_logs` (`-n`) from `vg_data`. Lowercase `-l` expects extent counts (e.g., `100%FREE`) rather than GiB sizes."
+  },
+  {
+    "id": "stor_18",
+    "domain": "5.0 Troubleshooting",
+    "category": "Storage & Networking",
+    "difficulty": "intermediate",
+    "prompt": "Grow logical volume /dev/vg_data/lv_logs by an additional 5 GiB AND automatically resize the underlying filesystem in a single command (as root).",
+    "choices": [
+      "lvextend -r -L +5G /dev/vg_data/lv_logs",
+      "lvextend -L 5G /dev/vg_data/lv_logs",
+      "lvresize -L +5G /dev/vg_data/lv_logs",
+      "resize2fs +5G /dev/vg_data/lv_logs"
+    ],
+    "correct_choice": "lvextend -r -L +5G /dev/vg_data/lv_logs",
+    "accepted_commands": [
+      "lvextend -r -L +5G /dev/vg_data/lv_logs",
+      "lvextend -L +5G -r /dev/vg_data/lv_logs",
+      "lvextend --resizefs -L +5G /dev/vg_data/lv_logs",
+      "lvextend -L +5G --resizefs /dev/vg_data/lv_logs",
+      "sudo lvextend -r -L +5G /dev/vg_data/lv_logs",
+      "sudo lvextend -L +5G -r /dev/vg_data/lv_logs"
+    ],
+    "hint": "Combine lvextend with -r (--resizefs) and -L +5G (note the + sign).",
+    "explanation": "Domain 5.0 (Troubleshooting): `lvextend -r -L +5G /dev/vg_data/lv_logs` adds 5 GiB (`+5G`) to the LV and invokes `fsadm`/`resize2fs`/`xfs_growfs` automatically (`-r`). Omitting `+` (`-L 5G`) attempts to set total size to 5 GiB, and omitting `-r` leaves the filesystem smaller than the LV."
+  },
+  {
+    "id": "stor_19",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "intermediate",
+    "prompt": "Format partition /dev/sdc1 with an ext4 filesystem labeled appdata (as root).",
+    "choices": [
+      "mkfs.ext4 -L appdata /dev/sdc1",
+      "mkfs.ext4 -n appdata /dev/sdc1",
+      "mkfs.xfs -n appdata /dev/sdc1",
+      "e2label /dev/sdc1 appdata"
+    ],
+    "correct_choice": "mkfs.ext4 -L appdata /dev/sdc1",
+    "accepted_commands": [
+      "mkfs.ext4 -L appdata /dev/sdc1",
+      "mkfs -t ext4 -L appdata /dev/sdc1",
+      "sudo mkfs.ext4 -L appdata /dev/sdc1",
+      "sudo mkfs -t ext4 -L appdata /dev/sdc1"
+    ],
+    "hint": "Use mkfs.ext4 with uppercase -L for the filesystem label.",
+    "explanation": "Domain 1.0 (System Management): `mkfs.ext4 -L appdata /dev/sdc1` initializes a new ext4 filesystem and assigns volume label `appdata` (`-L`). `-n` performs a dry run without writing to disk, and `e2label` only updates labels on already-formatted filesystems."
+  },
+  {
+    "id": "stor_20",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "intermediate",
+    "prompt": "Retrieve the UUID, PARTUUID, and filesystem TYPE directly from block device /dev/sdb1 using blkid (as root).",
+    "choices": [
+      "blkid /dev/sdb1",
+      "lsblk -u /dev/sdb1",
+      "df -T /dev/sdb1",
+      "fdisk -u /dev/sdb1"
+    ],
+    "correct_choice": "blkid /dev/sdb1",
+    "accepted_commands": [
+      "blkid /dev/sdb1",
+      "sudo blkid /dev/sdb1"
+    ],
+    "hint": "Use the block-ID inspection command followed by /dev/sdb1.",
+    "explanation": "Domain 1.0 (System Management): `blkid /dev/sdb1` probes device superblocks and prints `UUID=\"...\"`, `TYPE=\"...\"`, and `PARTUUID=\"...\"` for persistent `/etc/fstab` configuration."
+  },
+  {
+    "id": "stor_21",
+    "domain": "5.0 Troubleshooting",
+    "category": "Storage & Networking",
+    "difficulty": "intermediate",
+    "prompt": "Mount /dev/sdb1 strictly in read-only mode onto /mnt/recovery (as root) so forensic/troubleshooting inspection cannot modify data.",
+    "choices": [
+      "mount -o ro /dev/sdb1 /mnt/recovery",
+      "mount -o rw /dev/sdb1 /mnt/recovery",
+      "mount -a ro /dev/sdb1 /mnt/recovery",
+      "umount -r /dev/sdb1 /mnt/recovery"
+    ],
+    "correct_choice": "mount -o ro /dev/sdb1 /mnt/recovery",
+    "accepted_commands": [
+      "mount -o ro /dev/sdb1 /mnt/recovery",
+      "mount -o ro /dev/sdb1 /mnt/recovery/",
+      "mount -r /dev/sdb1 /mnt/recovery",
+      "sudo mount -o ro /dev/sdb1 /mnt/recovery",
+      "sudo mount -r /dev/sdb1 /mnt/recovery"
+    ],
+    "hint": "Use mount with option flag -o ro (or -r).",
+    "explanation": "Domain 5.0 (Troubleshooting): `mount -o ro /dev/sdb1 /mnt/recovery` passes mount option `ro` (`-o ro` or `-r`) so write operations are blocked at the VFS layer, protecting suspect or damaged disks during recovery."
+  },
+  {
+    "id": "stor_22",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "intermediate",
+    "prompt": "Activate the NetworkManager connection profile named corp-eth0 using nmcli (as root).",
+    "choices": [
+      "nmcli con up corp-eth0",
+      "nmcli dev up corp-eth0",
+      "nmcli con reload corp-eth0",
+      "ip link set corp-eth0 up"
+    ],
+    "correct_choice": "nmcli con up corp-eth0",
+    "accepted_commands": [
+      "nmcli con up corp-eth0",
+      "nmcli connection up corp-eth0",
+      "nmcli c up corp-eth0",
+      "sudo nmcli con up corp-eth0",
+      "sudo nmcli connection up corp-eth0"
+    ],
+    "hint": "Use nmcli with connection (or con) and up.",
+    "explanation": "Domain 1.0 (System Management): `nmcli con up corp-eth0` activates the saved NetworkManager connection profile `corp-eth0`. `ip link set` operates on raw kernel interface names rather than NetworkManager connection profiles."
+  },
+  {
+    "id": "stor_23",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "intermediate",
+    "prompt": "Add a temporary static IPv4 route (as root) for destination network 10.20.0.0/16 through gateway 192.168.1.254 using iproute2.",
+    "choices": [
+      "ip route add 10.20.0.0/16 via 192.168.1.254",
+      "ip route add 10.20.0.0/16 dev 192.168.1.254",
+      "ip addr add 10.20.0.0/16 via 192.168.1.254",
+      "route gw 192.168.1.254 10.20.0.0/16"
+    ],
+    "correct_choice": "ip route add 10.20.0.0/16 via 192.168.1.254",
+    "accepted_commands": [
+      "ip route add 10.20.0.0/16 via 192.168.1.254",
+      "ip r add 10.20.0.0/16 via 192.168.1.254",
+      "sudo ip route add 10.20.0.0/16 via 192.168.1.254",
+      "sudo ip r add 10.20.0.0/16 via 192.168.1.254"
+    ],
+    "hint": "The syntax is ip route add <CIDR> via <gateway_ip>.",
+    "explanation": "Domain 1.0 (System Management): `ip route add 10.20.0.0/16 via 192.168.1.254` inserts a kernel route directing traffic for `10.20.0.0/16` to next-hop router `192.168.1.254` (`via`). `dev` expects an interface name rather than a gateway IP."
+  },
+  {
+    "id": "stor_24",
+    "domain": "5.0 Troubleshooting",
+    "category": "Storage & Networking",
+    "difficulty": "intermediate",
+    "prompt": "Query DNS using dig for api.example.com and print ONLY the resolved IP address answer without headers, comments, or statistics.",
+    "choices": [
+      "dig +short api.example.com",
+      "dig -s api.example.com",
+      "dig +brief api.example.com",
+      "nslookup +short api.example.com"
+    ],
+    "correct_choice": "dig +short api.example.com",
+    "accepted_commands": [
+      "dig +short api.example.com",
+      "dig api.example.com +short",
+      "dig +short A api.example.com",
+      "dig +short api.example.com A"
+    ],
+    "hint": "Pass the +short query option to dig.",
+    "explanation": "Domain 5.0 (Troubleshooting): `dig +short api.example.com` suppresses the banner, question, authority, and timing sections so only the bare answer record(s) print—ideal for quick troubleshooting and Bash pipelines."
+  },
+  {
+    "id": "stor_25",
+    "domain": "5.0 Troubleshooting",
+    "category": "Storage & Networking",
+    "difficulty": "hard",
+    "prompt": "Inspect the health, RAID level, UUID, and member device states (active vs. failed/spare) of Linux software RAID array /dev/md0 (as root).",
+    "choices": [
+      "mdadm --detail /dev/md0",
+      "mdadm --examine /dev/md0",
+      "lsblk --raid /dev/md0",
+      "lvs /dev/md0"
+    ],
+    "correct_choice": "mdadm --detail /dev/md0",
+    "accepted_commands": [
+      "mdadm --detail /dev/md0",
+      "mdadm -D /dev/md0",
+      "sudo mdadm --detail /dev/md0",
+      "sudo mdadm -D /dev/md0"
+    ],
+    "hint": "Use mdadm with --detail (or -D) on /dev/md0.",
+    "explanation": "Domain 5.0 (Troubleshooting): `mdadm --detail /dev/md0` (`-D`) queries the active md array device to inspect sync state, degraded status, and failed member partitions. `--examine` (`-E`) inspects raw superblocks on individual component disks rather than the assembled `/dev/md0`."
+  },
+  {
+    "id": "stor_26",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "hard",
+    "prompt": "After extending its underlying logical volume, expand the mounted XFS filesystem at mountpoint /srv/xfsdata online (as root) to fill all available LV space.",
+    "choices": [
+      "xfs_growfs /srv/xfsdata",
+      "resize2fs /srv/xfsdata",
+      "xfs_repair /srv/xfsdata",
+      "mkfs.xfs -f /srv/xfsdata"
+    ],
+    "correct_choice": "xfs_growfs /srv/xfsdata",
+    "accepted_commands": [
+      "xfs_growfs /srv/xfsdata",
+      "xfs_growfs /srv/xfsdata/",
+      "xfs_growfs -d /srv/xfsdata",
+      "sudo xfs_growfs /srv/xfsdata",
+      "sudo xfs_growfs /srv/xfsdata/"
+    ],
+    "hint": "XFS uses xfs_growfs targeting the mounted directory (not resize2fs).",
+    "explanation": "Domain 1.0 (System Management): `xfs_growfs /srv/xfsdata` grows a mounted XFS filesystem online to the full underlying block device capacity. `resize2fs` only works on ext2/ext3/ext4, and `mkfs.xfs` destroys existing data."
+  },
+  {
+    "id": "stor_27",
+    "domain": "5.0 Troubleshooting",
+    "category": "Storage & Networking",
+    "difficulty": "hard",
+    "prompt": "Validate all /etc/fstab mount definitions, filesystem types, UUIDs, and mountpoints for syntax or configuration errors WITHOUT actually mounting filesystems (as root).",
+    "choices": [
+      "findmnt --verify",
+      "mount --check",
+      "fsck -f /etc/fstab",
+      "lsblk --verify"
+    ],
+    "correct_choice": "findmnt --verify",
+    "accepted_commands": [
+      "findmnt --verify",
+      "findmnt --verify --verbose",
+      "sudo findmnt --verify"
+    ],
+    "hint": "Use findmnt with the --verify flag.",
+    "explanation": "Domain 5.0 (Troubleshooting): `findmnt --verify` parses `/etc/fstab` safely without performing mounts, checking for duplicate targets, invalid options, missing mountpoints, and unresolvable UUID/LABEL devices before a reboot."
+  },
+  {
+    "id": "stor_28",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "hard",
+    "prompt": "Initialize a Linux swap space signature on newly partitioned device /dev/sdb2 (as root) before activating it with swapon.",
+    "choices": [
+      "mkswap /dev/sdb2",
+      "swapon /dev/sdb2",
+      "mkfs.swap /dev/sdb2",
+      "mkfs.ext4 -s /dev/sdb2"
+    ],
+    "correct_choice": "mkswap /dev/sdb2",
+    "accepted_commands": [
+      "mkswap /dev/sdb2",
+      "sudo mkswap /dev/sdb2"
+    ],
+    "hint": "Use the four-letter + two-letter swap creation command (mkswap).",
+    "explanation": "Domain 1.0 (System Management): `mkswap /dev/sdb2` writes the swap header and UUID onto `/dev/sdb2`; only after `mkswap` finishes can `swapon /dev/sdb2` activate the swap area."
+  },
+  {
+    "id": "stor_29",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "hard",
+    "prompt": "Before decommissioning physical disk /dev/sdb1 from an active LVM volume group, migrate all allocated physical extents off /dev/sdb1 onto other PVs in the VG online (as root).",
+    "choices": [
+      "pvmove /dev/sdb1",
+      "vgreduce /dev/sdb1",
+      "pvremove /dev/sdb1",
+      "lvmove /dev/sdb1"
+    ],
+    "correct_choice": "pvmove /dev/sdb1",
+    "accepted_commands": [
+      "pvmove /dev/sdb1",
+      "sudo pvmove /dev/sdb1"
+    ],
+    "hint": "Use the LVM physical-volume move command.",
+    "explanation": "Domain 1.0 (System Management): `pvmove /dev/sdb1` safely relocates allocated LE/PE extents off `/dev/sdb1` to free extents on sibling PVs while logical volumes stay mounted online. Only after `pvmove` succeeds can you run `vgreduce` and `pvremove`."
+  },
+  {
+    "id": "stor_30",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "hard",
+    "prompt": "Temporarily assign IPv4 address 192.168.50.10/24 to interface eth1 using iproute2 (as root).",
+    "choices": [
+      "ip addr add 192.168.50.10/24 dev eth1",
+      "ip addr set 192.168.50.10/24 eth1",
+      "ip link add 192.168.50.10/24 dev eth1",
+      "ip route add 192.168.50.10/24 dev eth1"
+    ],
+    "correct_choice": "ip addr add 192.168.50.10/24 dev eth1",
+    "accepted_commands": [
+      "ip addr add 192.168.50.10/24 dev eth1",
+      "ip a add 192.168.50.10/24 dev eth1",
+      "ip address add 192.168.50.10/24 dev eth1",
+      "sudo ip addr add 192.168.50.10/24 dev eth1",
+      "sudo ip a add 192.168.50.10/24 dev eth1"
+    ],
+    "hint": "Syntax is ip addr add <IP/prefix> dev <iface>.",
+    "explanation": "Domain 1.0 (System Management): `ip addr add 192.168.50.10/24 dev eth1` binds an IPv4 address and `/24` prefix mask to `eth1` in kernel memory. Always include `dev` before the interface name."
+  },
+  {
+    "id": "stor_31",
+    "domain": "5.0 Troubleshooting",
+    "category": "Storage & Networking",
+    "difficulty": "hard",
+    "prompt": "Bring network interface eth1 administratively UP at Layer 2 using iproute2 (as root) after observing its state is DOWN.",
+    "choices": [
+      "ip link set eth1 up",
+      "ip addr set eth1 up",
+      "ip link up eth1",
+      "ifup dev eth1"
+    ],
+    "correct_choice": "ip link set eth1 up",
+    "accepted_commands": [
+      "ip link set eth1 up",
+      "ip link set dev eth1 up",
+      "sudo ip link set eth1 up",
+      "sudo ip link set dev eth1 up"
+    ],
+    "hint": "Use ip link set <iface> up.",
+    "explanation": "Domain 5.0 (Troubleshooting): `ip link set eth1 up` enables the interface link administratively at Layer 2 so it can transmit/receive frames and pass carrier traffic."
+  },
+  {
+    "id": "stor_32",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "hard",
+    "prompt": "Configure the persistent NetworkManager connection profile corp-eth0 (as root) to use IPv4 DNS server 1.1.1.1 via nmcli.",
+    "choices": [
+      "nmcli con mod corp-eth0 ipv4.dns 1.1.1.1",
+      "nmcli con set corp-eth0 ipv4.dns 1.1.1.1",
+      "nmcli dev mod corp-eth0 dns 1.1.1.1",
+      "nmcli con add corp-eth0 ipv4.dns 1.1.1.1"
+    ],
+    "correct_choice": "nmcli con mod corp-eth0 ipv4.dns 1.1.1.1",
+    "accepted_commands": [
+      "nmcli con mod corp-eth0 ipv4.dns 1.1.1.1",
+      "nmcli connection modify corp-eth0 ipv4.dns 1.1.1.1",
+      "nmcli c mod corp-eth0 ipv4.dns 1.1.1.1",
+      "sudo nmcli con mod corp-eth0 ipv4.dns 1.1.1.1",
+      "sudo nmcli connection modify corp-eth0 ipv4.dns 1.1.1.1"
+    ],
+    "hint": "Use nmcli con mod <profile> ipv4.dns <ip>.",
+    "explanation": "Domain 1.0 (System Management): `nmcli con mod corp-eth0 ipv4.dns 1.1.1.1` persists the DNS resolver setting into the NetworkManager profile (`nmcli con up corp-eth0` activates the updated profile)."
+  },
+  {
+    "id": "stor_33",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "hard",
+    "prompt": "Immediately enable kernel IPv4 packet forwarding (net.ipv4.ip_forward=1) at runtime (as root) using sysctl so this Linux host can route packets between interfaces.",
+    "choices": [
+      "sysctl -w net.ipv4.ip_forward=1",
+      "sysctl -p net.ipv4.ip_forward=1",
+      "systemctl enable net.ipv4.ip_forward",
+      "ip route forward=1"
+    ],
+    "correct_choice": "sysctl -w net.ipv4.ip_forward=1",
+    "accepted_commands": [
+      "sysctl -w net.ipv4.ip_forward=1",
+      "sysctl net.ipv4.ip_forward=1",
+      "sudo sysctl -w net.ipv4.ip_forward=1",
+      "sudo sysctl net.ipv4.ip_forward=1"
+    ],
+    "hint": "Use sysctl -w <parameter>=<value>.",
+    "explanation": "Domain 1.0 (System Management): `sysctl -w net.ipv4.ip_forward=1` writes `1` to `/proc/sys/net/ipv4/ip_forward` immediately in kernel memory (`-w` writes a runtime tunable, whereas `-p` loads from a config file)."
+  },
+  {
+    "id": "stor_34",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "hard",
+    "prompt": "After saving persistent kernel parameter edits in /etc/sysctl.conf, load and apply those settings immediately (as root) using sysctl.",
+    "choices": [
+      "sysctl -p",
+      "sysctl -w",
+      "sysctl -a",
+      "systemctl reload sysctl"
+    ],
+    "correct_choice": "sysctl -p",
+    "accepted_commands": [
+      "sysctl -p",
+      "sysctl -p /etc/sysctl.conf",
+      "sysctl --system",
+      "sudo sysctl -p",
+      "sudo sysctl -p /etc/sysctl.conf",
+      "sudo sysctl --system"
+    ],
+    "hint": "Pass -p (load from /etc/sysctl.conf) to sysctl.",
+    "explanation": "Domain 1.0 (System Management): `sysctl -p` reads `/etc/sysctl.conf` (or a specified file path) and applies all listed kernel parameters immediately (`sysctl --system` loads all `/etc/sysctl.d/*.conf` drop-ins as well)."
+  }
+]

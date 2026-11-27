@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="cyberpunk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CompTIA Linux+ (XK0-006 / V8) Study Trainer</title>
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("linux_plus_theme");
+        if (saved === "osrs" || saved === "cyberpunk" || saved === "oot") {
+          document.documentElement.dataset.theme = saved;
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <div class="crt-overlay" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-group">
+        <div class="brand-emblem" aria-hidden="true">XK0</div>
+        <div>
+          <h1 class="brand-title">CompTIA Linux+ (XK0-006 / V8)</h1>
+          <p class="brand-subtitle">Interactive Bash &amp; POSIX Command Trainer</p>
+        </div>
+      </div>
+
+      <div class="topbar-controls">
+        <div class="player-hud" aria-label="Overall progress stats">
+          <span class="hud-chip">
+            <span class="hud-label">Total Lv</span>
+            <strong id="hud-level">4</strong>
+          </span>
+          <span class="hud-chip">
+            <span class="hud-label">XP</span>
+            <strong id="hud-xp">0</strong>
+          </span>
+          <span class="hud-chip">
+            <span class="hud-label">Accuracy</span>
+            <strong id="hud-accuracy">0.0%</strong>
+          </span>
+        </div>
+
+        <div class="theme-switcher" role="group" aria-label="Visual theme switcher">
+          <button type="button" class="theme-btn" data-theme-target="osrs" id="btn-theme-osrs">
+            &#9876; OSRS
+          </button>
+          <button type="button" class="theme-btn" data-theme-target="cyberpunk" id="btn-theme-cyberpunk">
+            &#9889; Cyberpunk
+          </button>
+          <button type="button" class="theme-btn" data-theme-target="oot" id="btn-theme-oot">
+            &#9650; Ocarina of Time
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="global-alert" class="alert-banner hidden" role="status"></div>
+
+    <!-- DASHBOARD VIEW -->
+    <section id="dashboard-view" class="view">
+      <div class="panel control-panel">
+        <div class="control-row">
+          <div class="mode-block">
+            <span class="section-label">Quiz Mode</span>
+            <div class="mode-toggle" role="group" aria-label="Quiz mode toggle">
+              <button type="button" class="mode-btn active" data-mode="multiple_choice" id="mode-mc-btn">
+                Multiple Choice (A–D)
+              </button>
+              <button type="button" class="mode-btn" data-mode="exact_command" id="mode-exact-btn">
+                Exact Command Entry ($)
+              </button>
+            </div>
+          </div>
+
+          <div class="mode-block">
+            <span class="section-label">Difficulty</span>
+            <div class="difficulty-toggle" role="group" aria-label="Difficulty filter">
+              <button type="button" class="diff-btn active" data-difficulty="all">All</button>
+              <button type="button" class="diff-btn" data-difficulty="beginner">Beginner</button>
+              <button type="button" class="diff-btn" data-difficulty="intermediate">Intermediate</button>
+              <button type="button" class="diff-btn" data-difficulty="hard">Hard</button>
+            </div>
+          </div>
+
+          <div class="quick-actions">
+            <button type="button" class="btn btn-primary" id="btn-start-all">
+              All Categories (<span id="all-count">45</span>)
+            </button>
+            <button type="button" class="btn btn-warning" id="btn-start-missed">
+              Review Missed (<span id="missed-count">0</span>)
+            </button>
+            <button type="button" class="btn btn-danger" id="btn-open-reset">
+              Reset Progress
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel skills-panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Skill Disciplines &amp; Category Progress</h2>
+            <p class="panel-desc">Choose any XK0-006 discipline to train and level up your command mastery.</p>
+          </div>
+          <div class="overall-summary-text">
+            Answered: <strong id="overall-answered">0</strong> &bull;
+            Correct: <strong id="overall-correct">0</strong>
+          </div>
+        </div>
+
+        <div id="categories-grid" class="categories-grid"></div>
+      </div>
+
+      <!-- SANDBOX LABS SECTION -->
+      <div class="panel labs-panel" id="sandbox-labs-panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Sandbox Labs (Hands-On Terminal)</h2>
+            <p class="panel-desc">Practice real Bash commands inside an isolated temporary Linux workspace with live filesystem verification.</p>
+          </div>
+          <div class="sandbox-labs-meta">
+            <div class="overall-summary-text">
+              Labs Completed: <strong id="labs-completed-count">0</strong> / <strong id="labs-total-count">10</strong>
+            </div>
+            <div class="sandbox-backend-bar">
+              <span class="badge badge-backend" id="dashboard-backend-badge" title="Active sandbox backend">Native Bash</span>
+              <div class="backend-toggle" id="dashboard-backend-toggle" role="group" aria-label="Sandbox backend"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="labs-grid" class="labs-grid"></div>
+      </div>
+    </section>
+
+    <!-- QUIZ VIEW -->
+    <section id="quiz-view" class="view hidden">
+      <div class="quiz-topbar panel">
+        <div class="quiz-topbar-row">
+          <button type="button" class="btn btn-ghost" id="btn-back-dashboard">&larr; Dashboard</button>
+          <div class="quiz-meta-tags">
+            <span class="badge badge-scope" id="quiz-scope-badge">Category</span>
+            <span class="badge badge-domain" id="quiz-domain-badge">1.0 System Management</span>
+            <span class="badge badge-difficulty" id="quiz-difficulty-badge">Beginner</span>
+          </div>
+          <div class="quiz-score-meta">
+            <span id="quiz-counter">Question 1 / 10</span>
+            <span class="sep">&bull;</span>
+            <span>Session XP: <strong id="session-xp">0</strong></span>
+          </div>
+        </div>
+
+        <div class="progress-track" aria-label="Quiz progress">
+          <div id="quiz-progress-fill" class="progress-fill" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <div class="panel question-panel">
+        <p class="scenario-label">TERMINAL SCENARIO</p>
+        <p id="question-prompt" class="question-prompt"></p>
+
+        <!-- Multiple Choice -->
+        <div id="mc-container" class="hidden">
+          <div id="mc-options" class="mc-grid"></div>
+          <div class="quiz-action-bar">
+            <span class="shortcut-hint">Shortcuts: 1–4 or A–D to answer &bull; H for Hint</span>
+            <div class="action-buttons">
+              <button type="button" class="btn btn-secondary" id="btn-mc-hint">Hint</button>
+              <button type="button" class="btn btn-warning" id="btn-mc-skip">Skip</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exact Command Entry -->
+        <div id="exact-container" class="hidden">
+          <form id="exact-form" class="terminal-form" autocomplete="off">
+            <div class="terminal-input-wrap">
+              <span class="terminal-prompt">phantom@linux-plus:~$</span>
+              <input
+                type="text"
+                id="cmd-input"
+                class="terminal-input"
+                placeholder="Type exact Bash/POSIX command (or 'hint' / 'skip')..."
+                autocomplete="off"
+                autocapitalize="off"
+                spellcheck="false"
+              >
+            </div>
+            <div class="quiz-action-bar">
+              <span class="shortcut-hint">Press Enter to execute &bull; 'hint' for clue &bull; 'skip' to reveal</span>
+              <div class="action-buttons">
+                <button type="submit" class="btn btn-primary" id="btn-exact-submit">Run Command</button>
+                <button type="button" class="btn btn-secondary" id="btn-exact-hint">Hint</button>
+                <button type="button" class="btn btn-warning" id="btn-exact-skip">Skip</button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Hint Display -->
+        <div id="hint-box" class="hint-box hidden" role="note">
+          <span class="hint-title">HINT</span>
+          <span id="hint-text"></span>
+        </div>
+      </div>
+
+      <!-- Feedback & Explanation Panel -->
+      <div id="feedback-panel" class="panel feedback-panel hidden" aria-live="polite">
+        <div class="feedback-header">
+          <div class="hitsplat" id="feedback-hitsplat">
+            <span id="feedback-status-label">CORRECT</span>
+            <small id="feedback-xp-label">+100 XP</small>
+          </div>
+          <div class="feedback-headline">
+            <div id="feedback-user-answer-row" class="answer-line hidden">
+              <span class="ans-label">Your Input:</span>
+              <code id="feedback-user-answer"></code>
+            </div>
+            <div class="answer-line">
+              <span class="ans-label">Canonical Command:</span>
+              <code id="feedback-correct-choice" class="canonical-code"></code>
+            </div>
+            <div id="feedback-variants-row" class="variants-row hidden">
+              <span class="ans-label">Accepted Variations:</span>
+              <div id="feedback-variants" class="variant-chips"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="feedback-body">
+          <div class="feedback-domain-line">
+            <strong>XK0-006 Domain:</strong> <span id="feedback-domain"></span>
+          </div>
+          <p id="feedback-explanation" class="explanation-text"></p>
+        </div>
+
+        <div class="feedback-footer">
+          <button type="button" class="btn btn-primary btn-next" id="btn-next-question">
+            Next Question (Enter) &rarr;
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SANDBOX LAB VIEW -->
+    <section id="lab-view" class="view hidden">
+      <div class="quiz-topbar panel">
+        <div class="quiz-topbar-row">
+          <button type="button" class="btn btn-ghost" id="btn-lab-back">&larr; Dashboard</button>
+          <div class="quiz-meta-tags">
+            <span class="badge badge-scope" id="lab-title-badge">Sandbox Lab</span>
+            <span class="badge badge-domain" id="lab-domain-badge">1.0 System Management</span>
+            <span class="badge badge-difficulty" id="lab-difficulty-badge">Beginner</span>
+          </div>
+          <div class="quiz-score-meta">
+            <span class="badge" id="lab-status-badge">IN PROGRESS</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="lab-workspace-grid">
+        <!-- Objective & Checklist Panel -->
+        <div class="panel lab-objective-panel">
+          <p class="scenario-label">LAB OBJECTIVE</p>
+          <p id="lab-objective-text" class="lab-objective-text"></p>
+
+          <p class="scenario-label">VERIFICATION CHECKLIST</p>
+          <ul id="lab-checklist" class="lab-checklist"></ul>
+
+          <div id="lab-pass-banner" class="lab-pass-banner hidden" role="status">
+            <strong>&#10003; LAB PASSED!</strong> All filesystem checks succeeded and progress was saved.
+          </div>
+
+          <div id="lab-hint-box" class="hint-box hidden" role="note">
+            <span class="hint-title">HINT</span>
+            <span id="lab-hint-text"></span>
+          </div>
+
+          <div id="lab-solution-box" class="lab-solution-box hidden" role="note">
+            <span class="hint-title">EXAMPLE SOLUTION</span>
+            <pre><code id="lab-solution-code"></code></pre>
+          </div>
+
+          <div class="lab-controls-bar">
+            <button type="button" class="btn btn-primary" id="btn-lab-check">Check Objective</button>
+            <button type="button" class="btn btn-secondary" id="btn-lab-hint">Hint</button>
+            <button type="button" class="btn btn-warning" id="btn-lab-reset">Reset Lab</button>
+            <button type="button" class="btn btn-ghost" id="btn-lab-solution">Show Solution</button>
+          </div>
+        </div>
+
+        <!-- Interactive Terminal Panel -->
+        <div class="panel lab-terminal-panel">
+          <div class="lab-terminal-header">
+            <span class="scenario-label">ISOLATED BASH SANDBOX</span>
+            <div class="lab-terminal-meta">
+              <span class="badge badge-backend" id="lab-backend-badge" title="Active sandbox backend">Native Bash</span>
+              <div class="backend-toggle backend-toggle-compact" id="lab-backend-toggle" role="group" aria-label="Switch sandbox backend"></div>
+              <span class="badge" id="lab-cwd-badge">~</span>
+            </div>
+          </div>
+
+          <div id="lab-terminal-output" class="lab-terminal-output" aria-live="polite"></div>
+
+          <form id="lab-cmd-form" class="terminal-form" autocomplete="off">
+            <div class="terminal-input-wrap lab-terminal-input-wrap">
+              <span class="terminal-prompt" id="lab-terminal-prompt">lab@sandbox:~$</span>
+              <input
+                type="text"
+                id="lab-cmd-input"
+                class="terminal-input"
+                placeholder="Enter Bash command (or 'check', 'hint', 'reset', 'clear')..."
+                autocomplete="off"
+                autocapitalize="off"
+                spellcheck="false"
+              >
+              <button type="submit" class="btn btn-primary btn-sm" id="btn-lab-run">Run</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- SESSION SUMMARY VIEW -->
+    <section id="summary-view" class="view hidden">
+      <div class="panel summary-panel">
+        <h2 class="panel-title">Training Session Complete</h2>
+        <p class="panel-desc" id="summary-scope-text"></p>
+
+        <div class="summary-stats-grid">
+          <div class="summary-stat-card">
+            <span class="stat-caption">Correct</span>
+            <strong class="stat-value" id="sum-correct">0 / 0</strong>
+          </div>
+          <div class="summary-stat-card">
+            <span class="stat-caption">Accuracy</span>
+            <strong class="stat-value" id="sum-accuracy">0.0%</strong>
+          </div>
+          <div class="summary-stat-card">
+            <span class="stat-caption">XP Earned</span>
+            <strong class="stat-value" id="sum-xp">+0 XP</strong>
+          </div>
+          <div class="summary-stat-card">
+            <span class="stat-caption">Skipped / Hints</span>
+            <strong class="stat-value" id="sum-meta">0 / 0</strong>
+          </div>
+        </div>
+
+        <div class="summary-actions">
+          <button type="button" class="btn btn-primary" id="btn-train-again">Train Same Scope Again</button>
+          <button type="button" class="btn btn-warning hidden" id="btn-summary-missed">Review Missed Questions</button>
+          <button type="button" class="btn btn-ghost" id="btn-summary-dashboard">Back to Dashboard</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- RESET CONFIRMATION MODAL -->
+  <div id="reset-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="reset-modal-title">
+    <div class="panel modal-card">
+      <h3 id="reset-modal-title" class="panel-title">Reset Study Progress?</h3>
+      <p id="reset-modal-body" class="modal-body-text">
+        This will permanently clear all per-category accuracy counters, skill XP levels, and your missed-questions queue in <code>data/progress.json</code>.
+      </p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="btn-cancel-reset">Cancel</button>
+        <button type="button" class="btn btn-danger" id="btn-confirm-reset">Yes, Reset Progress</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</body>
+</html>
