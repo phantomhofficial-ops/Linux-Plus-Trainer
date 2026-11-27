@@ -7,6 +7,11 @@ from pathlib import Path
 import sys
 from typing import Callable
 
+try:
+    import readline  # Enables arrow-key line editing & history in Terminal Mode
+except ImportError:
+    readline = None  # type: ignore[assignment]
+
 from rich import box
 from rich.console import Console
 from rich.markup import escape
@@ -36,6 +41,46 @@ from sandbox import (
 )
 from web_app import run_web_server
 from desktop_app import run_desktop_app
+
+
+def _configure_readline() -> bool:
+    """Enable readline line editing and command history if available."""
+    if readline is None:
+        return False
+    try:
+        if hasattr(readline, "set_auto_history"):
+            readline.set_auto_history(True)
+        if hasattr(readline, "set_history_length"):
+            readline.set_history_length(500)
+        return True
+    except Exception:
+        return False
+
+
+def _clear_readline_history() -> None:
+    """Clear current readline history buffer cleanly when supported."""
+    if readline is None:
+        return
+    try:
+        if hasattr(readline, "clear_history"):
+            readline.clear_history()
+    except Exception:
+        pass
+
+
+def _record_readline_history(command: str) -> None:
+    """Append command to readline history unless it duplicates the latest entry."""
+    if readline is None or not command:
+        return
+    try:
+        length = readline.get_current_history_length() if hasattr(readline, "get_current_history_length") else 0
+        if length > 0 and hasattr(readline, "get_history_item"):
+            if readline.get_history_item(length) == command:
+                return
+        if hasattr(readline, "add_history"):
+            readline.add_history(command)
+    except Exception:
+        pass
 
 
 def _safe_input(console: Console, prompt: str) -> str:
@@ -469,6 +514,8 @@ def run_sandbox_lab_session(
     )
     passed_in_session = False
 
+    _configure_readline()
+    _clear_readline_history()
     session = SandboxSession(lab, backend=backend)
     try:
         _render_lab_intro(console, lab, backend_label=session.backend_label)
@@ -484,6 +531,8 @@ def run_sandbox_lab_session(
             cmd = raw_input.strip()
             if not cmd:
                 continue
+
+            _record_readline_history(cmd)
 
             lowered = cmd.lower()
             if lowered in {"quit", "exit", ":q"}:
@@ -595,6 +644,7 @@ def run_sandbox_lab_session(
                 console.print(Text(err_text, style="red"), end="")
     finally:
         session.cleanup()
+        _clear_readline_history()
 
     return passed_in_session
 
@@ -605,6 +655,7 @@ def run_terminal_app(
     progress_path: Path | None = None,
 ) -> int:
     """Run the interactive Rich terminal CLI trainer loop."""
+    _configure_readline()
     active_console = console or Console()
     resolved_questions_dir = (
         Path(questions_dir) if questions_dir is not None else get_questions_dir()

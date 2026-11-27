@@ -307,6 +307,49 @@ class TerminalAndWebSandboxTests(unittest.TestCase):
             self.assertTrue(passed)
             self.assertTrue(tracker.is_lab_completed("lab_04"))
 
+    def test_terminal_sandbox_readline_history_and_none_fallback(self) -> None:
+        from unittest.mock import MagicMock, patch
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tracker = ProgressTracker(Path(tmpdir) / "progress.json", categories=["Cat"])
+            console = Console(file=io.StringIO(), force_terminal=False, width=100)
+            lab = get_lab_by_id("lab_04")
+
+            history_items: list[str] = []
+            fake_rl = MagicMock()
+            fake_rl.clear_history.side_effect = history_items.clear
+            fake_rl.get_current_history_length.side_effect = lambda: len(history_items)
+            fake_rl.get_history_item.side_effect = lambda idx: history_items[idx - 1]
+            fake_rl.add_history.side_effect = history_items.append
+
+            recorded_during_session: list[str] = []
+
+            def fake_reader(_prompt: str, it=iter(["pwd", "ln -s releases/v2 current", "check", "quit"])):
+                val = next(it)
+                if val == "quit":
+                    recorded_during_session.extend(history_items)
+                return val
+
+            with patch.object(cli_app, "readline", fake_rl):
+                passed = cli_app.run_sandbox_lab_session(
+                    console, lab, tracker, input_fn=fake_reader
+                )
+            self.assertTrue(passed)
+            fake_rl.set_auto_history.assert_called_once_with(True)
+            self.assertEqual(
+                recorded_during_session,
+                ["pwd", "ln -s releases/v2 current", "check"],
+            )
+            self.assertEqual(history_items, [])  # cleared on session exit
+
+            # Windows / missing-readline fallback (readline is None)
+            inputs_no_rl = iter(["ln -s releases/v2 current", "check", "quit"])
+            with patch.object(cli_app, "readline", None):
+                passed_no_rl = cli_app.run_sandbox_lab_session(
+                    console, lab, tracker, input_fn=lambda _: next(inputs_no_rl)
+                )
+            self.assertTrue(passed_no_rl)
+
     def test_web_sandbox_api_lifecycle_and_themes(self) -> None:
         # Dashboard & theme assets include sandbox lab UI
         html = self.client.get("/").get_data(as_text=True)
