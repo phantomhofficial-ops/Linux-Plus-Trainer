@@ -36,6 +36,10 @@ from labs import (
 DEFAULT_TIMEOUT_SECONDS = 5.0
 MAX_OUTPUT_CHARS = 65536
 _CWD_MARKER = "__LINUX_PLUS_SANDBOX_CWD__:"
+VIRTUAL_HOME = "/home/lab"
+_VIRTUAL_HOME_RE = re.compile(
+    r"(?<![A-Za-z0-9_./-])" + re.escape(VIRTUAL_HOME) + r"(?=/|$|[\s'\"`;|&<>)\]}])"
+)
 
 BACKEND_AUTO = "auto"
 BACKEND_NATIVE = "native"
@@ -345,6 +349,54 @@ def _is_within_sandbox(
     return cand_norm == root_norm or cand_norm.startswith(root_norm + sep)
 
 
+def _map_virtual_home_to_sandbox(
+    candidate: str,
+    sandbox_root: Path | PurePosixPath,
+    use_posix: bool,
+) -> str | None:
+    """Map /home/lab(/...) to sandbox_root, returning None if '..' escapes /home/lab."""
+    normed = posixpath.normpath(candidate.replace("\\", "/"))
+    if normed == VIRTUAL_HOME:
+        return str(sandbox_root)
+    if normed.startswith(VIRTUAL_HOME + "/"):
+        rel = normed[len(VIRTUAL_HOME) + 1 :]
+        return _join_sandbox_path(sandbox_root, rel, use_posix)
+    return None
+
+
+def _rewrite_virtual_home(command: str, sandbox_root: Path | PurePosixPath) -> str:
+    """Rewrite /home/lab references in a validated command to the real sandbox root."""
+    root_str = str(sandbox_root)
+    return _VIRTUAL_HOME_RE.sub(lambda _m: root_str, command)
+
+
+def _mask_sandbox_paths(text: str, sandbox_root: Path | PurePosixPath) -> str:
+    """Mask raw temporary sandbox root paths in output with /home/lab."""
+    if not text:
+        return text
+    variants: list[str] = [str(sandbox_root)]
+    if isinstance(sandbox_root, Path):
+        variants.append(sandbox_root.as_posix())
+        try:
+            resolved = sandbox_root.resolve()
+            variants.append(str(resolved))
+            variants.append(resolved.as_posix())
+        except OSError:
+            pass
+    seen: set[str] = set()
+    ordered: list[str] = []
+    for v in sorted(variants, key=len, reverse=True):
+        if v and v not in seen:
+            seen.add(v)
+            ordered.append(v)
+    masked = text
+    for raw_root in ordered:
+        masked = masked.replace(raw_root, VIRTUAL_HOME)
+    if os.sep != "/":
+        masked = masked.replace(VIRTUAL_HOME + "\\", VIRTUAL_HOME + "/")
+    return masked
+
+
 def _is_blocked_command_name(token: str) -> str | None:
     base = token.rsplit("/", 1)[-1]
     if base in BLOCKED_COMMANDS or base.startswith("mkfs."):
@@ -411,20 +463,29 @@ def _check_path_token(
                 )
 
         if candidate.startswith("/"):
+            if candidate == VIRTUAL_HOME or candidate.startswith(VIRTUAL_HOME + "/"):
+                mapped = _map_virtual_home_to_sandbox(candidate, sandbox_root, use_posix)
+                if mapped is None or not _is_within_sandbox(mapped, sandbox_root):
+                    return (
+                        f"Sandbox warning: path '{candidate}' escapes the lab workspace ({VIRTUAL_HOME}). "
+                        "Use relative paths (e.g., '../src') or '~/...'."
+                    )
+                continue
             for prefix in SENSITIVE_ROOT_PREFIXES:
                 if candidate == prefix or candidate.startswith(prefix + "/"):
                     return (
                         f"Sandbox warning: access to host path '{candidate}' is blocked. "
-                        "Work strictly within the isolated lab workspace."
+                        f"Work inside {VIRTUAL_HOME} using relative paths (e.g., '../src') or '~/...' instead of a leading '/'."
                     )
             if candidate in {"/", "/*"}:
                 return (
                     "Sandbox warning: referencing the host root '/' is blocked. "
-                    "Work strictly within the isolated lab workspace."
+                    f"Work inside {VIRTUAL_HOME} using relative paths (e.g., '../src') or '~/...' instead of a leading '/'."
                 )
             if not _is_within_sandbox(candidate, sandbox_root):
                 return (
-                    f"Sandbox warning: absolute path '{candidate}' is outside the sandbox root."
+                    f"Sandbox warning: absolute path '{candidate}' is outside the lab workspace. "
+                    "Use relative paths (e.g., '../src') or '~/...' instead of a leading '/'."
                 )
 
         if ".." in candidate.replace("\\", "/").split("/"):
@@ -523,10 +584,16 @@ def validate_command(
                     return "Sandbox warning: cannot 'cd' above the sandbox root directory."
                 sim_cwd = candidate
             elif target.startswith("/"):
-                candidate = _norm_sandbox_path(target, use_posix) if use_posix else target
-                if not _is_within_sandbox(candidate, sandbox_root):
-                    return "Sandbox warning: cannot 'cd' outside the sandbox root directory."
-                sim_cwd = candidate
+                if target == VIRTUAL_HOME or target.startswith(VIRTUAL_HOME + "/"):
+                    mapped = _map_virtual_home_to_sandbox(target, sandbox_root, use_posix)
+                    if mapped is None or not _is_within_sandbox(mapped, sandbox_root):
+                        return "Sandbox warning: cannot 'cd' outside the sandbox root directory."
+                    sim_cwd = mapped
+                else:
+                    candidate = _norm_sandbox_path(target, use_posix) if use_posix else target
+                    if not _is_within_sandbox(candidate, sandbox_root):
+                        return "Sandbox warning: cannot 'cd' outside the sandbox root directory."
+                    sim_cwd = candidate
             else:
                 candidate = _join_sandbox_path(sim_cwd, target, use_posix)
                 if not _is_within_sandbox(candidate, sandbox_root):
@@ -584,7 +651,13 @@ def _lex_shell(command: str) -> list[_LexToken]:
     def flush_word() -> None:
         nonlocal buf, has_word, word_quoted
         if has_word:
-            tokens.append(_LexToken("word", "".join(buf), quoted=word_quoted))
+            word = "".join(buf)
+            if not word_quoted:
+                if word == "~":
+                    word = VIRTUAL_HOME
+                elif word.startswith("~/"):
+                    word = VIRTUAL_HOME + word[1:]
+            tokens.append(_LexToken("word", word, quoted=word_quoted))
             buf = []
             has_word = False
             word_quoted = False
@@ -658,6 +731,14 @@ def _lex_shell(command: str) -> list[_LexToken]:
                 if command[i] == "\\" and i + 1 < n and command[i + 1] in {'"', "\\", "$", "`"}:
                     buf.append(command[i + 1])
                     i += 2
+                elif command[i : i + 7] == "${HOME}":
+                    buf.append(VIRTUAL_HOME)
+                    i += 7
+                elif command[i : i + 5] == "$HOME" and (
+                    i + 5 >= n or not (command[i + 5].isalnum() or command[i + 5] == "_")
+                ):
+                    buf.append(VIRTUAL_HOME)
+                    i += 5
                 else:
                     buf.append(command[i])
                     i += 1
@@ -671,6 +752,20 @@ def _lex_shell(command: str) -> list[_LexToken]:
             word_quoted = True
             buf.append(command[i + 1])
             i += 2
+            continue
+
+        if command[i : i + 7] == "${HOME}":
+            has_word = True
+            buf.append(VIRTUAL_HOME)
+            i += 7
+            continue
+
+        if command[i : i + 5] == "$HOME" and (
+            i + 5 >= n or not (command[i + 5].isalnum() or command[i + 5] == "_")
+        ):
+            has_word = True
+            buf.append(VIRTUAL_HOME)
+            i += 5
             continue
 
         has_word = True
@@ -905,10 +1000,13 @@ class SimulatedShell:
         follow_final: bool = True,
     ) -> Path:
         cleaned = raw.strip()
-        if cleaned == "~":
+        if cleaned in {"~", VIRTUAL_HOME}:
             return self.root
         if cleaned.startswith("~/"):
-            candidate = self.root / cleaned[2:]
+            candidate = Path(os.path.normpath(str(self.root / cleaned[2:])))
+        elif cleaned.startswith(VIRTUAL_HOME + "/"):
+            rel = cleaned[len(VIRTUAL_HOME) + 1 :]
+            candidate = Path(os.path.normpath(str(self.root / rel)))
         elif cleaned.startswith("/"):
             candidate = Path(posixpath.normpath(cleaned))
         else:
@@ -924,14 +1022,16 @@ class SimulatedShell:
     def _expand_glob(self, word: str, cwd: Path) -> list[str]:
         if not any(ch in word for ch in "*?["):
             return [word]
-        if word.startswith("~/"):
-            pattern = str(self.root / word[2:])
+        if word.startswith("~/") or word.startswith(VIRTUAL_HOME + "/"):
+            prefix = "~/" if word.startswith("~/") else VIRTUAL_HOME + "/"
+            sub = word[len(prefix) :]
+            pattern = str(self.root / sub)
             matches = sorted(pyglob.glob(pattern))
             rel_matches = []
             for m in matches:
                 mp = Path(m)
                 if _is_within_sandbox(mp, self.root):
-                    rel_matches.append("~/" + mp.relative_to(self.root).as_posix())
+                    rel_matches.append(prefix + mp.relative_to(self.root).as_posix())
             return rel_matches or [word]
         if word.startswith("/"):
             return [word]
@@ -1131,10 +1231,8 @@ class SimulatedShell:
             return "", "", 1, cwd, False
 
         if cmd_name == "pwd":
-            rel = "~" if cwd == self.root else "~/" + cwd.relative_to(self.root).as_posix()
-            # Match realistic POSIX path rooted at sandbox
-            if "-P" in rest or True:
-                return f"/home/sandbox{'' if rel == '~' else rel[1:]}\n", "", 0, cwd, False
+            rel = "" if cwd == self.root else "/" + cwd.relative_to(self.root).as_posix()
+            return f"{VIRTUAL_HOME}{rel}\n", "", 0, cwd, False
 
         if cmd_name == "whoami":
             return "lab\n", "", 0, cwd, False
@@ -2547,7 +2645,7 @@ class SimulatedShell:
                 if follow:
                     resolved = self.vfs.resolve_path(p, follow_final=True)
                     rel = resolved.relative_to(self.root).as_posix()
-                    out_lines.append(f"/home/sandbox/{rel}" if rel != "." else "/home/sandbox")
+                    out_lines.append(f"{VIRTUAL_HOME}/{rel}" if rel != "." else VIRTUAL_HOME)
                 else:
                     target = self.vfs.readlink(p)
                     if target is None:
@@ -2800,12 +2898,13 @@ class SandboxSession:
 
     def _execute_wsl(self, command: str) -> CommandResult:
         assert self._wsl_exe is not None
+        exec_command = _rewrite_virtual_home(command, self.root)
         wrapped = (
             f"export HOME={shlex.quote(str(self.root))} "
             "PATH=/usr/local/bin:/usr/bin:/bin LC_ALL=C LANG=C TERM=xterm-256color\n"
             f"cd {shlex.quote(str(self.cwd))} || exit 1\n"
             "{\n"
-            f"{command}\n"
+            f"{exec_command}\n"
             "}\n"
             "__sb_rc=$?\n"
             f"printf '\\n%s%s\\n' '{_CWD_MARKER}' \"$(pwd -P)\"\n"
@@ -2846,9 +2945,10 @@ class SandboxSession:
         return self._format_result(command, raw_stdout, raw_stderr, proc.returncode)
 
     def _execute_native(self, command: str) -> CommandResult:
+        exec_command = _rewrite_virtual_home(command, self.root)
         wrapped = (
             "{\n"
-            f"{command}\n"
+            f"{exec_command}\n"
             "}\n"
             "__sb_rc=$?\n"
             f"printf '\\n%s%s\\n' '{_CWD_MARKER}' \"$(pwd -P)\"\n"
@@ -2896,6 +2996,8 @@ class SandboxSession:
     def _format_result(
         self, command: str, raw_stdout: str, raw_stderr: str, returncode: int
     ) -> CommandResult:
+        raw_stdout = _mask_sandbox_paths(raw_stdout, self.root)
+        raw_stderr = _mask_sandbox_paths(raw_stderr, self.root)
         if len(raw_stdout) > MAX_OUTPUT_CHARS:
             raw_stdout = raw_stdout[:MAX_OUTPUT_CHARS] + "\n...[output truncated]"
         if len(raw_stderr) > MAX_OUTPUT_CHARS:

@@ -109,6 +109,60 @@ class SandboxIsolationTests(unittest.TestCase):
         # Context manager exit cleans up temp dir
         self.assertFalse(session.root.exists())
 
+    def test_virtual_home_masking_tilde_and_home_lab_mapping(self) -> None:
+        from sandbox import BACKEND_NATIVE, BACKEND_SIMULATED, VIRTUAL_HOME
+
+        for backend in (BACKEND_NATIVE, BACKEND_SIMULATED):
+            with self.subTest(backend=backend):
+                with SandboxSession("lab_01", backend=backend) as session:
+                    raw_root = str(session.root)
+
+                    # pwd and echo $HOME mask temp dir to /home/lab
+                    pwd_res = session.execute("pwd")
+                    self.assertEqual(pwd_res.returncode, 0)
+                    self.assertEqual(pwd_res.stdout.strip(), VIRTUAL_HOME)
+                    self.assertNotIn(raw_root, pwd_res.stdout)
+
+                    home_res = session.execute("echo $HOME")
+                    self.assertEqual(home_res.returncode, 0)
+                    self.assertEqual(home_res.stdout.strip(), VIRTUAL_HOME)
+
+                    # ~ and ~/inbox work naturally
+                    tilde_ls = session.execute("ls ~/inbox")
+                    self.assertEqual(tilde_ls.returncode, 0)
+                    self.assertIn("app.py", tilde_ls.stdout)
+
+                    # /home/lab/... maps to sandbox root
+                    cd_res = session.execute("cd /home/lab/inbox && pwd")
+                    self.assertFalse(cd_res.blocked)
+                    self.assertEqual(cd_res.returncode, 0)
+                    self.assertEqual(cd_res.cwd, "~/inbox")
+                    self.assertEqual(cd_res.stdout.strip(), f"{VIRTUAL_HOME}/inbox")
+
+                    cat_res = session.execute("cat /home/lab/inbox/app.py")
+                    self.assertFalse(cat_res.blocked)
+                    self.assertEqual(cat_res.returncode, 0)
+                    self.assertIn("hello linux+", cat_res.stdout)
+
+                    # cd ~ returns to sandbox root
+                    back_res = session.execute("cd ~ && pwd")
+                    self.assertEqual(back_res.returncode, 0)
+                    self.assertEqual(back_res.cwd, "~")
+                    self.assertEqual(back_res.stdout.strip(), VIRTUAL_HOME)
+
+                    # Error output masks raw temp dir if triggered
+                    err_res = session.execute("ls /home/lab/does_not_exist")
+                    self.assertNotEqual(err_res.returncode, 0)
+                    self.assertNotIn(raw_root, err_res.stderr)
+
+                    # Escaping /home/lab or referencing host paths remains blocked with helpful guidance
+                    for bad in ("cat /home/lab/../etc/passwd", "ls /etc/passwd", "ls /home"):
+                        blocked_res = session.execute(bad)
+                        self.assertTrue(blocked_res.blocked, f"Expected blocked: {bad!r}")
+                        self.assertEqual(blocked_res.returncode, 126)
+                        self.assertIn("Sandbox warning", blocked_res.stderr)
+                        self.assertIn("~/", blocked_res.stderr)
+
 
 class StarterLabsVerificationTests(unittest.TestCase):
     """Verify all 10 labs fail initially, pass with their solution, and accept alternative valid approaches."""
