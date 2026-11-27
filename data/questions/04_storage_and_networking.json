@@ -17,7 +17,7 @@
       "lsblk --fs"
     ],
     "hint": "Use lsblk with the filesystem info flag (-f).",
-    "explanation": "Domain 1.0 (System Management): `lsblk -f` (`--fs`) outputs block device trees including `FSTYPE`, `LABEL`, `UUID`, and `MOUNTPOINTS`—vital for persistent `/etc/fstab` configuration. `lsblk -m` displays permissions/owner, `fdisk -l` prints partition tables without UUIDs, and `df` only shows mounted filesystems."
+    "explanation": "Domain 1.0 (System Management): `lsblk -f` (`--fs`) outputs block device trees including `FSTYPE`, `LABEL`, `UUID`, and `MOUNTPOINTS`\u2014vital for persistent `/etc/fstab` configuration. `lsblk -m` displays permissions/owner, `fdisk -l` prints partition tables without UUIDs, and `df` only shows mounted filesystems."
   },
   {
     "id": "stor_02",
@@ -561,7 +561,7 @@
       "dig +short api.example.com A"
     ],
     "hint": "Pass the +short query option to dig.",
-    "explanation": "Domain 5.0 (Troubleshooting): `dig +short api.example.com` suppresses the banner, question, authority, and timing sections so only the bare answer record(s) print—ideal for quick troubleshooting and Bash pipelines."
+    "explanation": "Domain 5.0 (Troubleshooting): `dig +short api.example.com` suppresses the banner, question, authority, and timing sections so only the bare answer record(s) print\u2014ideal for quick troubleshooting and Bash pipelines."
   },
   {
     "id": "stor_25",
@@ -782,5 +782,398 @@
     ],
     "hint": "Pass -p (load from /etc/sysctl.conf) to sysctl.",
     "explanation": "Domain 1.0 (System Management): `sysctl -p` reads `/etc/sysctl.conf` (or a specified file path) and applies all listed kernel parameters immediately (`sysctl --system` loads all `/etc/sysctl.d/*.conf` drop-ins as well)."
+  },
+  {
+    "id": "stor_35",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "beginner",
+    "prompt": "Display layer-2 network interface states (UP/DOWN, MAC addresses, MTU) without IP address clutter.",
+    "choices": [
+      "ip link show",
+      "ip route show",
+      "ss -tuln",
+      "nmcli con show"
+    ],
+    "correct_choice": "ip link show",
+    "accepted_commands": [
+      "ip link show",
+      "ip link",
+      "ip l"
+    ],
+    "hint": "Use the 'link' object of the ip command.",
+    "explanation": "ip link show displays link state, MAC address, and MTU for every network interface (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "stor_36",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "beginner",
+    "prompt": "Inspect the local static hostname-to-IP mapping file '/etc/hosts'.",
+    "choices": [
+      "cat /etc/hosts",
+      "cat /etc/resolv.conf",
+      "cat /etc/hostname",
+      "hostnamectl"
+    ],
+    "correct_choice": "cat /etc/hosts",
+    "accepted_commands": [
+      "cat /etc/hosts"
+    ],
+    "hint": "Read /etc/hosts.",
+    "explanation": "/etc/hosts maps static IP addresses to hostnames locally before or alongside DNS (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "stor_37",
+    "domain": "5.0 Troubleshooting",
+    "category": "Storage & Networking",
+    "difficulty": "beginner",
+    "prompt": "Check which DNS nameservers and search domains are configured in '/etc/resolv.conf'.",
+    "choices": [
+      "cat /etc/resolv.conf",
+      "cat /etc/hosts",
+      "cat /etc/nsswitch.conf",
+      "ip route"
+    ],
+    "correct_choice": "cat /etc/resolv.conf",
+    "accepted_commands": [
+      "cat /etc/resolv.conf"
+    ],
+    "hint": "Read /etc/resolv.conf.",
+    "explanation": "/etc/resolv.conf lists DNS nameserver IPs and search domains used by the stub resolver (XK0-006 Domain 5.0)."
+  },
+  {
+    "id": "stor_38",
+    "domain": "5.0 Troubleshooting",
+    "category": "Storage & Networking",
+    "difficulty": "beginner",
+    "prompt": "Perform a quick DNS lookup for 'db.internal.local' using the 'host' utility.",
+    "choices": [
+      "host db.internal.local",
+      "ping db.internal.local",
+      "whois db.internal.local",
+      "ss db.internal.local"
+    ],
+    "correct_choice": "host db.internal.local",
+    "accepted_commands": [
+      "host db.internal.local"
+    ],
+    "hint": "Use the simple 'host' DNS lookup command.",
+    "explanation": "host resolves hostnames to IP addresses (and reverse IPs to names) concisely (XK0-006 Domain 5.0)."
+  },
+  {
+    "id": "stor_39",
+    "domain": "5.0 Troubleshooting",
+    "category": "Storage & Networking",
+    "difficulty": "beginner",
+    "prompt": "Query domain registration and registrar ownership details for 'example.org'.",
+    "choices": [
+      "whois example.org",
+      "dig example.org",
+      "host example.org",
+      "nslookup example.org"
+    ],
+    "correct_choice": "whois example.org",
+    "accepted_commands": [
+      "whois example.org"
+    ],
+    "hint": "Use the WHOIS directory lookup tool.",
+    "explanation": "whois queries domain/IP registration records (registrar, nameservers, org contact) (XK0-006 Domain 5.0)."
+  },
+  {
+    "id": "stor_40",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "beginner",
+    "prompt": "Display active swap devices/files along with their size and priority.",
+    "choices": [
+      "swapon --show",
+      "mkswap --show",
+      "lsblk -s",
+      "df -h /swap"
+    ],
+    "correct_choice": "swapon --show",
+    "accepted_commands": [
+      "swapon --show",
+      "swapon -s"
+    ],
+    "hint": "Use swapon with --show (or -s).",
+    "explanation": "swapon --show lists all active swap partitions and swap files with sizes and priorities (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "stor_41",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "beginner",
+    "prompt": "List all LVM Physical Volumes (PVs) and their assigned Volume Groups.",
+    "choices": [
+      "pvs",
+      "vgs",
+      "lvs",
+      "lsblk -f"
+    ],
+    "correct_choice": "pvs",
+    "accepted_commands": [
+      "pvs",
+      "pvdisplay"
+    ],
+    "hint": "Short 3-letter LVM summary command for Physical Volumes.",
+    "explanation": "pvs prints a concise summary table of LVM Physical Volumes, sizes, and parent Volume Groups (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "stor_42",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "intermediate",
+    "prompt": "Display a summary of all LVM Volume Groups (VGs) and their free space.",
+    "choices": [
+      "vgs",
+      "pvs",
+      "lvs",
+      "vgcreate -l"
+    ],
+    "correct_choice": "vgs",
+    "accepted_commands": [
+      "vgs",
+      "vgdisplay"
+    ],
+    "hint": "Short 3-letter LVM command for Volume Groups.",
+    "explanation": "vgs summarizes Volume Group capacity, PV/LV counts, and remaining free extents (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "stor_43",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "intermediate",
+    "prompt": "Display a summary of all LVM Logical Volumes (LVs) and their sizes.",
+    "choices": [
+      "lvs",
+      "vgs",
+      "pvs",
+      "lvdisplay -s"
+    ],
+    "correct_choice": "lvs",
+    "accepted_commands": [
+      "lvs",
+      "lvdisplay"
+    ],
+    "hint": "Short 3-letter LVM command for Logical Volumes.",
+    "explanation": "lvs lists Logical Volumes, their Volume Groups, attributes, and sizes (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "stor_44",
+    "domain": "5.0 Troubleshooting",
+    "category": "Storage & Networking",
+    "difficulty": "intermediate",
+    "prompt": "Inspect the kernel's ARP/NDP neighbor cache table using iproute2.",
+    "choices": [
+      "ip neigh show",
+      "ip route show",
+      "ip link show",
+      "ss -an"
+    ],
+    "correct_choice": "ip neigh show",
+    "accepted_commands": [
+      "ip neigh show",
+      "ip neigh",
+      "ip n",
+      "arp -a"
+    ],
+    "hint": "Use the 'neigh' subcommand of ip.",
+    "explanation": "ip neigh show displays IP-to-MAC neighbor mappings (REACHABLE, STALE, FAILED) (XK0-006 Domain 5.0)."
+  },
+  {
+    "id": "stor_45",
+    "domain": "5.0 Troubleshooting",
+    "category": "Storage & Networking",
+    "difficulty": "intermediate",
+    "prompt": "Check per-interface DNS servers and DNSSEC status managed by systemd-resolved.",
+    "choices": [
+      "resolvectl status",
+      "nmcli dns status",
+      "systemctl status dnsmasq",
+      "cat /etc/hosts"
+    ],
+    "correct_choice": "resolvectl status",
+    "accepted_commands": [
+      "resolvectl status",
+      "resolvectl"
+    ],
+    "hint": "Use resolvectl.",
+    "explanation": "resolvectl status shows global and per-link DNS servers, domains, and protocol status (XK0-006 Domain 5.0)."
+  },
+  {
+    "id": "stor_46",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "intermediate",
+    "prompt": "List all defined KVM/libvirt virtual machines, including both running and shut-off domains.",
+    "choices": [
+      "virsh list --all",
+      "virsh list",
+      "qemu-img list",
+      "lsblk --vm"
+    ],
+    "correct_choice": "virsh list --all",
+    "accepted_commands": [
+      "virsh list --all"
+    ],
+    "hint": "Use virsh list with --all.",
+    "explanation": "virsh list shows only running VMs by default; --all includes shut-off VMs as well (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "stor_47",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "hard",
+    "prompt": "Print the partition table of '/dev/sda' non-interactively using fdisk.",
+    "choices": [
+      "fdisk -l /dev/sda",
+      "fdisk -p /dev/sda",
+      "lsblk -p /dev/sda",
+      "blkid -l /dev/sda"
+    ],
+    "correct_choice": "fdisk -l /dev/sda",
+    "accepted_commands": [
+      "fdisk -l /dev/sda"
+    ],
+    "hint": "Use fdisk with -l.",
+    "explanation": "fdisk -l lists partition layout, sector boundaries, and partition types without entering interactive mode (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "stor_48",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "hard",
+    "prompt": "Print the GPT partition table of '/dev/nvme0n1' non-interactively using parted.",
+    "choices": [
+      "parted /dev/nvme0n1 print",
+      "parted -l /dev/nvme0n1",
+      "parted /dev/nvme0n1 show",
+      "gdisk -p /dev/nvme0n1"
+    ],
+    "correct_choice": "parted /dev/nvme0n1 print",
+    "accepted_commands": [
+      "parted /dev/nvme0n1 print",
+      "parted -s /dev/nvme0n1 print"
+    ],
+    "hint": "Pass the 'print' subcommand to parted.",
+    "explanation": "parted <device> print outputs disk size, partition table type (gpt/msdos), and partition boundaries (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "stor_49",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "hard",
+    "prompt": "Add the new Physical Volume '/dev/sdd1' into the existing LVM Volume Group 'vg_data'.",
+    "choices": [
+      "vgextend vg_data /dev/sdd1",
+      "lvextend vg_data /dev/sdd1",
+      "pvcreate vg_data /dev/sdd1",
+      "vgcreate vg_data /dev/sdd1"
+    ],
+    "correct_choice": "vgextend vg_data /dev/sdd1",
+    "accepted_commands": [
+      "vgextend vg_data /dev/sdd1"
+    ],
+    "hint": "Use vgextend <vg_name> <pv_device>.",
+    "explanation": "vgextend expands an existing Volume Group's pool by adding one or more Physical Volumes (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "stor_50",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "hard",
+    "prompt": "Permanently remove the unmounted LVM Logical Volume '/dev/vg_data/lv_old'.",
+    "choices": [
+      "lvremove /dev/vg_data/lv_old",
+      "lvdelete /dev/vg_data/lv_old",
+      "vgremove /dev/vg_data/lv_old",
+      "rm -f /dev/vg_data/lv_old"
+    ],
+    "correct_choice": "lvremove /dev/vg_data/lv_old",
+    "accepted_commands": [
+      "lvremove /dev/vg_data/lv_old",
+      "lvremove -f /dev/vg_data/lv_old"
+    ],
+    "hint": "Use lvremove.",
+    "explanation": "lvremove deletes a Logical Volume and returns its extents to the Volume Group (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "stor_51",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "hard",
+    "prompt": "Deactivate the swap device '/dev/sdb2' cleanly before repartitioning.",
+    "choices": [
+      "swapoff /dev/sdb2",
+      "swapon -d /dev/sdb2",
+      "umount /dev/sdb2",
+      "rmswap /dev/sdb2"
+    ],
+    "correct_choice": "swapoff /dev/sdb2",
+    "accepted_commands": [
+      "swapoff /dev/sdb2"
+    ],
+    "hint": "Opposite of swapon.",
+    "explanation": "swapoff migrates pages out of the swap device and disables it safely (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "stor_52",
+    "domain": "5.0 Troubleshooting",
+    "category": "Storage & Networking",
+    "difficulty": "hard",
+    "prompt": "Inspect ext4 superblock parameters (UUID, block size, mount count, reserved blocks) on '/dev/sdb1'.",
+    "choices": [
+      "tune2fs -l /dev/sdb1",
+      "xfs_info /dev/sdb1",
+      "e2fsck -l /dev/sdb1",
+      "df -i /dev/sdb1"
+    ],
+    "correct_choice": "tune2fs -l /dev/sdb1",
+    "accepted_commands": [
+      "tune2fs -l /dev/sdb1",
+      "dumpe2fs -h /dev/sdb1"
+    ],
+    "hint": "Use tune2fs with -l.",
+    "explanation": "tune2fs -l prints ext2/ext3/ext4 superblock metadata including UUID, inode count, and check intervals (XK0-006 Domain 5.0)."
+  },
+  {
+    "id": "stor_53",
+    "domain": "5.0 Troubleshooting",
+    "category": "Storage & Networking",
+    "difficulty": "hard",
+    "prompt": "Display XFS filesystem geometry (block size, AG count, inode size) for mounted '/srv/xfsdata'.",
+    "choices": [
+      "xfs_info /srv/xfsdata",
+      "tune2fs -l /srv/xfsdata",
+      "xfs_repair -n /srv/xfsdata",
+      "mkfs.xfs -n /srv/xfsdata"
+    ],
+    "correct_choice": "xfs_info /srv/xfsdata",
+    "accepted_commands": [
+      "xfs_info /srv/xfsdata"
+    ],
+    "hint": "Use xfs_info on the mount point.",
+    "explanation": "xfs_info outputs allocation group, block size, and metadata layout for an XFS filesystem (XK0-006 Domain 5.0)."
+  },
+  {
+    "id": "stor_54",
+    "domain": "1.0 System Management",
+    "category": "Storage & Networking",
+    "difficulty": "hard",
+    "prompt": "Apply updated YAML network configuration changes in '/etc/netplan/' on an Ubuntu server.",
+    "choices": [
+      "netplan apply",
+      "nmcli netplan reload",
+      "systemctl apply netplan",
+      "ip netplan reload"
+    ],
+    "correct_choice": "netplan apply",
+    "accepted_commands": [
+      "netplan apply"
+    ],
+    "hint": "Use the netplan CLI with the apply subcommand.",
+    "explanation": "netplan apply renders /etc/netplan/*.yaml into systemd-networkd/NetworkManager configs and activates them (XK0-006 Domain 1.0)."
   }
 ]

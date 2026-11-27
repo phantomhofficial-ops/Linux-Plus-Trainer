@@ -49,6 +49,14 @@ class QuestionBankLoaderTests(unittest.TestCase):
         "07_packages_containers_and_troubleshooting.json",
     )
 
+    CANONICAL_DOMAINS = (
+        "1.0 System Management",
+        "2.0 Services and User Management",
+        "3.0 Security",
+        "4.0 Automation, Orchestration, and Scripting",
+        "5.0 Troubleshooting",
+    )
+
     def test_expected_files_exist_with_minimum_counts(self) -> None:
         total = 0
         for filename in self.EXPECTED_FILES:
@@ -56,25 +64,25 @@ class QuestionBankLoaderTests(unittest.TestCase):
             self.assertTrue(path.is_file(), f"Missing question file: {path}")
             loaded = load_questions_from_file(path)
             self.assertGreaterEqual(
-                len(loaded), 10, f"{filename} must contain at least 10 questions"
+                len(loaded), 54, f"{filename} must contain at least 54 questions"
             )
             beginner_count = sum(1 for q in loaded if q.difficulty == "beginner")
             self.assertGreaterEqual(
                 beginner_count,
-                10,
-                f"{filename} must contain at least 10 beginner questions",
+                18,
+                f"{filename} must contain at least 18 beginner questions",
             )
             intermediate_count = sum(1 for q in loaded if q.difficulty == "intermediate")
             self.assertGreaterEqual(
                 intermediate_count,
-                10,
-                f"{filename} must contain at least 10 intermediate questions",
+                18,
+                f"{filename} must contain at least 18 intermediate questions",
             )
             hard_count = sum(1 for q in loaded if q.difficulty == "hard")
             self.assertGreaterEqual(
                 hard_count,
-                10,
-                f"{filename} must contain at least 10 hard questions",
+                18,
+                f"{filename} must contain at least 18 hard questions",
             )
             total += len(loaded)
         self.assertGreaterEqual(total, 40, "Starter bank must have at least 40 questions total")
@@ -90,6 +98,11 @@ class QuestionBankLoaderTests(unittest.TestCase):
         self.assertEqual(len(categories), 7)
 
         for question in questions:
+            self.assertIn(
+                question.domain,
+                self.CANONICAL_DOMAINS,
+                f"{question.id}: non-canonical domain {question.domain!r}",
+            )
             self.assertIn(question.difficulty, {"beginner", "intermediate", "hard"})
             self.assertEqual(len(question.choices), 4)
             self.assertEqual(len(set(question.choices)), 4)
@@ -397,6 +410,61 @@ class MultipleChoiceAndProgressTests(unittest.TestCase):
 
             with self.assertRaises(ValueError):
                 tracker.reset_category("Nonexistent Category", questions)
+
+    def test_progress_tracker_difficulty_stats_and_legacy_compatibility(self) -> None:
+        questions = self._sample_questions() + [
+            Question(
+                id="q3",
+                domain="3.0 Security",
+                category="Navigation & File Management",
+                difficulty="hard",
+                prompt="Find setuid binaries.",
+                choices=["find / -perm -4000", "ls -la", "chmod 4755", "umask 022"],
+                correct_choice="find / -perm -4000",
+                accepted_commands=["find / -perm -4000"],
+                hint="Use -perm.",
+                explanation="Finds SUID files.",
+            )
+        ]
+        with tempfile.TemporaryDirectory() as tmpdir:
+            progress_path = Path(tmpdir) / "progress.json"
+            # Legacy file without difficulty_stats loads cleanly
+            legacy = {
+                "categories": {"Navigation & File Management": {"answered": 1, "correct": 1}},
+                "missed_question_ids": [],
+            }
+            progress_path.write_text(json.dumps(legacy), encoding="utf-8")
+
+            tracker = ProgressTracker(progress_path, categories=get_categories(questions))
+            self.assertEqual(tracker.difficulty_stats, {})
+
+            # Record answers across difficulties (including repeat of q1)
+            tracker.record_answer(questions[0], is_correct=True, difficulty="beginner")
+            tracker.record_answer(questions[0], is_correct=False, difficulty="beginner")
+            tracker.record_answer(questions[2], is_correct=True, difficulty="hard")
+
+            reloaded = ProgressTracker(progress_path, categories=get_categories(questions))
+            beg = reloaded.get_category_difficulty_stats("Navigation & File Management", "beginner")
+            self.assertEqual(beg["answered"], 2)
+            self.assertEqual(beg["correct"], 1)
+            self.assertEqual(beg["unique_answered"], 1)
+            self.assertEqual(beg["accuracy"], 50.0)
+
+            hrd = reloaded.get_category_difficulty_stats("Navigation & File Management", "hard")
+            self.assertEqual(hrd["answered"], 1)
+            self.assertEqual(hrd["correct"], 1)
+            self.assertEqual(hrd["unique_answered"], 1)
+
+            # reset_category clears difficulty_stats for that category
+            reloaded.reset_category("Navigation & File Management", questions)
+            beg_after = reloaded.get_category_difficulty_stats("Navigation & File Management", "beginner")
+            self.assertEqual(beg_after["answered"], 0)
+            self.assertEqual(beg_after["unique_answered"], 0)
+
+            # full reset clears difficulty_stats
+            reloaded.record_answer(questions[1], is_correct=True)
+            reloaded.reset(get_categories(questions))
+            self.assertEqual(reloaded.difficulty_stats, {})
 
 
 if __name__ == "__main__":

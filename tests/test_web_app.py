@@ -233,6 +233,84 @@ class WebAppTests(unittest.TestCase):
             self.assertIn("btnThemeOot", js_text)
             self.assertIn('"oot"', js_text)
 
+    def test_appearance_customizer_assets_and_hooks(self) -> None:
+        html = self.client.get("/").get_data(as_text=True)
+        self.assertNotIn('type="color"', html)
+        for token in (
+            "btn-open-customizer",
+            "customizer-drawer",
+            'data-theme-preset="halo"',
+            'data-theme-preset="custom1"',
+            'data-theme-preset="custom2"',
+            'data-theme-target="halo"',
+            'data-theme-target="custom1"',
+            'data-theme-target="custom2"',
+            "btn-save-custom1",
+            "btn-save-custom2",
+            "color-target-grid",
+            "inline-color-editor",
+            "editor-hex-input",
+            "slider-h",
+            "slider-s",
+            "slider-b",
+            "slider-r",
+            "slider-g",
+            "slider-b-rgb",
+            "custom-ui-font",
+            "custom-mono-font",
+            "custom-font-scale",
+            "custom-radius",
+            "custom-effects-toggle",
+            "data-density-target",
+            "btn-randomize-customizer",
+            "btn-reset-customizer",
+            "linux_plus_custom_ui",
+            'value="modern-sans"',
+            'value="scifi"',
+            'value="rpg-serif"',
+            'value="arcade"',
+            'value="legible"',
+            'value="jetbrains"',
+            'value="fira"',
+            'value="source-code"',
+            'value="ibm-plex"',
+            'value="retro-crt"',
+        ):
+            self.assertIn(token, html)
+
+        with self.client.get("/static/styles.css") as css_resp:
+            css = css_resp.get_data(as_text=True)
+            self.assertNotIn('[data-theme="light"]', css)
+            for token in (
+                '[data-theme="halo"]',
+                '[data-theme="nordic"]',
+                '[data-theme="matrix"]',
+                '[data-theme="custom1"]',
+                '[data-theme="custom2"]',
+                '[data-effects="off"]',
+                '[data-density="compact"]',
+                "max-width: min(380px, 100vw)",
+                "overflow-x: hidden",
+                "--font-scale",
+                ".customizer-drawer",
+                ".hue-slider",
+            ):
+                self.assertIn(token, css)
+
+        with self.client.get("/static/app.js") as js_resp:
+            js_text = js_resp.get_data(as_text=True)
+            for token in (
+                "linux_plus_custom_ui",
+                "linux_plus_custom_slots",
+                "applyCustomUi",
+                "saveCurrentLookToSlot",
+                "rgbToHsb",
+                "hsbToRgb",
+                "randomizeAppearance",
+                "resetCustomizerToThemeDefaults",
+            ):
+                self.assertIn(token, js_text)
+
     def test_web_difficulty_filtering_and_empty_combo(self) -> None:
         category = "Navigation & File Management"
         beginner_expected = [
@@ -255,7 +333,10 @@ class WebAppTests(unittest.TestCase):
         self.assertEqual(start_data["total_questions"], len(beginner_expected))
         self.assertEqual(start_data["question"]["difficulty"], "beginner")
 
-        # Hard difficulty in category now returns 10 hard questions
+        # Hard difficulty in category returns all hard questions in that category (>= 18)
+        hard_expected = [
+            q for q in self.all_questions if q.category == category and q.difficulty == "hard"
+        ]
         hard_resp = self.client.post(
             "/api/quiz/start",
             json={
@@ -269,7 +350,8 @@ class WebAppTests(unittest.TestCase):
         self.assertEqual(hard_resp.status_code, 200)
         hard_data = hard_resp.get_json()
         self.assertEqual(hard_data["difficulty"], "hard")
-        self.assertEqual(hard_data["total_questions"], 10)
+        self.assertEqual(hard_data["total_questions"], len(hard_expected))
+        self.assertGreaterEqual(hard_data["total_questions"], 18)
         self.assertEqual(hard_data["question"]["difficulty"], "hard")
 
         # Skip a beginner question so missed queue has 1 beginner and 0 hard -> empty 400
@@ -330,6 +412,57 @@ class WebAppTests(unittest.TestCase):
             json={"confirm": True, "category": "Unknown"},
         )
         self.assertEqual(bad_cat.status_code, 400)
+
+    def test_api_state_difficulty_breakdowns_and_segmented_bar_hooks(self) -> None:
+        state_before = self.client.get("/api/state").get_json()
+        self.assertIn("all", state_before["difficulty_counts"])
+        self.assertEqual(state_before["difficulty_counts"]["all"], len(self.all_questions))
+        self.assertIn("answered_by_difficulty", state_before)
+        self.assertIn("missed_by_difficulty", state_before)
+        for card in state_before["categories"]:
+            self.assertIn("difficulties", card)
+            self.assertEqual(set(card["difficulties"].keys()), {"beginner", "intermediate", "hard"})
+
+        # Answer 1 beginner question correctly and skip 1 hard question
+        cat = "Navigation & File Management"
+        s_beg = self.client.post(
+            "/api/quiz/start",
+            json={"scope": "category", "category": cat, "mode": "exact_command", "difficulty": "beginner", "shuffle": False},
+        ).get_json()["session_id"]
+        beg_q = [q for q in self.all_questions if q.category == cat and q.difficulty == "beginner"][0]
+        self.client.post("/api/quiz/answer", json={"session_id": s_beg, "command": beg_q.correct_choice})
+
+        s_hrd = self.client.post(
+            "/api/quiz/start",
+            json={"scope": "category", "category": cat, "mode": "exact_command", "difficulty": "hard", "shuffle": False},
+        ).get_json()["session_id"]
+        self.client.post("/api/quiz/answer", json={"session_id": s_hrd, "action": "skip"})
+
+        state_after = self.client.get("/api/state").get_json()
+        self.assertEqual(state_after["answered_by_difficulty"]["beginner"], 1)
+        self.assertEqual(state_after["answered_by_difficulty"]["hard"], 1)
+        self.assertEqual(state_after["missed_by_difficulty"]["hard"], 1)
+        self.assertEqual(state_after["missed_by_difficulty"]["all"], 1)
+
+        cat_card = next(c for c in state_after["categories"] if c["name"] == cat)
+        self.assertEqual(cat_card["difficulties"]["beginner"]["unique_answered"], 1)
+        self.assertEqual(cat_card["difficulties"]["beginner"]["correct"], 1)
+        self.assertEqual(cat_card["difficulties"]["hard"]["unique_answered"], 1)
+        self.assertEqual(cat_card["difficulties"]["hard"]["correct"], 0)
+
+        html = self.client.get("/").get_data(as_text=True)
+        for token in ("diff-count-all", "diff-count-beginner", "diff-count-intermediate", "diff-count-hard"):
+            self.assertIn(token, html)
+
+        with self.client.get("/static/styles.css") as css_resp:
+            css = css_resp.get_data(as_text=True)
+            for token in (".segmented-progress-track", ".seg-beginner", ".seg-intermediate", ".seg-hard"):
+                self.assertIn(token, css)
+
+        with self.client.get("/static/app.js") as js_resp:
+            js_text = js_resp.get_data(as_text=True)
+            for token in ("segmented-progress-track", "diff-mini-breakdown", "missed_by_difficulty"):
+                self.assertIn(token, js_text)
 
 
 class AppStartupSelectorTests(unittest.TestCase):
@@ -404,7 +537,9 @@ class AppStartupSelectorTests(unittest.TestCase):
             self.assertIsNotNone(picked_hard)
             diff_name, filtered_hard = picked_hard
             self.assertEqual(diff_name, "hard")
-            self.assertEqual(len(filtered_hard), 70)
+            expected_hard_total = sum(1 for q in questions if q.difficulty == "hard")
+            self.assertEqual(len(filtered_hard), expected_hard_total)
+            self.assertGreaterEqual(len(filtered_hard), 70)
             self.assertTrue(all(q.difficulty == "hard" for q in filtered_hard))
 
         with patch("rich.console.Console.input", return_value="2"):

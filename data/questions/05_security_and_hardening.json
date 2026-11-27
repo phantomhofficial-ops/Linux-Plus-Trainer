@@ -678,6 +678,439 @@
       "sudo rpm -V -a"
     ],
     "hint": "Combine rpm's verify (-V) and all-packages (-a) flags.",
-    "explanation": "Domain 3.0 (Security): `rpm -Va` (`--verify --all`) compares every installed file's size, mode, digest (`5`), owner, and group against the RPM database—flagging tampered system binaries during security incident investigations."
+    "explanation": "Domain 3.0 (Security): `rpm -Va` (`--verify --all`) compares every installed file's size, mode, digest (`5`), owner, and group against the RPM database\u2014flagging tampered system binaries during security incident investigations."
+  },
+  {
+    "id": "sec_33",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "beginner",
+    "prompt": "Enable the UFW firewall so its configured rules take effect and persist across reboots.",
+    "choices": [
+      "ufw enable",
+      "ufw start",
+      "systemctl enable ufw",
+      "ufw reload"
+    ],
+    "correct_choice": "ufw enable",
+    "accepted_commands": [
+      "ufw enable"
+    ],
+    "hint": "Use ufw with the enable subcommand.",
+    "explanation": "ufw enable activates the Uncomplicated Firewall and enables it on boot (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "sec_34",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "beginner",
+    "prompt": "Explicitly block incoming Telnet traffic on TCP port 23 using UFW.",
+    "choices": [
+      "ufw deny 23/tcp",
+      "ufw block 23/tcp",
+      "ufw drop 23/tcp",
+      "ufw reject 23/udp"
+    ],
+    "correct_choice": "ufw deny 23/tcp",
+    "accepted_commands": [
+      "ufw deny 23/tcp",
+      "ufw deny 23"
+    ],
+    "hint": "Use ufw deny with port/protocol.",
+    "explanation": "ufw deny 23/tcp adds a rule dropping incoming TCP connections on port 23 (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "sec_35",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "beginner",
+    "prompt": "Display a detailed summary of SELinux status, current mode, configured mode, and loaded policy.",
+    "choices": [
+      "sestatus",
+      "getenforce",
+      "aa-status",
+      "semanage status"
+    ],
+    "correct_choice": "sestatus",
+    "accepted_commands": [
+      "sestatus",
+      "sestatus -v"
+    ],
+    "hint": "More detailed than getenforce.",
+    "explanation": "sestatus prints SELinux state, policy name, current mode, and mode from /etc/selinux/config (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "sec_36",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "beginner",
+    "prompt": "Show the history of recent successful user logins and system reboots from '/var/log/wtmp'.",
+    "choices": [
+      "last",
+      "lastb",
+      "who",
+      "w"
+    ],
+    "correct_choice": "last",
+    "accepted_commands": [
+      "last",
+      "last -n 20"
+    ],
+    "hint": "Use the 'last' command.",
+    "explanation": "last reads /var/log/wtmp to display login/logout history, source hosts, and reboot timestamps (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "sec_37",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "beginner",
+    "prompt": "List all users currently logged into the system along with their terminals and login times.",
+    "choices": [
+      "who",
+      "whoami",
+      "last",
+      "groups"
+    ],
+    "correct_choice": "who",
+    "accepted_commands": [
+      "who",
+      "w"
+    ],
+    "hint": "Short 3-letter command.",
+    "explanation": "who (and w) displays active logged-in user sessions, TTYs, and remote hosts (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "sec_38",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "beginner",
+    "prompt": "List all public keys currently stored in your GnuPG keyring.",
+    "choices": [
+      "gpg --list-keys",
+      "gpg --show-keys",
+      "ssh-add -l",
+      "openssl x509 -list"
+    ],
+    "correct_choice": "gpg --list-keys",
+    "accepted_commands": [
+      "gpg --list-keys",
+      "gpg -k"
+    ],
+    "hint": "Use gpg with --list-keys (or -k).",
+    "explanation": "gpg --list-keys (or gpg -k) displays public keys, fingerprints, and user IDs in the GPG keyring (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "sec_39",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "intermediate",
+    "prompt": "Delete rule number 2 from UFW's numbered firewall rule list.",
+    "choices": [
+      "ufw delete 2",
+      "ufw remove 2",
+      "ufw rm 2",
+      "ufw reset 2"
+    ],
+    "correct_choice": "ufw delete 2",
+    "accepted_commands": [
+      "ufw delete 2"
+    ],
+    "hint": "Use ufw delete followed by the rule number.",
+    "explanation": "ufw delete <num> removes the rule at that index shown by ufw status numbered (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "sec_40",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "intermediate",
+    "prompt": "Display all services, ports, interfaces, and rich rules configured in the default firewalld zone.",
+    "choices": [
+      "firewall-cmd --list-all",
+      "firewall-cmd --get-services",
+      "firewall-cmd --state",
+      "iptables -L"
+    ],
+    "correct_choice": "firewall-cmd --list-all",
+    "accepted_commands": [
+      "firewall-cmd --list-all",
+      "firewall-cmd --zone=public --list-all"
+    ],
+    "hint": "Use firewall-cmd with --list-all.",
+    "explanation": "firewall-cmd --list-all prints the full configuration of the default (or specified) zone (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "sec_41",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "intermediate",
+    "prompt": "Show which firewalld zones are currently active and which network interfaces are bound to each.",
+    "choices": [
+      "firewall-cmd --get-active-zones",
+      "firewall-cmd --get-zones",
+      "firewall-cmd --list-all-zones",
+      "firewall-cmd --get-default-zone"
+    ],
+    "correct_choice": "firewall-cmd --get-active-zones",
+    "accepted_commands": [
+      "firewall-cmd --get-active-zones"
+    ],
+    "hint": "Use --get-active-zones.",
+    "explanation": "firewall-cmd --get-active-zones lists only zones currently bound to active interfaces or source subnets (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "sec_42",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "intermediate",
+    "prompt": "List all iptables filter rules numerically (no DNS lookups) with packet and byte counters.",
+    "choices": [
+      "iptables -L -n -v",
+      "iptables -S -a",
+      "iptables --list-all",
+      "nft -L -n -v"
+    ],
+    "correct_choice": "iptables -L -n -v",
+    "accepted_commands": [
+      "iptables -L -n -v",
+      "iptables -L -nv",
+      "iptables -nvL"
+    ],
+    "hint": "Combine -L (list), -n (numeric), and -v (verbose counters).",
+    "explanation": "iptables -L -n -v shows chains, numeric IPs/ports, and packet/byte hit counts (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "sec_43",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "intermediate",
+    "prompt": "Check loaded AppArmor security profiles and whether they are in enforce or complain mode.",
+    "choices": [
+      "aa-status",
+      "sestatus",
+      "getenforce",
+      "apparmor_parser -s"
+    ],
+    "correct_choice": "aa-status",
+    "accepted_commands": [
+      "aa-status",
+      "apparmor_status"
+    ],
+    "hint": "Use aa-status.",
+    "explanation": "aa-status (or apparmor_status) reports loaded AppArmor profiles in enforce, complain, or unconfined states (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "sec_44",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "intermediate",
+    "prompt": "Inspect failed login attempts recorded in '/var/log/btmp' to detect brute-force activity.",
+    "choices": [
+      "lastb",
+      "last",
+      "who -b",
+      "faillock --list"
+    ],
+    "correct_choice": "lastb",
+    "accepted_commands": [
+      "lastb",
+      "lastb -n 20"
+    ],
+    "hint": "Similar to 'last', with a 'b' for bad logins.",
+    "explanation": "lastb reads /var/log/btmp to show failed authentication attempts, source IPs, and timestamps (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "sec_45",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "intermediate",
+    "prompt": "Connect over SSH to 'admin@10.0.10.25' using the specific private key file '~/.ssh/prod_ed25519'.",
+    "choices": [
+      "ssh -i ~/.ssh/prod_ed25519 admin@10.0.10.25",
+      "ssh -k ~/.ssh/prod_ed25519 admin@10.0.10.25",
+      "ssh -p ~/.ssh/prod_ed25519 admin@10.0.10.25",
+      "ssh-copy-id -i ~/.ssh/prod_ed25519 admin@10.0.10.25"
+    ],
+    "correct_choice": "ssh -i ~/.ssh/prod_ed25519 admin@10.0.10.25",
+    "accepted_commands": [
+      "ssh -i ~/.ssh/prod_ed25519 admin@10.0.10.25"
+    ],
+    "hint": "Use ssh with -i (identity file).",
+    "explanation": "ssh -i <key_path> specifies the private key identity file for public-key authentication (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "sec_46",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "intermediate",
+    "prompt": "Decrypt the GPG-encrypted file 'secrets.tar.gz.gpg' and save the plaintext output to 'secrets.tar.gz'.",
+    "choices": [
+      "gpg -d secrets.tar.gz.gpg > secrets.tar.gz",
+      "gpg -c secrets.tar.gz.gpg > secrets.tar.gz",
+      "gpg -e secrets.tar.gz.gpg -o secrets.tar.gz",
+      "openssl enc -d secrets.tar.gz.gpg > secrets.tar.gz"
+    ],
+    "correct_choice": "gpg -d secrets.tar.gz.gpg > secrets.tar.gz",
+    "accepted_commands": [
+      "gpg -d secrets.tar.gz.gpg > secrets.tar.gz",
+      "gpg --decrypt secrets.tar.gz.gpg > secrets.tar.gz",
+      "gpg -o secrets.tar.gz -d secrets.tar.gz.gpg"
+    ],
+    "hint": "Use gpg -d (or --decrypt).",
+    "explanation": "gpg -d decrypts a GPG file to stdout (or -o file) after verifying the passphrase or private key (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "sec_47",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "hard",
+    "prompt": "Create a new nftables table named 'filter' in the 'inet' (dual IPv4/IPv6) address family.",
+    "choices": [
+      "nft add table inet filter",
+      "nft create chain inet filter",
+      "nft add table ip6 filter",
+      "iptables -N inet filter"
+    ],
+    "correct_choice": "nft add table inet filter",
+    "accepted_commands": [
+      "nft add table inet filter"
+    ],
+    "hint": "Use nft add table <family> <name>.",
+    "explanation": "nft add table inet filter creates a dual-stack IPv4/IPv6 nftables table named filter (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "sec_48",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "hard",
+    "prompt": "Immediately clear all active nftables tables, chains, and rules from the kernel.",
+    "choices": [
+      "nft flush ruleset",
+      "nft delete ruleset",
+      "nft clear all",
+      "iptables -F"
+    ],
+    "correct_choice": "nft flush ruleset",
+    "accepted_commands": [
+      "nft flush ruleset"
+    ],
+    "hint": "Use nft flush ruleset.",
+    "explanation": "nft flush ruleset removes every table, chain, and rule currently loaded in nftables (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "sec_49",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "hard",
+    "prompt": "Temporarily change the SELinux type context of '/srv/web/index.html' to 'httpd_sys_content_t'.",
+    "choices": [
+      "chcon -t httpd_sys_content_t /srv/web/index.html",
+      "restorecon -t httpd_sys_content_t /srv/web/index.html",
+      "semanage -t httpd_sys_content_t /srv/web/index.html",
+      "setsebool httpd_sys_content_t /srv/web/index.html"
+    ],
+    "correct_choice": "chcon -t httpd_sys_content_t /srv/web/index.html",
+    "accepted_commands": [
+      "chcon -t httpd_sys_content_t /srv/web/index.html"
+    ],
+    "hint": "Use chcon -t <type> <path>.",
+    "explanation": "chcon -t modifies the SELinux type label directly (note: restorecon would revert it unless persisted with semanage fcontext) (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "sec_50",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "hard",
+    "prompt": "List all active Linux kernel audit (auditd) rules currently loaded.",
+    "choices": [
+      "auditctl -l",
+      "ausearch -l",
+      "aureport -l",
+      "auditd -s"
+    ],
+    "correct_choice": "auditctl -l",
+    "accepted_commands": [
+      "auditctl -l"
+    ],
+    "hint": "Use auditctl with the list flag (-l).",
+    "explanation": "auditctl -l prints all active syscall and filesystem watch rules in the Linux Audit subsystem (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "sec_51",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "hard",
+    "prompt": "Generate a summary report of all authentication events recorded by auditd.",
+    "choices": [
+      "aureport --auth",
+      "ausearch --auth",
+      "auditctl --auth",
+      "lastb --auth"
+    ],
+    "correct_choice": "aureport --auth",
+    "accepted_commands": [
+      "aureport --auth",
+      "aureport -au"
+    ],
+    "hint": "Use aureport with --auth (or -au).",
+    "explanation": "aureport --auth summarizes authentication successes and failures from /var/log/audit/audit.log (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "sec_52",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "hard",
+    "prompt": "Generate a 4096-bit RSA private key named 'server.key' using OpenSSL.",
+    "choices": [
+      "openssl genrsa -out server.key 4096",
+      "openssl req -new 4096 -out server.key",
+      "ssh-keygen -t rsa -b 4096 -f server.key",
+      "openssl x509 -genrsa 4096 server.key"
+    ],
+    "correct_choice": "openssl genrsa -out server.key 4096",
+    "accepted_commands": [
+      "openssl genrsa -out server.key 4096"
+    ],
+    "hint": "Use openssl genrsa -out <file> <bits>.",
+    "explanation": "openssl genrsa -out server.key 4096 creates a 4096-bit RSA private key in PEM format (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "sec_53",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "hard",
+    "prompt": "Compute the SHA-256 cryptographic digest of 'release.tar.gz' using OpenSSL.",
+    "choices": [
+      "openssl dgst -sha256 release.tar.gz",
+      "openssl x509 -sha256 release.tar.gz",
+      "openssl enc -sha256 release.tar.gz",
+      "gpg --sha256 release.tar.gz"
+    ],
+    "correct_choice": "openssl dgst -sha256 release.tar.gz",
+    "accepted_commands": [
+      "openssl dgst -sha256 release.tar.gz",
+      "openssl sha256 release.tar.gz"
+    ],
+    "hint": "Use openssl dgst -sha256.",
+    "explanation": "openssl dgst -sha256 calculates the SHA-256 hash of a file (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "sec_54",
+    "domain": "3.0 Security",
+    "category": "Security & Hardening",
+    "difficulty": "hard",
+    "prompt": "Create an SSH local port-forwarding tunnel mapping local port 8443 to 127.0.0.1:443 on 'admin@10.0.10.25'.",
+    "choices": [
+      "ssh -L 8443:127.0.0.1:443 admin@10.0.10.25",
+      "ssh -R 8443:127.0.0.1:443 admin@10.0.10.25",
+      "ssh -D 8443 admin@10.0.10.25",
+      "ssh -p 8443:443 admin@10.0.10.25"
+    ],
+    "correct_choice": "ssh -L 8443:127.0.0.1:443 admin@10.0.10.25",
+    "accepted_commands": [
+      "ssh -L 8443:127.0.0.1:443 admin@10.0.10.25",
+      "ssh -N -L 8443:127.0.0.1:443 admin@10.0.10.25"
+    ],
+    "hint": "Use ssh -L <local_port>:<remote_host>:<remote_port>.",
+    "explanation": "ssh -L forwards a local TCP port securely over the SSH tunnel to the target host:port (-R is reverse, -D is SOCKS) (XK0-006 Domain 3.0)."
   }
 ]

@@ -184,7 +184,7 @@
       "uptime"
     ],
     "hint": "This single six-letter command displays how long the host has been up.",
-    "explanation": "Domain 5.0 (Troubleshooting): `uptime` outputs the current clock time, time since boot, active user count, and 1/5/15-minute load averages—making it a rapid triage check for sudden reboots or CPU saturation."
+    "explanation": "Domain 5.0 (Troubleshooting): `uptime` outputs the current clock time, time since boot, active user count, and 1/5/15-minute load averages\u2014making it a rapid triage check for sudden reboots or CPU saturation."
   },
   {
     "id": "pkg_10",
@@ -513,7 +513,7 @@
     "domain": "5.0 Troubleshooting",
     "category": "Packages, Containers & Troubleshooting",
     "difficulty": "hard",
-    "prompt": "df -h reports /var is 100% full, yet du -sh /var shows plenty of space—indicating a deleted file is still held open by a process. Use lsof (as root) to list open files with a link count below 1.",
+    "prompt": "df -h reports /var is 100% full, yet du -sh /var shows plenty of space\u2014indicating a deleted file is still held open by a process. Use lsof (as root) to list open files with a link count below 1.",
     "choices": [
       "lsof +L1",
       "lsof -d 0",
@@ -687,5 +687,443 @@
     ],
     "hint": "Use the module-information command (modinfo).",
     "explanation": "Domain 1.0 (System Management): `modinfo e1000e` reads metadata embedded inside the `.ko` kernel module file, printing `filename`, `depends`, `parm` tunable options, and version details without changing loaded kernel state."
+  },
+  {
+    "id": "pkg_33",
+    "domain": "2.0 Services and User Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "beginner",
+    "prompt": "Search Debian/Ubuntu APT package repositories for packages matching 'nginx'.",
+    "choices": [
+      "apt search nginx",
+      "apt find nginx",
+      "dpkg -s nginx",
+      "apt list --installed nginx"
+    ],
+    "correct_choice": "apt search nginx",
+    "accepted_commands": [
+      "apt search nginx",
+      "apt-cache search nginx"
+    ],
+    "hint": "Use apt search.",
+    "explanation": "apt search queries package names and descriptions in the local APT cache (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "pkg_34",
+    "domain": "2.0 Services and User Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "beginner",
+    "prompt": "Remove orphaned dependency packages that are no longer needed on a Debian/Ubuntu host.",
+    "choices": [
+      "apt autoremove -y",
+      "apt clean",
+      "dpkg --purge-all",
+      "apt purge -y"
+    ],
+    "correct_choice": "apt autoremove -y",
+    "accepted_commands": [
+      "apt autoremove -y",
+      "apt autoremove",
+      "apt-get autoremove -y"
+    ],
+    "hint": "Use apt autoremove.",
+    "explanation": "apt autoremove uninstalls automatically installed dependencies no longer required by any package (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "pkg_35",
+    "domain": "2.0 Services and User Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "beginner",
+    "prompt": "List all installed '.deb' packages on a Debian/Ubuntu system using dpkg.",
+    "choices": [
+      "dpkg -l",
+      "dpkg -i",
+      "apt show",
+      "rpm -qa"
+    ],
+    "correct_choice": "dpkg -l",
+    "accepted_commands": [
+      "dpkg -l",
+      "dpkg --list"
+    ],
+    "hint": "Use dpkg with -l.",
+    "explanation": "dpkg -l lists installed Debian packages along with version, architecture, and summary (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "pkg_36",
+    "domain": "2.0 Services and User Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "beginner",
+    "prompt": "List all installed RPM packages on a RHEL/Fedora/Rocky Linux system.",
+    "choices": [
+      "rpm -qa",
+      "rpm -qi",
+      "dnf list",
+      "dpkg -l"
+    ],
+    "correct_choice": "rpm -qa",
+    "accepted_commands": [
+      "rpm -qa",
+      "rpm --query --all"
+    ],
+    "hint": "Combine -q (query) and -a (all) with rpm.",
+    "explanation": "rpm -qa queries the RPM database and prints every installed package (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "pkg_37",
+    "domain": "1.0 System Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "beginner",
+    "prompt": "Display CPU architecture, core/thread count, sockets, and virtualization flags.",
+    "choices": [
+      "lscpu",
+      "lspci",
+      "lsusb",
+      "free -h"
+    ],
+    "correct_choice": "lscpu",
+    "accepted_commands": [
+      "lscpu"
+    ],
+    "hint": "Use the ls* hardware command for CPUs.",
+    "explanation": "lscpu summarizes CPU architecture, cores, threads, caches, and flags from /proc/cpuinfo and sysfs (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "pkg_38",
+    "domain": "1.0 System Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "beginner",
+    "prompt": "List all PCI devices (NICs, GPUs, NVMe controllers) attached to the system.",
+    "choices": [
+      "lspci",
+      "lsusb",
+      "lscpu",
+      "lsblk"
+    ],
+    "correct_choice": "lspci",
+    "accepted_commands": [
+      "lspci",
+      "lspci -v",
+      "lspci -nn"
+    ],
+    "hint": "Use the ls* hardware command for the PCI bus.",
+    "explanation": "lspci enumerates PCI/PCIe devices and kernel drivers (-k/-v for driver details) (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "pkg_39",
+    "domain": "2.0 Services and User Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "intermediate",
+    "prompt": "List all installed APT packages that currently have newer versions available.",
+    "choices": [
+      "apt list --upgradable",
+      "apt search --upgradable",
+      "apt update --list",
+      "dpkg --upgradable"
+    ],
+    "correct_choice": "apt list --upgradable",
+    "accepted_commands": [
+      "apt list --upgradable"
+    ],
+    "hint": "Use apt list with --upgradable.",
+    "explanation": "apt list --upgradable shows packages with pending updates after running apt update (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "pkg_40",
+    "domain": "2.0 Services and User Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "intermediate",
+    "prompt": "Check for available DNF package updates on a RHEL-based host without installing them.",
+    "choices": [
+      "dnf check-update",
+      "dnf update --dry-run",
+      "dnf list --upgradable",
+      "rpm -U --test"
+    ],
+    "correct_choice": "dnf check-update",
+    "accepted_commands": [
+      "dnf check-update"
+    ],
+    "hint": "Use dnf check-update.",
+    "explanation": "dnf check-update lists available package updates and exits 100 if updates exist (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "pkg_41",
+    "domain": "2.0 Services and User Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "intermediate",
+    "prompt": "List all enabled software repositories configured for DNF.",
+    "choices": [
+      "dnf repolist",
+      "dnf list --repos",
+      "rpm --repolist",
+      "cat /etc/dnf/repos"
+    ],
+    "correct_choice": "dnf repolist",
+    "accepted_commands": [
+      "dnf repolist",
+      "dnf repolist --enabled"
+    ],
+    "hint": "Use dnf repolist.",
+    "explanation": "dnf repolist displays repository IDs, names, and status (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "pkg_42",
+    "domain": "5.0 Troubleshooting",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "intermediate",
+    "prompt": "Identify which DNF package provides the '/usr/bin/dig' binary.",
+    "choices": [
+      "dnf provides /usr/bin/dig",
+      "dnf search /usr/bin/dig",
+      "rpm -qi /usr/bin/dig",
+      "which -p dig"
+    ],
+    "correct_choice": "dnf provides /usr/bin/dig",
+    "accepted_commands": [
+      "dnf provides /usr/bin/dig",
+      "dnf whatprovides /usr/bin/dig"
+    ],
+    "hint": "Use dnf provides (or whatprovides).",
+    "explanation": "dnf provides finds the package (even if not yet installed) that supplies a given file path (XK0-006 Domain 5.0)."
+  },
+  {
+    "id": "pkg_43",
+    "domain": "2.0 Services and User Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "intermediate",
+    "prompt": "Display detailed package metadata (version, install date, summary, license) for the installed 'openssh-server' RPM.",
+    "choices": [
+      "rpm -qi openssh-server",
+      "rpm -ql openssh-server",
+      "rpm -qa openssh-server",
+      "dnf history openssh-server"
+    ],
+    "correct_choice": "rpm -qi openssh-server",
+    "accepted_commands": [
+      "rpm -qi openssh-server"
+    ],
+    "hint": "Combine -q (query) and -i (info).",
+    "explanation": "rpm -qi prints full metadata for an installed RPM package (-ql lists its files) (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "pkg_44",
+    "domain": "1.0 System Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "intermediate",
+    "prompt": "Download the 'alpine:latest' container image from a registry without starting a container.",
+    "choices": [
+      "docker pull alpine:latest",
+      "docker run alpine:latest",
+      "docker fetch alpine:latest",
+      "docker images alpine:latest"
+    ],
+    "correct_choice": "docker pull alpine:latest",
+    "accepted_commands": [
+      "docker pull alpine:latest",
+      "podman pull alpine:latest"
+    ],
+    "hint": "Use docker/podman pull.",
+    "explanation": "docker pull (or podman pull) downloads an image tag into local storage (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "pkg_45",
+    "domain": "1.0 System Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "intermediate",
+    "prompt": "List all Podman container networks configured on the host.",
+    "choices": [
+      "podman network ls",
+      "podman ps --network",
+      "ip netns list",
+      "podman inspect --network"
+    ],
+    "correct_choice": "podman network ls",
+    "accepted_commands": [
+      "podman network ls",
+      "docker network ls"
+    ],
+    "hint": "Use podman network ls.",
+    "explanation": "podman network ls (or docker network ls) displays container networks and their drivers (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "pkg_46",
+    "domain": "1.0 System Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "intermediate",
+    "prompt": "List all USB buses and connected USB devices.",
+    "choices": [
+      "lsusb",
+      "lspci",
+      "lscpu",
+      "lsblk"
+    ],
+    "correct_choice": "lsusb",
+    "accepted_commands": [
+      "lsusb",
+      "lsusb -v"
+    ],
+    "hint": "Use the ls* hardware command for USB.",
+    "explanation": "lsusb enumerates USB controllers and attached USB peripherals with vendor/product IDs (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "pkg_47",
+    "domain": "2.0 Services and User Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "hard",
+    "prompt": "Install a local Debian package file '/tmp/agent.deb' directly using dpkg.",
+    "choices": [
+      "dpkg -i /tmp/agent.deb",
+      "dpkg -l /tmp/agent.deb",
+      "apt install /tmp/agent.deb --dpkg",
+      "dpkg -r /tmp/agent.deb"
+    ],
+    "correct_choice": "dpkg -i /tmp/agent.deb",
+    "accepted_commands": [
+      "dpkg -i /tmp/agent.deb",
+      "dpkg --install /tmp/agent.deb"
+    ],
+    "hint": "Use dpkg with -i.",
+    "explanation": "dpkg -i installs a local .deb archive (follow with apt -f install if dependencies are missing) (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "pkg_48",
+    "domain": "1.0 System Management",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "hard",
+    "prompt": "Start all services defined in 'compose.yml' in detached background mode using Docker Compose v2.",
+    "choices": [
+      "docker compose up -d",
+      "docker compose start -d",
+      "docker run -d compose.yml",
+      "docker compose build -d"
+    ],
+    "correct_choice": "docker compose up -d",
+    "accepted_commands": [
+      "docker compose up -d",
+      "podman compose up -d"
+    ],
+    "hint": "Use docker compose up with -d.",
+    "explanation": "docker compose up -d creates networks/volumes and starts all compose services in the background (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "pkg_49",
+    "domain": "5.0 Troubleshooting",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "hard",
+    "prompt": "Inspect the full JSON configuration, IP address, mounts, and state of container 'web-api'.",
+    "choices": [
+      "podman inspect web-api",
+      "podman ps web-api",
+      "podman logs web-api",
+      "podman stats web-api"
+    ],
+    "correct_choice": "podman inspect web-api",
+    "accepted_commands": [
+      "podman inspect web-api",
+      "docker inspect web-api"
+    ],
+    "hint": "Use podman/docker inspect.",
+    "explanation": "podman inspect (or docker inspect) outputs low-level JSON metadata including env vars, mounts, and network settings (XK0-006 Domain 5.0)."
+  },
+  {
+    "id": "pkg_50",
+    "domain": "5.0 Troubleshooting",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "hard",
+    "prompt": "Take a one-shot snapshot of CPU, memory, and network I/O usage across running Docker containers.",
+    "choices": [
+      "docker stats --no-stream",
+      "docker top --once",
+      "docker ps --stats",
+      "docker inspect --stats"
+    ],
+    "correct_choice": "docker stats --no-stream",
+    "accepted_commands": [
+      "docker stats --no-stream",
+      "podman stats --no-stream"
+    ],
+    "hint": "Use docker stats with --no-stream.",
+    "explanation": "docker stats --no-stream prints a single snapshot of container resource metrics and exits immediately (XK0-006 Domain 5.0)."
+  },
+  {
+    "id": "pkg_51",
+    "domain": "5.0 Troubleshooting",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "hard",
+    "prompt": "Query SMBIOS/DMI hardware tables for physical memory DIMM slots and speeds.",
+    "choices": [
+      "dmidecode -t memory",
+      "lscpu -t memory",
+      "free -m --dmi",
+      "lspci -t memory"
+    ],
+    "correct_choice": "dmidecode -t memory",
+    "accepted_commands": [
+      "dmidecode -t memory",
+      "dmidecode --type memory"
+    ],
+    "hint": "Use dmidecode -t memory.",
+    "explanation": "dmidecode -t memory decodes BIOS DMI tables to show installed RAM modules, slots, and speeds (XK0-006 Domain 5.0)."
+  },
+  {
+    "id": "pkg_52",
+    "domain": "5.0 Troubleshooting",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "hard",
+    "prompt": "Filter the kernel ring buffer with dmesg to display only error-level messages.",
+    "choices": [
+      "dmesg --level=err",
+      "dmesg -p err",
+      "journalctl --dmesg=err",
+      "dmesg --filter=error"
+    ],
+    "correct_choice": "dmesg --level=err",
+    "accepted_commands": [
+      "dmesg --level=err",
+      "dmesg -l err"
+    ],
+    "hint": "Use dmesg --level=err (or -l err).",
+    "explanation": "dmesg --level=err filters kernel messages by severity so hardware/driver errors stand out immediately (XK0-006 Domain 5.0)."
+  },
+  {
+    "id": "pkg_53",
+    "domain": "5.0 Troubleshooting",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "hard",
+    "prompt": "Print the shared library dependencies of '/usr/sbin/sshd' to check for missing '.so' libraries.",
+    "choices": [
+      "ldd /usr/sbin/sshd",
+      "lsmod /usr/sbin/sshd",
+      "modinfo /usr/sbin/sshd",
+      "file /usr/sbin/sshd"
+    ],
+    "correct_choice": "ldd /usr/sbin/sshd",
+    "accepted_commands": [
+      "ldd /usr/sbin/sshd"
+    ],
+    "hint": "Use ldd.",
+    "explanation": "ldd prints all dynamic shared libraries required by an executable and flags any 'not found' dependencies (XK0-006 Domain 5.0)."
+  },
+  {
+    "id": "pkg_54",
+    "domain": "5.0 Troubleshooting",
+    "category": "Packages, Containers & Troubleshooting",
+    "difficulty": "hard",
+    "prompt": "Run a 10-packet non-interactive network path latency and packet-loss report to 'example.com' using mtr.",
+    "choices": [
+      "mtr -r -c 10 example.com",
+      "traceroute -c 10 example.com",
+      "ping -r 10 example.com",
+      "mtr -n 10 example.com"
+    ],
+    "correct_choice": "mtr -r -c 10 example.com",
+    "accepted_commands": [
+      "mtr -r -c 10 example.com",
+      "mtr --report -c 10 example.com",
+      "mtr -rc 10 example.com"
+    ],
+    "hint": "Combine mtr -r (report mode) with -c 10.",
+    "explanation": "mtr -r -c 10 sends 10 probes per hop and prints a combined ping+traceroute packet-loss report (XK0-006 Domain 5.0)."
   }
 ]

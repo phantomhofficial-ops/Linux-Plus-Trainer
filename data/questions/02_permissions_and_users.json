@@ -432,7 +432,7 @@
     "domain": "2.0 Services and User Management",
     "category": "Permissions & User Management",
     "difficulty": "intermediate",
-    "prompt": "Query NSS (Name Service Switch) databases—supporting both /etc/group and central LDAP/SSSD entries—to inspect the members and GID of group wheel.",
+    "prompt": "Query NSS (Name Service Switch) databases\u2014supporting both /etc/group and central LDAP/SSSD entries\u2014to inspect the members and GID of group wheel.",
     "choices": [
       "getent group wheel",
       "id -g wheel",
@@ -692,5 +692,443 @@
     ],
     "hint": "Pass -h (--no-dereference) to chown.",
     "explanation": "Domain 3.0 (Security): By default `chown` follows symlinks and changes the target object. `chown -h` (`--no-dereference`) applies `www-data:www-data` ownership to the symlink inode itself."
+  },
+  {
+    "id": "perm_33",
+    "domain": "2.0 Services and User Management",
+    "category": "Permissions & User Management",
+    "difficulty": "beginner",
+    "prompt": "Display the '/etc/passwd' entry for user 'alex' to check their UID, GID, home directory, and login shell.",
+    "choices": [
+      "grep '^alex:' /etc/passwd",
+      "cat /etc/shadow alex",
+      "id -g alex",
+      "passwd -l alex"
+    ],
+    "correct_choice": "grep '^alex:' /etc/passwd",
+    "accepted_commands": [
+      "grep '^alex:' /etc/passwd",
+      "getent passwd alex"
+    ],
+    "hint": "Search /etc/passwd for the line starting with alex: (or use getent passwd).",
+    "explanation": "/etc/passwd stores user account metadata (username, UID, GID, GECOS, home, shell); grep '^alex:' /etc/passwd or getent passwd alex retrieves it (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "perm_34",
+    "domain": "2.0 Services and User Management",
+    "category": "Permissions & User Management",
+    "difficulty": "beginner",
+    "prompt": "Print the effective username of the current shell session.",
+    "choices": [
+      "whoami",
+      "who",
+      "users",
+      "logname -a"
+    ],
+    "correct_choice": "whoami",
+    "accepted_commands": [
+      "whoami",
+      "id -un"
+    ],
+    "hint": "A single-word command asking who you are.",
+    "explanation": "whoami prints the effective user name of the current process (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "perm_35",
+    "domain": "2.0 Services and User Management",
+    "category": "Permissions & User Management",
+    "difficulty": "beginner",
+    "prompt": "List all group names that user 'alex' belongs to.",
+    "choices": [
+      "groups alex",
+      "groupadd alex",
+      "cat /etc/passwd alex",
+      "who alex"
+    ],
+    "correct_choice": "groups alex",
+    "accepted_commands": [
+      "groups alex",
+      "id -Gn alex"
+    ],
+    "hint": "Use the plural 'groups' command.",
+    "explanation": "groups <user> prints the primary and supplementary group names for that user (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "perm_36",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "beginner",
+    "prompt": "Switch to user 'deploy' with a full login shell and clean target user environment.",
+    "choices": [
+      "su - deploy",
+      "su deploy",
+      "sudo deploy",
+      "login deploy"
+    ],
+    "correct_choice": "su - deploy",
+    "accepted_commands": [
+      "su - deploy",
+      "su -l deploy",
+      "su --login deploy"
+    ],
+    "hint": "Include the hyphen (-) or -l flag with su.",
+    "explanation": "su - <user> starts a login shell, resetting HOME, PATH, and working directory to the target user (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "perm_37",
+    "domain": "2.0 Services and User Management",
+    "category": "Permissions & User Management",
+    "difficulty": "beginner",
+    "prompt": "List the skeleton template files copied into every new user's home directory when created with useradd -m.",
+    "choices": [
+      "ls -la /etc/skel",
+      "ls -la /etc/default/useradd",
+      "ls -la /home/skel",
+      "cat /etc/login.defs"
+    ],
+    "correct_choice": "ls -la /etc/skel",
+    "accepted_commands": [
+      "ls -la /etc/skel",
+      "ls -al /etc/skel"
+    ],
+    "hint": "Check the /etc/skel directory.",
+    "explanation": "/etc/skel holds default dotfiles (.bashrc, .profile, etc.) copied into new home directories (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "perm_38",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "beginner",
+    "prompt": "Display the current shell's file-creation umask value.",
+    "choices": [
+      "umask",
+      "chmod",
+      "stat ~",
+      "getfacl ."
+    ],
+    "correct_choice": "umask",
+    "accepted_commands": [
+      "umask",
+      "umask -S"
+    ],
+    "hint": "Run the umask command with no numeric argument.",
+    "explanation": "umask without arguments prints the current octal permission mask (or symbolic with -S) (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "perm_39",
+    "domain": "2.0 Services and User Management",
+    "category": "Permissions & User Management",
+    "difficulty": "beginner",
+    "prompt": "View all local group definitions and member lists in '/etc/group'.",
+    "choices": [
+      "cat /etc/group",
+      "cat /etc/passwd",
+      "cat /etc/gshadow",
+      "groups -a"
+    ],
+    "correct_choice": "cat /etc/group",
+    "accepted_commands": [
+      "cat /etc/group",
+      "getent group"
+    ],
+    "hint": "Read /etc/group.",
+    "explanation": "/etc/group defines local group names, GIDs, and supplementary members (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "perm_40",
+    "domain": "2.0 Services and User Management",
+    "category": "Permissions & User Management",
+    "difficulty": "intermediate",
+    "prompt": "Temporarily switch your current shell's active primary group to 'docker' without logging out.",
+    "choices": [
+      "newgrp docker",
+      "usermod -g docker",
+      "chgrp docker",
+      "su - docker"
+    ],
+    "correct_choice": "newgrp docker",
+    "accepted_commands": [
+      "newgrp docker"
+    ],
+    "hint": "Use newgrp to change your effective primary GID in the current session.",
+    "explanation": "newgrp starts a subshell with the specified group as the active primary GID for newly created files (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "perm_41",
+    "domain": "2.0 Services and User Management",
+    "category": "Permissions & User Management",
+    "difficulty": "intermediate",
+    "prompt": "Change user 'alex's home directory to '/srv/homes/alex' and move all existing home files there.",
+    "choices": [
+      "usermod -d /srv/homes/alex -m alex",
+      "usermod -h /srv/homes/alex alex",
+      "useradd -d /srv/homes/alex -m alex",
+      "mv /home/alex /srv/homes/alex"
+    ],
+    "correct_choice": "usermod -d /srv/homes/alex -m alex",
+    "accepted_commands": [
+      "usermod -d /srv/homes/alex -m alex",
+      "usermod -m -d /srv/homes/alex alex"
+    ],
+    "hint": "Combine usermod -d (new directory) with -m (move contents).",
+    "explanation": "usermod -d <new_dir> -m updates /etc/passwd and migrates the user's files to the new location (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "perm_42",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "intermediate",
+    "prompt": "Lock user 'tempadmin's password using usermod.",
+    "choices": [
+      "usermod -L tempadmin",
+      "usermod -U tempadmin",
+      "usermod -D tempadmin",
+      "userdel tempadmin"
+    ],
+    "correct_choice": "usermod -L tempadmin",
+    "accepted_commands": [
+      "usermod -L tempadmin",
+      "usermod --lock tempadmin"
+    ],
+    "hint": "Use usermod with the uppercase -L flag.",
+    "explanation": "usermod -L prepends '!' to the password hash in /etc/shadow to lock password login (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "perm_43",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "intermediate",
+    "prompt": "Unlock user 'tempadmin's previously locked password using usermod.",
+    "choices": [
+      "usermod -U tempadmin",
+      "usermod -L tempadmin",
+      "passwd -l tempadmin",
+      "chage -E 0 tempadmin"
+    ],
+    "correct_choice": "usermod -U tempadmin",
+    "accepted_commands": [
+      "usermod -U tempadmin",
+      "usermod --unlock tempadmin"
+    ],
+    "hint": "Use usermod with the uppercase -U flag.",
+    "explanation": "usermod -U removes the leading '!' lock from /etc/shadow, restoring password authentication (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "perm_44",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "intermediate",
+    "prompt": "Inspect the password aging and account expiration details for user 'alex'.",
+    "choices": [
+      "chage -l alex",
+      "passwd -l alex",
+      "id -a alex",
+      "usermod -l alex"
+    ],
+    "correct_choice": "chage -l alex",
+    "accepted_commands": [
+      "chage -l alex",
+      "chage --list alex"
+    ],
+    "hint": "Use chage with the list flag (-l).",
+    "explanation": "chage -l displays last password change, min/max age, warning days, and account expiration date (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "perm_45",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "intermediate",
+    "prompt": "Display the POSIX Access Control List (ACL) entries on '/srv/shared/report.csv'.",
+    "choices": [
+      "getfacl /srv/shared/report.csv",
+      "setfacl -l /srv/shared/report.csv",
+      "lsattr /srv/shared/report.csv",
+      "stat -a /srv/shared/report.csv"
+    ],
+    "correct_choice": "getfacl /srv/shared/report.csv",
+    "accepted_commands": [
+      "getfacl /srv/shared/report.csv"
+    ],
+    "hint": "Use getfacl to read ACLs.",
+    "explanation": "getfacl prints owner, group, mask, and named user/group ACL permissions on a file or directory (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "perm_46",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "intermediate",
+    "prompt": "Grant user 'alex' read and write ACL permissions on '/srv/shared/notes.txt' without changing standard owner/group bits.",
+    "choices": [
+      "setfacl -m u:alex:rw /srv/shared/notes.txt",
+      "setfacl -x u:alex:rw /srv/shared/notes.txt",
+      "chmod u+rw:alex /srv/shared/notes.txt",
+      "chown alex /srv/shared/notes.txt"
+    ],
+    "correct_choice": "setfacl -m u:alex:rw /srv/shared/notes.txt",
+    "accepted_commands": [
+      "setfacl -m u:alex:rw /srv/shared/notes.txt",
+      "setfacl -m user:alex:rw /srv/shared/notes.txt"
+    ],
+    "hint": "Use setfacl -m with u:user:perms.",
+    "explanation": "setfacl -m u:alex:rw adds or modifies a named-user ACL entry granting read/write access (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "perm_47",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "hard",
+    "prompt": "Recursively grant group 'auditors' read and execute ACL access across '/srv/logs' and all files inside it.",
+    "choices": [
+      "setfacl -R -m g:auditors:rx /srv/logs",
+      "setfacl -r -m g:auditors:rx /srv/logs",
+      "setfacl -m d:g:auditors:rx /srv/logs",
+      "chmod -R g:auditors+rx /srv/logs"
+    ],
+    "correct_choice": "setfacl -R -m g:auditors:rx /srv/logs",
+    "accepted_commands": [
+      "setfacl -R -m g:auditors:rx /srv/logs",
+      "setfacl -Rm g:auditors:rx /srv/logs"
+    ],
+    "hint": "Use uppercase -R with setfacl -m g:group:perms.",
+    "explanation": "setfacl -R -m applies the group ACL entry recursively across existing subdirectories and files (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "perm_48",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "hard",
+    "prompt": "Set the effective ACL mask on '/srv/shared/script.sh' to 'r-x' so no named user or group ACL can exercise write permission.",
+    "choices": [
+      "setfacl -m m::rx /srv/shared/script.sh",
+      "setfacl -m u::rx /srv/shared/script.sh",
+      "umask 022 /srv/shared/script.sh",
+      "setfacl -x m::w /srv/shared/script.sh"
+    ],
+    "correct_choice": "setfacl -m m::rx /srv/shared/script.sh",
+    "accepted_commands": [
+      "setfacl -m m::rx /srv/shared/script.sh",
+      "setfacl -m m::r-x /srv/shared/script.sh",
+      "setfacl -m mask::rx /srv/shared/script.sh"
+    ],
+    "hint": "The ACL mask entry uses 'm::perms'.",
+    "explanation": "The ACL mask (m::rx) caps the maximum effective permissions for named users, the owning group, and named groups (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "perm_49",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "hard",
+    "prompt": "Remove only the ACL entry for user 'alex' on '/srv/shared/notes.txt' while keeping all other ACLs.",
+    "choices": [
+      "setfacl -x u:alex /srv/shared/notes.txt",
+      "setfacl -b /srv/shared/notes.txt",
+      "setfacl -m u:alex:0 /srv/shared/notes.txt",
+      "setfacl -d u:alex /srv/shared/notes.txt"
+    ],
+    "correct_choice": "setfacl -x u:alex /srv/shared/notes.txt",
+    "accepted_commands": [
+      "setfacl -x u:alex /srv/shared/notes.txt",
+      "setfacl -x user:alex /srv/shared/notes.txt"
+    ],
+    "hint": "Use -x to delete a specific ACL entry (-b removes all).",
+    "explanation": "setfacl -x u:alex removes only alex's ACL entry, whereas -b strips all extended ACLs (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "perm_50",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "hard",
+    "prompt": "Set octal permissions on '/usr/local/bin/check_disk' to 0755 with the SUID bit enabled.",
+    "choices": [
+      "chmod 4755 /usr/local/bin/check_disk",
+      "chmod 2755 /usr/local/bin/check_disk",
+      "chmod 1755 /usr/local/bin/check_disk",
+      "chmod 7755 /usr/local/bin/check_disk"
+    ],
+    "correct_choice": "chmod 4755 /usr/local/bin/check_disk",
+    "accepted_commands": [
+      "chmod 4755 /usr/local/bin/check_disk"
+    ],
+    "hint": "SUID = 4, SGID = 2, Sticky = 1.",
+    "explanation": "The leading 4 in 4755 sets the SUID bit so the binary executes with the file owner's effective UID (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "perm_51",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "hard",
+    "prompt": "Using symbolic chmod syntax, set '/opt/secrets/rotate.sh' to owner rwx, group rx, and others none.",
+    "choices": [
+      "chmod u=rwx,g=rx,o= /opt/secrets/rotate.sh",
+      "chmod u+rwx,g+rx,o-rwx /opt/secrets/rotate.sh",
+      "chmod 750 /opt/secrets/rotate.sh",
+      "chmod a=rwx,o= /opt/secrets/rotate.sh"
+    ],
+    "correct_choice": "chmod u=rwx,g=rx,o= /opt/secrets/rotate.sh",
+    "accepted_commands": [
+      "chmod u=rwx,g=rx,o= /opt/secrets/rotate.sh",
+      "chmod u=rwx,g=rx,o-rwx /opt/secrets/rotate.sh"
+    ],
+    "hint": "Use '=' assignments for u, g, and o (leaving o= empty).",
+    "explanation": "Symbolic '=' sets exact permissions per class regardless of prior bits: u=rwx,g=rx,o= equals 0750 (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "perm_52",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "hard",
+    "prompt": "Add the sticky bit to '/srv/shared_tmp' using symbolic chmod notation so users can only delete their own files.",
+    "choices": [
+      "chmod +t /srv/shared_tmp",
+      "chmod +s /srv/shared_tmp",
+      "chmod u+s /srv/shared_tmp",
+      "chmod o+w /srv/shared_tmp"
+    ],
+    "correct_choice": "chmod +t /srv/shared_tmp",
+    "accepted_commands": [
+      "chmod +t /srv/shared_tmp",
+      "chmod o+t /srv/shared_tmp"
+    ],
+    "hint": "The sticky bit uses the letter 't'.",
+    "explanation": "chmod +t sets the sticky bit (restricted deletion) on a shared directory (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "perm_53",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "hard",
+    "prompt": "Safely open and edit the drop-in sudoers file '/etc/sudoers.d/webadmin' with automatic syntax checking.",
+    "choices": [
+      "visudo -f /etc/sudoers.d/webadmin",
+      "nano /etc/sudoers.d/webadmin",
+      "visudo -c /etc/sudoers.d/webadmin",
+      "sudoedit -c /etc/sudoers.d/webadmin"
+    ],
+    "correct_choice": "visudo -f /etc/sudoers.d/webadmin",
+    "accepted_commands": [
+      "visudo -f /etc/sudoers.d/webadmin"
+    ],
+    "hint": "Use visudo with -f to edit a specific drop-in file.",
+    "explanation": "visudo -f locks the target file and validates sudoers syntax before saving changes (XK0-006 Domain 3.0)."
+  },
+  {
+    "id": "perm_54",
+    "domain": "3.0 Security",
+    "category": "Permissions & User Management",
+    "difficulty": "hard",
+    "prompt": "Query the '/etc/shadow' database for user 'alex' (as root) using getent to inspect the password hash and aging fields.",
+    "choices": [
+      "getent shadow alex",
+      "getent passwd alex",
+      "passwd -S alex",
+      "id -Z alex"
+    ],
+    "correct_choice": "getent shadow alex",
+    "accepted_commands": [
+      "getent shadow alex",
+      "grep '^alex:' /etc/shadow"
+    ],
+    "hint": "Use getent with the shadow database.",
+    "explanation": "getent shadow <user> queries the NSS shadow database to display the user's encrypted hash and aging fields (XK0-006 Domain 3.0)."
   }
 ]

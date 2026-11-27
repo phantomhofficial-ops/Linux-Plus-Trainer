@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 from pathlib import Path
 import sys
+import time
 from typing import Callable
 
 try:
@@ -22,12 +24,22 @@ from rich.text import Text
 from engine import (
     MODE_EXACT_COMMAND,
     MODE_MULTIPLE_CHOICE,
+    QUIZ_LENGTH_PRESETS,
     ProgressTracker,
     Question,
     filter_questions_by_difficulty,
     get_categories,
     load_all_questions,
     run_quiz_session,
+    select_practice_questions,
+)
+from exams import (
+    EXAM_PRESETS,
+    PASSING_SCALED_SCORE,
+    XK0_006_DOMAINS,
+    build_mock_exam,
+    get_primary_domain,
+    score_mock_exam,
 )
 from labs import LabDefinition, get_all_labs
 from paths import get_progress_file, get_questions_dir
@@ -649,6 +661,308 @@ def run_sandbox_lab_session(
     return passed_in_session
 
 
+def select_quiz_length(console: Console, total_available: int) -> str | None:
+    """Prompt user for a quiz length preset ('short', 'medium', 'long', 'all')."""
+    console.print(
+        f"\n[bold]Select Quiz Length[/bold] ([cyan]{total_available}[/cyan] matching question(s)):"
+    )
+    console.print("  [bold yellow][1][/bold yellow] Short (10 Qs)")
+    console.print("  [bold yellow][2][/bold yellow] Medium (20 Qs)")
+    console.print("  [bold yellow][3][/bold yellow] Long (40 Qs)")
+    console.print(f"  [bold yellow][4][/bold yellow] All ({total_available} Qs)")
+    console.print("  [bold yellow][B][/bold yellow] Back")
+
+    mapping = {"1": "short", "2": "medium", "3": "long", "4": "all"}
+    while True:
+        choice = _safe_input(console, "[bold cyan]Choose length (1-4 or B):[/bold cyan] ").lower()
+        if choice in {"b", "back", ""}:
+            return None
+        if choice in mapping:
+            return mapping[choice]
+        console.print("[red]Invalid choice. Enter 1, 2, 3, 4, or B.[/red]")
+
+
+def select_custom_practice(
+    console: Console,
+    questions: list[Question],
+    categories: list[str],
+) -> tuple[str, list[Question]] | None:
+    """Interactive multi-category / multi-domain custom mix builder."""
+    table = Table(
+        title="Custom Practice Mix — Categories & XK0-006 Domains",
+        box=box.ROUNDED,
+        border_style="cyan",
+    )
+    table.add_column("Code", style="bold yellow", width=6)
+    table.add_column("Type", style="dim", width=10)
+    table.add_column("Name", style="bold white")
+
+    for idx, cat in enumerate(categories, start=1):
+        table.add_row(str(idx), "Category", cat)
+    for idx, dom in enumerate(XK0_006_DOMAINS, start=1):
+        table.add_row(f"d{idx}", "Domain", dom)
+
+    console.print(table)
+    console.print(
+        "[dim]Enter comma-separated codes (e.g. '1,3' or 'd1,d3'), or 'B' to go back.[/dim]"
+    )
+
+    while True:
+        raw = _safe_input(console, "[bold cyan]Selection:[/bold cyan] ").strip().lower()
+        if raw in {"b", "back", ""}:
+            return None
+
+        chosen_cats: list[str] = []
+        chosen_doms: list[str] = []
+        invalid = False
+        for token in [t.strip() for t in raw.split(",") if t.strip()]:
+            if token.isdigit():
+                idx = int(token) - 1
+                if 0 <= idx < len(categories):
+                    if categories[idx] not in chosen_cats:
+                        chosen_cats.append(categories[idx])
+                else:
+                    invalid = True
+                    break
+            elif token.startswith("d") and token[1:].isdigit():
+                idx = int(token[1:]) - 1
+                if 0 <= idx < len(XK0_006_DOMAINS):
+                    if XK0_006_DOMAINS[idx] not in chosen_doms:
+                        chosen_doms.append(XK0_006_DOMAINS[idx])
+                else:
+                    invalid = True
+                    break
+            else:
+                invalid = True
+                break
+
+        if invalid or (not chosen_cats and not chosen_doms):
+            console.print("[red]Invalid selection. Example: 1,2 or d1,d3[/red]")
+            continue
+
+        matched = select_practice_questions(
+            questions,
+            categories=chosen_cats or None,
+            domains=chosen_doms or None,
+        )
+        if not matched:
+            console.print("[yellow]No questions matched that combination. Try again.[/yellow]")
+            continue
+
+        label_parts: list[str] = []
+        if chosen_cats:
+            label_parts.append(f"{len(chosen_cats)} cat(s)")
+        if chosen_doms:
+            label_parts.append(f"{len(chosen_doms)} domain(s)")
+        return f"Custom Mix ({', '.join(label_parts)})", matched
+
+
+def select_mock_exam_preset(console: Console, tracker: ProgressTracker) -> str | None:
+    """Display XK0-006 mock exam presets and recent history, returning a preset ID."""
+    table = Table(
+        title="CompTIA Linux+ (XK0-006) Weighted Mock Exams",
+        box=box.ROUNDED,
+        border_style="cyan",
+    )
+    table.add_column("#", style="bold yellow", width=4)
+    table.add_column("Exam", style="bold white")
+    table.add_column("Questions", justify="right", width=10)
+    table.add_column("Time", justify="right", width=10)
+    table.add_column("Details", style="dim")
+
+    preset_keys = list(EXAM_PRESETS.keys())
+    for idx, key in enumerate(preset_keys, start=1):
+        p = EXAM_PRESETS[key]
+        table.add_row(
+            str(idx),
+            str(p["title"]),
+            str(p["question_count"]),
+            f"{p['duration_minutes']} min",
+            str(p["subtitle"]),
+        )
+    console.print(table)
+
+    if tracker.mock_exam_history:
+        recent = tracker.mock_exam_history[-3:]
+        console.print("[bold]Recent Attempts:[/bold]")
+        for entry in reversed(recent):
+            status = "[green]PASS[/green]" if entry.get("passed") else "[red]FAIL[/red]"
+            console.print(
+                f"  • {escape(str(entry.get('title')))}: "
+                f"{entry.get('scaled_score')}/900 ({status}) "
+                f"[{entry.get('correct')}/{entry.get('total')}]"
+            )
+
+    while True:
+        choice = _safe_input(
+            console, f"[bold cyan]Select mock exam (1-{len(preset_keys)} or B):[/bold cyan] "
+        ).lower()
+        if choice in {"b", "back", ""}:
+            return None
+        if choice.isdigit():
+            idx = int(choice) - 1
+            if 0 <= idx < len(preset_keys):
+                return preset_keys[idx]
+        console.print(f"[red]Please enter a number 1-{len(preset_keys)} or B.[/red]")
+
+
+def run_terminal_mock_exam(
+    console: Console,
+    questions: list[Question],
+    preset_id: str,
+    tracker: ProgressTracker,
+) -> None:
+    """Run an interactive timed XK0-006 mock exam in Terminal Mode."""
+    build = build_mock_exam(questions, preset_id)
+    total = len(build.questions)
+    total_seconds = build.duration_minutes * 60
+    start_ts = time.monotonic()
+
+    answers: dict[str, int | None] = {}
+    flagged_ids: set[str] = set()
+    idx = 0
+    timed_out = False
+
+    console.print(
+        Panel(
+            f"[bold]{escape(build.title)}[/bold]\n"
+            f"{total} weighted questions • {build.duration_minutes} minutes • Passing: {PASSING_SCALED_SCORE}/900\n"
+            "[dim]Commands: A/B/C/D (or 1-4) to answer, 'flag', 'next', 'prev', 'jump <n>', 'submit', 'quit'[/dim]",
+            title="[bold cyan]Mock Exam Started[/bold cyan]",
+            border_style="cyan",
+            box=box.ROUNDED,
+        )
+    )
+
+    letters = ["A", "B", "C", "D"]
+    while True:
+        elapsed = time.monotonic() - start_ts
+        remaining = max(0, int(total_seconds - elapsed))
+        if remaining <= 0:
+            timed_out = True
+            console.print("\n[bold red]Time expired! Auto-submitting your mock exam...[/bold red]")
+            break
+
+        q = build.questions[idx]
+        mins, secs = divmod(remaining, 60)
+        flag_tag = " [yellow]★ FLAGGED[/yellow]" if q.id in flagged_ids else ""
+        selected_idx = answers.get(q.id)
+
+        body = Text()
+        body.append(f"{q.prompt}\n\n", style="bold white")
+        for c_idx, choice_text in enumerate(q.choices):
+            marker = "▶ " if selected_idx == c_idx else "  "
+            style = "bold cyan" if selected_idx == c_idx else "white"
+            body.append(f"{marker}[{letters[c_idx]}] {choice_text}\n", style=style)
+
+        console.print(
+            Panel(
+                body,
+                title=(
+                    f"[bold]Q {idx + 1}/{total}[/bold] • {escape(get_primary_domain(q.domain))}"
+                    f" • [cyan]{mins:02d}:{secs:02d} left[/cyan]{flag_tag}"
+                ),
+                subtitle=f"Answered: {len(answers)}/{total} | Flagged: {len(flagged_ids)}",
+                border_style="cyan",
+                box=box.ROUNDED,
+            )
+        )
+
+        raw = _safe_input(
+            console, "[bold cyan]Answer (A-D), next/prev/flag/jump <n>/submit/quit:[/bold cyan] "
+        ).strip()
+        lowered = raw.lower()
+
+        if lowered in {"quit", "exit", "q"}:
+            console.print("[yellow]Mock exam cancelled (not scored).[/yellow]")
+            return
+        if lowered == "submit":
+            unanswered = total - len(answers)
+            if unanswered > 0:
+                confirm = _safe_input(
+                    console,
+                    f"[yellow]{unanswered} question(s) unanswered. Submit anyway? (y/N):[/yellow] ",
+                ).lower()
+                if confirm not in {"y", "yes"}:
+                    continue
+            break
+        if lowered in {"n", "next", ""}:
+            if idx + 1 < total:
+                idx += 1
+            else:
+                console.print("[dim]Already at last question. Type 'submit' to score.[/dim]")
+            continue
+        if lowered in {"p", "prev"}:
+            if idx > 0:
+                idx -= 1
+            continue
+        if lowered == "flag":
+            if q.id in flagged_ids:
+                flagged_ids.remove(q.id)
+            else:
+                flagged_ids.add(q.id)
+            continue
+        if lowered.startswith("jump "):
+            target = lowered.split(None, 1)[1].strip()
+            if target.isdigit() and 1 <= int(target) <= total:
+                idx = int(target) - 1
+            else:
+                console.print(f"[red]Enter a question number 1-{total}.[/red]")
+            continue
+
+        choice_map = {"a": 0, "b": 1, "c": 2, "d": 3, "1": 0, "2": 1, "3": 2, "4": 3}
+        if lowered in choice_map:
+            answers[q.id] = choice_map[lowered]
+            if idx + 1 < total:
+                idx += 1
+        else:
+            console.print("[red]Unrecognized command. Use A-D, flag, next, prev, jump <n>, or submit.[/red]")
+
+    elapsed_final = int(time.monotonic() - start_ts)
+    scorecard = score_mock_exam(build.questions, answers, flagged_ids=flagged_ids)
+    tracker.record_mock_exam(
+        {
+            "preset_id": build.preset_id,
+            "title": build.title,
+            "scaled_score": scorecard["scaled_score"],
+            "passed": scorecard["passed"],
+            "correct": scorecard["correct"],
+            "total": scorecard["total"],
+            "accuracy": scorecard["accuracy"],
+            "elapsed_seconds": elapsed_final,
+            "timed_out": timed_out,
+            "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+        }
+    )
+
+    verdict = "[bold green]PASS[/bold green]" if scorecard["passed"] else "[bold red]FAIL[/bold red]"
+    console.print(
+        Panel(
+            f"Result: {verdict}   Scaled Score: [bold cyan]{scorecard['scaled_score']} / 900[/bold cyan] "
+            f"(Passing: {PASSING_SCALED_SCORE})\n"
+            f"Correct: {scorecard['correct']} / {scorecard['total']} ({scorecard['accuracy']}%)",
+            title=f"[bold]{escape(build.title)} Scorecard[/bold]",
+            border_style="green" if scorecard["passed"] else "red",
+            box=box.ROUNDED,
+        )
+    )
+
+    dom_table = Table(title="XK0-006 Domain Breakdown", box=box.ROUNDED, border_style="cyan")
+    dom_table.add_column("Domain", style="bold white")
+    dom_table.add_column("Weight", justify="right")
+    dom_table.add_column("Score", justify="right")
+    dom_table.add_column("Accuracy", justify="right")
+    for entry in scorecard["domain_breakdown"]:  # type: ignore[attr-defined]
+        dom_table.add_row(
+            str(entry["domain"]),
+            f"{entry['weight']}%",
+            f"{entry['correct']}/{entry['total']}",
+            f"{entry['accuracy']}%",
+        )
+    console.print(dom_table)
+    _safe_input(console, "[dim]Press Enter to return to Main Menu...[/dim]")
+
+
 def run_terminal_app(
     console: Console | None = None,
     questions_dir: Path | None = None,
@@ -705,11 +1019,21 @@ def run_terminal_app(
             "Sandbox Labs (Hands-On)",
             f"Interactive Bash labs ({completed_labs}/{total_labs} completed)",
         )
+        menu.add_row(
+            "[6]",
+            "Mock Exams (XK0-006 Weighted)",
+            f"Timed 90Q / 45Q exams ({len(tracker.mock_exam_history)} attempt(s))",
+        )
+        menu.add_row(
+            "[7]",
+            "Custom Practice Mix",
+            "Combine multiple categories or XK0-006 domains",
+        )
         menu.add_row("[Q]", "Quit", "Exit trainer")
 
         active_console.print(menu)
         choice = _safe_input(
-            active_console, "[bold cyan]Select an option (1-5 or Q):[/bold cyan] "
+            active_console, "[bold cyan]Select an option (1-7 or Q):[/bold cyan] "
         ).lower()
 
         if choice == "1":
@@ -721,25 +1045,43 @@ def run_terminal_app(
             if diff_pick is None:
                 continue
             chosen_diff, filtered_questions = diff_pick
+            length_pick = select_quiz_length(active_console, len(filtered_questions))
+            if length_pick is None:
+                continue
+            final_questions = select_practice_questions(
+                filtered_questions,
+                length=length_pick,
+                missed_ids=tracker.missed_question_ids,
+                answered_ids=tracker.get_all_answered_ids(),
+            )
             effective_label = (
                 cat_name if chosen_diff == "all" else f"{cat_name} ({chosen_diff.title()})"
             )
-            mode = select_quiz_mode(active_console, effective_label, len(filtered_questions))
+            mode = select_quiz_mode(active_console, effective_label, len(final_questions))
             if mode is not None:
-                run_quiz_session(filtered_questions, mode, tracker, active_console)
+                run_quiz_session(final_questions, mode, tracker, active_console)
         elif choice == "2":
             diff_pick = select_difficulty(active_console, "All Categories", questions)
             if diff_pick is None:
                 continue
             chosen_diff, filtered_questions = diff_pick
+            length_pick = select_quiz_length(active_console, len(filtered_questions))
+            if length_pick is None:
+                continue
+            final_questions = select_practice_questions(
+                filtered_questions,
+                length=length_pick,
+                missed_ids=tracker.missed_question_ids,
+                answered_ids=tracker.get_all_answered_ids(),
+            )
             effective_label = (
                 "All Categories"
                 if chosen_diff == "all"
                 else f"All Categories ({chosen_diff.title()})"
             )
-            mode = select_quiz_mode(active_console, effective_label, len(filtered_questions))
+            mode = select_quiz_mode(active_console, effective_label, len(final_questions))
             if mode is not None:
-                run_quiz_session(filtered_questions, mode, tracker, active_console)
+                run_quiz_session(final_questions, mode, tracker, active_console)
         elif choice == "3":
             missed_questions = tracker.get_missed_questions(questions)
             if not missed_questions:
@@ -790,11 +1132,36 @@ def run_terminal_app(
                     tracker,
                     backend=sandbox_backend,
                 )
+        elif choice == "6":
+            preset_id = select_mock_exam_preset(active_console, tracker)
+            if preset_id is not None:
+                run_terminal_mock_exam(active_console, questions, preset_id, tracker)
+        elif choice == "7":
+            custom_pick = select_custom_practice(active_console, questions, categories)
+            if custom_pick is None:
+                continue
+            custom_label, custom_questions = custom_pick
+            diff_pick = select_difficulty(active_console, custom_label, custom_questions)
+            if diff_pick is None:
+                continue
+            chosen_diff, filtered_questions = diff_pick
+            length_pick = select_quiz_length(active_console, len(filtered_questions))
+            if length_pick is None:
+                continue
+            final_questions = select_practice_questions(
+                filtered_questions,
+                length=length_pick,
+                missed_ids=tracker.missed_question_ids,
+                answered_ids=tracker.get_all_answered_ids(),
+            )
+            mode = select_quiz_mode(active_console, custom_label, len(final_questions))
+            if mode is not None:
+                run_quiz_session(final_questions, mode, tracker, active_console)
         elif choice in {"q", "quit", "exit"}:
             active_console.print("\n[cyan]Good luck on your CompTIA Linux+ (XK0-006) exam![/cyan]\n")
             return 0
         else:
-            active_console.print("[red]Invalid option. Please choose 1, 2, 3, 4, 5, or Q.[/red]")
+            active_console.print("[red]Invalid option. Please choose 1-7 or Q.[/red]")
 
 
 def launch_web_mode(

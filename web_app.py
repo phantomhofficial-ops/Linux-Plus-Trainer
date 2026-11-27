@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import atexit
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
 import random
 import threading
@@ -17,6 +18,7 @@ from engine import (
     DIFFICULTY_FILTERS,
     MODE_EXACT_COMMAND,
     MODE_MULTIPLE_CHOICE,
+    QUIZ_LENGTH_PRESETS,
     ProgressTracker,
     Question,
     evaluate_multiple_choice,
@@ -27,6 +29,16 @@ from engine import (
     normalize_command,
     parse_meta_command,
     prepare_shuffled_choices,
+    select_practice_questions,
+)
+from exams import (
+    DOMAIN_WEIGHTS,
+    EXAM_PRESETS,
+    PASSING_SCALED_SCORE,
+    XK0_006_DOMAINS,
+    build_mock_exam,
+    get_primary_domain,
+    score_mock_exam,
 )
 from labs import get_all_labs, get_lab_by_id
 from paths import (
@@ -42,6 +54,20 @@ BASE_DIR = get_resource_path()
 XP_PER_CORRECT = 100
 MAX_SKILL_LEVEL = 99
 NUMBER_TO_LETTER = {"1": "A", "2": "B", "3": "C", "4": "D"}
+
+
+@dataclass
+class WebMockExamSession:
+    """In-memory state for an active timed mock exam session."""
+
+    exam_session_id: str
+    preset_id: str
+    title: str
+    subtitle: str
+    duration_minutes: int
+    questions: list[Question]
+    answers: dict[str, int | None] = field(default_factory=dict)
+    flagged_ids: set[str] = field(default_factory=set)
 
 
 def compute_skill_xp(correct: int) -> dict[str, int | float]:
@@ -114,6 +140,7 @@ class WebQuizSession:
 
 def _count_difficulties(questions: list[Question]) -> dict[str, int]:
     return {
+        "all": len(questions),
         "beginner": sum(1 for q in questions if q.difficulty == "beginner"),
         "intermediate": sum(1 for q in questions if q.difficulty == "intermediate"),
         "hard": sum(1 for q in questions if q.difficulty == "hard"),
@@ -129,6 +156,8 @@ def _build_dashboard_payload(
     per_cat = stats["categories"]
     category_cards: list[dict[str, object]] = []
     total_level = 0
+    answered_by_diff = {"all": 0, "beginner": 0, "intermediate": 0, "hard": 0}
+    unique_answered_by_diff = {"all": 0, "beginner": 0, "intermediate": 0, "hard": 0}
 
     for category in categories:
         cat_stats = per_cat[category]
@@ -138,11 +167,37 @@ def _build_dashboard_payload(
         skill = compute_skill_xp(correct)
         total_level += int(skill["level"])
         cat_questions = [q for q in questions if q.category == category]
+        cat_diff_counts = _count_difficulties(cat_questions)
+
+        difficulties_payload: dict[str, dict[str, float | int]] = {}
+        cat_unique_total = 0
+        for tier in ("beginner", "intermediate", "hard"):
+            t_stats = tracker.get_category_difficulty_stats(category, tier)
+            t_answered = int(t_stats["answered"])
+            t_correct = int(t_stats["correct"])
+            t_unique = int(t_stats["unique_answered"])
+            t_acc = round(float(t_stats["accuracy"]), 1)
+            difficulties_payload[tier] = {
+                "total": cat_diff_counts[tier],
+                "answered": t_answered,
+                "unique_answered": t_unique,
+                "correct": t_correct,
+                "accuracy": t_acc,
+            }
+            answered_by_diff[tier] += t_answered
+            unique_answered_by_diff[tier] += t_unique
+            cat_unique_total += t_unique
+
+        answered_by_diff["all"] += answered
+        unique_answered_by_diff["all"] += cat_unique_total
+
         category_cards.append(
             {
                 "name": category,
                 "question_count": len(cat_questions),
-                "difficulty_counts": _count_difficulties(cat_questions),
+                "unique_answered": cat_unique_total,
+                "difficulty_counts": cat_diff_counts,
+                "difficulties": difficulties_payload,
                 "answered": answered,
                 "correct": correct,
                 "accuracy": accuracy,
@@ -152,9 +207,35 @@ def _build_dashboard_payload(
 
     all_labs = get_all_labs()
     total_correct = int(stats["total_correct"])
+    missed_questions = tracker.get_missed_questions(questions)
+    missed_by_difficulty = _count_difficulties(missed_questions)
+    domain_counts: dict[str, int] = {d: 0 for d in XK0_006_DOMAINS}
+    for q in questions:
+        primary = get_primary_domain(q.domain)
+        if primary in domain_counts:
+            domain_counts[primary] += 1
+
+    domains_payload = [
+        {
+            "name": domain,
+            "weight": DOMAIN_WEIGHTS[domain],
+            "question_count": domain_counts[domain],
+        }
+        for domain in XK0_006_DOMAINS
+    ]
     return {
         "total_questions": len(questions),
         "difficulty_counts": _count_difficulties(questions),
+        "answered_by_difficulty": answered_by_diff,
+        "unique_answered_by_difficulty": unique_answered_by_diff,
+        "missed_by_difficulty": missed_by_difficulty,
+        "domains": domains_payload,
+        "quiz_lengths": [
+            {"id": "short", "label": "10 Qs", "count": 10},
+            {"id": "medium", "label": "20 Qs", "count": 20},
+            {"id": "long", "label": "40 Qs", "count": 40},
+            {"id": "all", "label": "All", "count": None},
+        ],
         "overall": {
             "answered": int(stats["total_answered"]),
             "correct": total_correct,
@@ -166,6 +247,7 @@ def _build_dashboard_payload(
         "categories": category_cards,
         "completed_labs": list(tracker.completed_labs),
         "total_labs": len(all_labs),
+        "mock_exam_history": list(reversed(tracker.mock_exam_history)),
     }
 
 
@@ -204,6 +286,8 @@ def create_app(
     )
     sessions: dict[str, WebQuizSession] = {}
     app.extensions["quiz_sessions"] = sessions
+    exam_sessions: dict[str, WebMockExamSession] = {}
+    app.extensions["exam_sessions"] = exam_sessions
     lab_sessions: dict[str, SandboxSession] = {}
     app.extensions["lab_sessions"] = lab_sessions
 
@@ -221,6 +305,11 @@ def create_app(
         if not isinstance(session_id, str) or not session_id:
             return None
         return sessions.get(session_id)
+
+    def _get_exam_session(exam_session_id: object) -> WebMockExamSession | None:
+        if not isinstance(exam_session_id, str) or not exam_session_id:
+            return None
+        return exam_sessions.get(exam_session_id)
 
     def _get_lab_session(session_id: object) -> SandboxSession | None:
         if not isinstance(session_id, str) or not session_id:
@@ -242,32 +331,77 @@ def create_app(
         mode = data.get("mode", MODE_MULTIPLE_CHOICE)
         scope = data.get("scope", "all")
         category = data.get("category")
+        selected_categories = data.get("categories")
+        selected_domains = data.get("domains")
         difficulty = str(data.get("difficulty") or "all").strip().lower()
+        length = data.get("length", "all")
+        if length is None or length == "":
+            length = "all"
+        if isinstance(length, str):
+            length = length.strip().lower()
         shuffle = bool(data.get("shuffle", True))
 
         if mode not in {MODE_MULTIPLE_CHOICE, MODE_EXACT_COMMAND}:
             return jsonify({"error": f"Unsupported quiz mode: {mode!r}"}), 400
         if difficulty not in DIFFICULTY_FILTERS:
             return jsonify({"error": f"Unsupported difficulty: {difficulty!r}"}), 400
+        if isinstance(length, str) and length not in QUIZ_LENGTH_PRESETS:
+            return jsonify({"error": f"Unsupported quiz length: {length!r}"}), 400
 
         tracker = _get_tracker()
         if scope == "all":
-            selected_questions = list(questions)
+            pool = list(questions)
             scope_label = "All Categories"
         elif scope == "category":
             if not isinstance(category, str) or category not in categories:
                 return jsonify({"error": "Unknown or missing category."}), 400
-            selected_questions = [q for q in questions if q.category == category]
+            pool = [q for q in questions if q.category == category]
             scope_label = category
         elif scope == "missed":
-            selected_questions = tracker.get_missed_questions(questions)
-            if not selected_questions:
+            pool = tracker.get_missed_questions(questions)
+            if not pool:
                 return jsonify({"error": "No missed questions in your review queue."}), 400
             scope_label = "Review Missed Questions"
+        elif scope == "custom":
+            cat_list = [
+                c for c in (selected_categories or [])
+                if isinstance(c, str) and c in categories
+            ]
+            dom_list = [
+                d for d in (selected_domains or [])
+                if isinstance(d, str) and d.strip()
+            ]
+            if not cat_list and not dom_list:
+                return jsonify({"error": "Select at least one category or domain for Custom Mix."}), 400
+            pool = select_practice_questions(
+                questions,
+                categories=cat_list or None,
+                domains=dom_list or None,
+                difficulty="all",
+                length="all",
+            )
+            parts: list[str] = []
+            if cat_list:
+                parts.append(f"{len(cat_list)} cat" if len(cat_list) == 1 else f"{len(cat_list)} cats")
+            if dom_list:
+                parts.append(f"{len(dom_list)} domain" if len(dom_list) == 1 else f"{len(dom_list)} domains")
+            scope_label = f"Custom Mix ({', '.join(parts)})"
         else:
             return jsonify({"error": f"Unsupported scope: {scope!r}"}), 400
 
-        selected_questions = filter_questions_by_difficulty(selected_questions, difficulty)
+        if length == "all":
+            selected_questions = filter_questions_by_difficulty(pool, difficulty)
+            if shuffle:
+                random.shuffle(selected_questions)
+        else:
+            selected_questions = select_practice_questions(
+                pool,
+                difficulty=difficulty,
+                length=length,
+                missed_ids=tracker.missed_question_ids,
+                answered_ids=tracker.get_all_answered_ids(),
+            )
+
         if not selected_questions:
             return (
                 jsonify(
@@ -284,9 +418,6 @@ def create_app(
             if difficulty == "all"
             else f"{scope_label} • {difficulty.title()}"
         )
-
-        if shuffle:
-            random.shuffle(selected_questions)
 
         choice_maps: dict[str, dict[str, str]] = {}
         if mode == MODE_MULTIPLE_CHOICE:
@@ -374,7 +505,7 @@ def create_app(
 
         if action == "skip":
             session.skipped_count += 1
-            tracker.record_attempt(question, is_correct=False)
+            tracker.record_answer(question, is_correct=False, difficulty=question.difficulty)
             is_correct = False
             status = "skipped"
         elif session.mode == MODE_MULTIPLE_CHOICE:
@@ -389,7 +520,7 @@ def create_app(
             session.answered_count += 1
             if is_correct:
                 session.correct_count += 1
-            tracker.record_attempt(question, is_correct=is_correct)
+            tracker.record_answer(question, is_correct=is_correct, difficulty=question.difficulty)
             status = "correct" if is_correct else "incorrect"
         else:
             normalized = normalize_command(raw_command)
@@ -400,7 +531,7 @@ def create_app(
             session.answered_count += 1
             if is_correct:
                 session.correct_count += 1
-            tracker.record_attempt(question, is_correct=is_correct)
+            tracker.record_answer(question, is_correct=is_correct, difficulty=question.difficulty)
             status = "correct" if is_correct else "incorrect"
 
         correct_letter: str | None = None
@@ -643,6 +774,175 @@ def create_app(
             sb = lab_sessions.pop(session_id)
             sb.cleanup()
         return jsonify({"closed": True})
+
+    @app.get("/api/exams")
+    def api_exams_list():
+        tracker = _get_tracker()
+        presets_payload = [
+            {
+                "id": preset["id"],
+                "title": preset["title"],
+                "subtitle": preset["subtitle"],
+                "question_count": preset["question_count"],
+                "duration_minutes": preset["duration_minutes"],
+                "quotas": preset["quotas"],
+            }
+            for preset in EXAM_PRESETS.values()
+        ]
+        domains_payload = [
+            {"name": d, "weight": DOMAIN_WEIGHTS[d]}
+            for d in XK0_006_DOMAINS
+        ]
+        return jsonify(
+            {
+                "presets": presets_payload,
+                "domains": domains_payload,
+                "passing_score": PASSING_SCALED_SCORE,
+                "history": list(reversed(tracker.mock_exam_history)),
+            }
+        )
+
+    @app.post("/api/exams/start")
+    def api_exams_start():
+        data = request.get_json(silent=True) or {}
+        preset_id = str(data.get("preset") or "exam_a").strip()
+        if preset_id not in EXAM_PRESETS:
+            return jsonify({"error": f"Unknown mock exam preset: {preset_id!r}"}), 400
+
+        build = build_mock_exam(questions, preset_id)
+        exam_session_id = uuid.uuid4().hex
+        exam_session = WebMockExamSession(
+            exam_session_id=exam_session_id,
+            preset_id=build.preset_id,
+            title=build.title,
+            subtitle=build.subtitle,
+            duration_minutes=build.duration_minutes,
+            questions=build.questions,
+        )
+        exam_sessions[exam_session_id] = exam_session
+
+        serialized_questions = [
+            {
+                "number": idx + 1,
+                "id": q.id,
+                "domain": get_primary_domain(q.domain),
+                "category": q.category,
+                "difficulty": q.difficulty,
+                "prompt": q.prompt,
+                "choices": list(q.choices),
+            }
+            for idx, q in enumerate(build.questions)
+        ]
+
+        return jsonify(
+            {
+                "exam_session_id": exam_session_id,
+                "preset_id": build.preset_id,
+                "title": build.title,
+                "subtitle": build.subtitle,
+                "duration_minutes": build.duration_minutes,
+                "duration_seconds": build.duration_minutes * 60,
+                "total_questions": len(build.questions),
+                "passing_score": PASSING_SCALED_SCORE,
+                "domain_counts": build.domain_counts,
+                "questions": serialized_questions,
+            }
+        )
+
+    @app.post("/api/exams/answer")
+    def api_exams_answer():
+        data = request.get_json(silent=True) or {}
+        exam_session = _get_exam_session(data.get("exam_session_id"))
+        if exam_session is None:
+            return jsonify({"error": "Mock exam session not found or expired."}), 404
+
+        question_id = data.get("question_id")
+        if not isinstance(question_id, str) or not any(q.id == question_id for q in exam_session.questions):
+            return jsonify({"error": "Question ID does not belong to this mock exam."}), 400
+
+        if "selected_index" in data:
+            sel = data.get("selected_index")
+            if sel is None:
+                exam_session.answers.pop(question_id, None)
+            elif isinstance(sel, int) and not isinstance(sel, bool) and 0 <= sel <= 3:
+                exam_session.answers[question_id] = sel
+            else:
+                return jsonify({"error": "selected_index must be an integer 0..3 or null."}), 400
+
+        if "flagged" in data:
+            if bool(data.get("flagged")):
+                exam_session.flagged_ids.add(question_id)
+            else:
+                exam_session.flagged_ids.discard(question_id)
+
+        return jsonify(
+            {
+                "saved": True,
+                "question_id": question_id,
+                "selected_index": exam_session.answers.get(question_id),
+                "flagged": question_id in exam_session.flagged_ids,
+                "answered_count": len(exam_session.answers),
+                "flagged_count": len(exam_session.flagged_ids),
+                "total_questions": len(exam_session.questions),
+            }
+        )
+
+    @app.post("/api/exams/submit")
+    def api_exams_submit():
+        data = request.get_json(silent=True) or {}
+        exam_session = _get_exam_session(data.get("exam_session_id"))
+        if exam_session is None:
+            return jsonify({"error": "Mock exam session not found or expired."}), 404
+
+        incoming_answers = data.get("answers")
+        if isinstance(incoming_answers, dict):
+            valid_ids = {q.id for q in exam_session.questions}
+            for qid, sel in incoming_answers.items():
+                if qid in valid_ids and isinstance(sel, int) and not isinstance(sel, bool) and 0 <= sel <= 3:
+                    exam_session.answers[qid] = sel
+
+        incoming_flagged = data.get("flagged_ids")
+        if isinstance(incoming_flagged, list):
+            valid_ids = {q.id for q in exam_session.questions}
+            exam_session.flagged_ids = {qid for qid in incoming_flagged if isinstance(qid, str) and qid in valid_ids}
+
+        scorecard = score_mock_exam(
+            exam_session.questions,
+            exam_session.answers,
+            flagged_ids=exam_session.flagged_ids,
+        )
+
+        elapsed_seconds = data.get("elapsed_seconds")
+        elapsed_val = int(elapsed_seconds) if isinstance(elapsed_seconds, (int, float)) else None
+        timed_out = bool(data.get("timed_out", False))
+
+        history_entry: dict[str, object] = {
+            "preset_id": exam_session.preset_id,
+            "title": exam_session.title,
+            "scaled_score": scorecard["scaled_score"],
+            "passed": scorecard["passed"],
+            "correct": scorecard["correct"],
+            "total": scorecard["total"],
+            "accuracy": scorecard["accuracy"],
+            "elapsed_seconds": elapsed_val,
+            "timed_out": timed_out,
+            "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+        }
+        tracker = _get_tracker()
+        tracker.record_mock_exam(history_entry)
+        exam_sessions.pop(exam_session.exam_session_id, None)
+
+        return jsonify(
+            {
+                "preset_id": exam_session.preset_id,
+                "title": exam_session.title,
+                "subtitle": exam_session.subtitle,
+                "elapsed_seconds": elapsed_val,
+                "timed_out": timed_out,
+                **scorecard,
+                "dashboard": _build_dashboard_payload(questions, categories, tracker),
+            }
+        )
 
     return app
 

@@ -661,5 +661,440 @@
     ],
     "hint": "Pass -n (noexec) to bash.",
     "explanation": "Domain 4.0 (Automation, Orchestration, and Scripting): `bash -n deploy.sh` (`noexec`) parses the script and reports syntax errors without running any commands. `bash -x` actually executes the script in trace mode."
+  },
+  {
+    "id": "auto_33",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "beginner",
+    "prompt": "Print the exit status code of the most recently executed foreground command in Bash.",
+    "choices": [
+      "echo $?",
+      "echo $#",
+      "echo $0",
+      "echo $$"
+    ],
+    "correct_choice": "echo $?",
+    "accepted_commands": [
+      "echo $?"
+    ],
+    "hint": "Use the special $? variable.",
+    "explanation": "$? holds the exit code (0 for success, non-zero for failure) of the last foreground command (XK0-006 Domain 4.0)."
+  },
+  {
+    "id": "auto_34",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "beginner",
+    "prompt": "List all configured Git remote names and their fetch/push URLs.",
+    "choices": [
+      "git remote -v",
+      "git branch -a",
+      "git config --list",
+      "git status -v"
+    ],
+    "correct_choice": "git remote -v",
+    "accepted_commands": [
+      "git remote -v",
+      "git remote --verbose"
+    ],
+    "hint": "Use git remote with -v.",
+    "explanation": "git remote -v shows remote aliases (e.g., origin) along with fetch and push URLs (XK0-006 Domain 4.0)."
+  },
+  {
+    "id": "auto_35",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "beginner",
+    "prompt": "Download updates from the 'origin' Git remote without merging them into your local branch.",
+    "choices": [
+      "git fetch origin",
+      "git pull origin",
+      "git merge origin",
+      "git clone origin"
+    ],
+    "correct_choice": "git fetch origin",
+    "accepted_commands": [
+      "git fetch origin",
+      "git fetch"
+    ],
+    "hint": "Unlike git pull, this command only downloads remote refs.",
+    "explanation": "git fetch updates remote-tracking branches without altering your working tree or local branch (XK0-006 Domain 4.0)."
+  },
+  {
+    "id": "auto_36",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "beginner",
+    "prompt": "Safely delete the already-merged local Git branch 'feature/old'.",
+    "choices": [
+      "git branch -d feature/old",
+      "git rm -b feature/old",
+      "git checkout -d feature/old",
+      "git delete feature/old"
+    ],
+    "correct_choice": "git branch -d feature/old",
+    "accepted_commands": [
+      "git branch -d feature/old",
+      "git branch --delete feature/old"
+    ],
+    "hint": "Use git branch -d.",
+    "explanation": "git branch -d deletes a local branch only if it has been fully merged (-D forces deletion) (XK0-006 Domain 4.0)."
+  },
+  {
+    "id": "auto_37",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "beginner",
+    "prompt": "Check the installed Python 3 interpreter version.",
+    "choices": [
+      "python3 --version",
+      "python3 -v",
+      "pip3 --version",
+      "which python3"
+    ],
+    "correct_choice": "python3 --version",
+    "accepted_commands": [
+      "python3 --version",
+      "python3 -V"
+    ],
+    "hint": "Use --version or -V (lowercase -v enables verbose import tracing).",
+    "explanation": "python3 --version (or -V) prints the Python version string and exits (XK0-006 Domain 4.0)."
+  },
+  {
+    "id": "auto_38",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "beginner",
+    "prompt": "Install all Python packages pinned in 'requirements.txt' using python3 -m pip.",
+    "choices": [
+      "python3 -m pip install -r requirements.txt",
+      "python3 -m pip freeze requirements.txt",
+      "pip install requirements.txt",
+      "python3 setup.py requirements.txt"
+    ],
+    "correct_choice": "python3 -m pip install -r requirements.txt",
+    "accepted_commands": [
+      "python3 -m pip install -r requirements.txt",
+      "pip install -r requirements.txt",
+      "pip3 install -r requirements.txt"
+    ],
+    "hint": "Use pip install -r <file>.",
+    "explanation": "python3 -m pip install -r requirements.txt installs every pinned dependency into the active environment (XK0-006 Domain 4.0)."
+  },
+  {
+    "id": "auto_39",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "intermediate",
+    "prompt": "Display the commit metadata and full diff for Git commit 'a1b2c3d'.",
+    "choices": [
+      "git show a1b2c3d",
+      "git log a1b2c3d",
+      "git diff a1b2c3d",
+      "git status a1b2c3d"
+    ],
+    "correct_choice": "git show a1b2c3d",
+    "accepted_commands": [
+      "git show a1b2c3d"
+    ],
+    "hint": "Use git show.",
+    "explanation": "git show <commit> prints the commit author, message, and patch diff introduced by that commit (XK0-006 Domain 4.0)."
+  },
+  {
+    "id": "auto_40",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "intermediate",
+    "prompt": "Inspect which commit and author last modified each line of 'deploy.sh'.",
+    "choices": [
+      "git blame deploy.sh",
+      "git log deploy.sh",
+      "git show deploy.sh",
+      "git diff deploy.sh"
+    ],
+    "correct_choice": "git blame deploy.sh",
+    "accepted_commands": [
+      "git blame deploy.sh"
+    ],
+    "hint": "Use git blame.",
+    "explanation": "git blame annotates every line of a file with the commit hash, author, and timestamp of its last edit (XK0-006 Domain 4.0)."
+  },
+  {
+    "id": "auto_41",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "intermediate",
+    "prompt": "Discard unstaged working-directory edits to 'nginx.conf' and restore it from the index.",
+    "choices": [
+      "git restore nginx.conf",
+      "git reset nginx.conf",
+      "git clean nginx.conf",
+      "git revert nginx.conf"
+    ],
+    "correct_choice": "git restore nginx.conf",
+    "accepted_commands": [
+      "git restore nginx.conf",
+      "git checkout -- nginx.conf"
+    ],
+    "hint": "Use git restore <file>.",
+    "explanation": "git restore <file> discards uncommitted changes in the working tree (XK0-006 Domain 4.0)."
+  },
+  {
+    "id": "auto_42",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "intermediate",
+    "prompt": "Fetch remote changes and replay your local commits on top of the upstream branch without creating a merge commit.",
+    "choices": [
+      "git pull --rebase",
+      "git pull --squash",
+      "git fetch --merge",
+      "git push --rebase"
+    ],
+    "correct_choice": "git pull --rebase",
+    "accepted_commands": [
+      "git pull --rebase",
+      "git pull -r"
+    ],
+    "hint": "Pass --rebase to git pull.",
+    "explanation": "git pull --rebase fetches upstream commits and rebases local commits onto them for a linear history (XK0-006 Domain 4.0)."
+  },
+  {
+    "id": "auto_43",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "intermediate",
+    "prompt": "Validate and pretty-print 'config.json' using Python's built-in json.tool module.",
+    "choices": [
+      "python3 -m json.tool config.json",
+      "python3 -c json config.json",
+      "python3 -m json config.json",
+      "jq --validate config.json"
+    ],
+    "correct_choice": "python3 -m json.tool config.json",
+    "accepted_commands": [
+      "python3 -m json.tool config.json",
+      "cat config.json | python3 -m json.tool"
+    ],
+    "hint": "Run the json.tool module with python3 -m.",
+    "explanation": "python3 -m json.tool parses JSON (failing on syntax errors) and formats it with indentation (XK0-006 Domain 4.0)."
+  },
+  {
+    "id": "auto_44",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "intermediate",
+    "prompt": "Run the automated Python test suite verbosely using pytest.",
+    "choices": [
+      "pytest -v",
+      "python3 -m test",
+      "pytest --dry-run",
+      "pip test -v"
+    ],
+    "correct_choice": "pytest -v",
+    "accepted_commands": [
+      "pytest -v",
+      "python3 -m pytest -v"
+    ],
+    "hint": "Use pytest with -v.",
+    "explanation": "pytest -v discovers and runs test files with per-test pass/fail output (XK0-006 Domain 4.0)."
+  },
+  {
+    "id": "auto_45",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "intermediate",
+    "prompt": "Output the full parsed Ansible inventory graph as JSON from 'hosts.ini'.",
+    "choices": [
+      "ansible-inventory -i hosts.ini --list",
+      "ansible-playbook -i hosts.ini --list",
+      "ansible all -i hosts.ini --list",
+      "ansible-doc -i hosts.ini --list"
+    ],
+    "correct_choice": "ansible-inventory -i hosts.ini --list",
+    "accepted_commands": [
+      "ansible-inventory -i hosts.ini --list"
+    ],
+    "hint": "Use ansible-inventory with --list.",
+    "explanation": "ansible-inventory -i hosts.ini --list dumps all host groups and variables in JSON (XK0-006 Domain 4.0)."
+  },
+  {
+    "id": "auto_46",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "intermediate",
+    "prompt": "View built-in Ansible documentation and usage examples for the 'copy' module.",
+    "choices": [
+      "ansible-doc copy",
+      "ansible --help copy",
+      "ansible-playbook --doc copy",
+      "man ansible-copy"
+    ],
+    "correct_choice": "ansible-doc copy",
+    "accepted_commands": [
+      "ansible-doc copy",
+      "ansible-doc ansible.builtin.copy"
+    ],
+    "hint": "Use ansible-doc.",
+    "explanation": "ansible-doc <module> displays parameters, defaults, and YAML examples for any Ansible module (XK0-006 Domain 4.0)."
+  },
+  {
+    "id": "auto_47",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "hard",
+    "prompt": "Enable strict Bash error handling at the top of a script so it exits on any error, unset variable, or failed pipe.",
+    "choices": [
+      "set -euo pipefail",
+      "set -xvf pipefail",
+      "trap -euo pipefail",
+      "export -euo pipefail"
+    ],
+    "correct_choice": "set -euo pipefail",
+    "accepted_commands": [
+      "set -euo pipefail"
+    ],
+    "hint": "Combine set -e, -u, and -o pipefail.",
+    "explanation": "set -e exits on non-zero status, -u fails on unset variables, and -o pipefail propagates failures across pipelines (XK0-006 Domain 4.0)."
+  },
+  {
+    "id": "auto_48",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "hard",
+    "prompt": "Register a Bash trap that automatically removes '/tmp/lock' whenever the script exits.",
+    "choices": [
+      "trap 'rm -f /tmp/lock' EXIT",
+      "on_exit 'rm -f /tmp/lock'",
+      "set -e 'rm -f /tmp/lock' EXIT",
+      "cleanup 'rm -f /tmp/lock'"
+    ],
+    "correct_choice": "trap 'rm -f /tmp/lock' EXIT",
+    "accepted_commands": [
+      "trap 'rm -f /tmp/lock' EXIT",
+      "trap \"rm -f /tmp/lock\" EXIT"
+    ],
+    "hint": "Use trap '<command>' EXIT.",
+    "explanation": "trap '...' EXIT runs the cleanup command on normal exit or signal termination (XK0-006 Domain 4.0)."
+  },
+  {
+    "id": "auto_49",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "hard",
+    "prompt": "Write a POSIX test one-liner that prints 'ready' only if '/etc/app/prod.conf' exists and is a regular file.",
+    "choices": [
+      "[ -f /etc/app/prod.conf ] && echo \"ready\"",
+      "[ -d /etc/app/prod.conf ] && echo \"ready\"",
+      "[ -x /etc/app/prod.conf ] || echo \"ready\"",
+      "test -e /etc/app/prod.conf ; echo \"ready\""
+    ],
+    "correct_choice": "[ -f /etc/app/prod.conf ] && echo \"ready\"",
+    "accepted_commands": [
+      "[ -f /etc/app/prod.conf ] && echo \"ready\"",
+      "[ -f /etc/app/prod.conf ] && echo 'ready'",
+      "test -f /etc/app/prod.conf && echo \"ready\""
+    ],
+    "hint": "Use [ -f ... ] chained with &&.",
+    "explanation": "[ -f path ] checks that path exists and is a regular file; && runs echo only if the test succeeds (XK0-006 Domain 4.0)."
+  },
+  {
+    "id": "auto_50",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "hard",
+    "prompt": "Write a Bash for-loop one-liner that compresses every '*.log' file in the current directory with gzip.",
+    "choices": [
+      "for f in *.log; do gzip \"$f\"; done",
+      "foreach f in *.log; gzip $f; end",
+      "for f in *.log | gzip $f; done",
+      "while f in *.log; do gzip \"$f\"; done"
+    ],
+    "correct_choice": "for f in *.log; do gzip \"$f\"; done",
+    "accepted_commands": [
+      "for f in *.log; do gzip \"$f\"; done",
+      "for f in *.log; do gzip $f; done"
+    ],
+    "hint": "Use standard Bash syntax: for var in glob; do ...; done.",
+    "explanation": "for f in *.log; do gzip \"$f\"; done iterates safely over matching filenames and compresses each (XK0-006 Domain 4.0)."
+  },
+  {
+    "id": "auto_51",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "hard",
+    "prompt": "Prompt the user with 'Enter hostname: ' and store their input in variable HOST in a Bash script.",
+    "choices": [
+      "read -p \"Enter hostname: \" HOST",
+      "input -p \"Enter hostname: \" HOST",
+      "echo \"Enter hostname: \" > HOST",
+      "scanf \"Enter hostname: \" HOST"
+    ],
+    "correct_choice": "read -p \"Enter hostname: \" HOST",
+    "accepted_commands": [
+      "read -p \"Enter hostname: \" HOST",
+      "read -p 'Enter hostname: ' HOST"
+    ],
+    "hint": "Use read with -p.",
+    "explanation": "read -p displays an inline prompt and stores the user's line in the named variable (XK0-006 Domain 4.0)."
+  },
+  {
+    "id": "auto_52",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "hard",
+    "prompt": "Extract the 'ip' field from every object in the 'servers' array inside 'inventory.json' using jq.",
+    "choices": [
+      "jq '.servers[].ip' inventory.json",
+      "jq '.servers.ip' inventory.json",
+      "jq -f '.servers/ip' inventory.json",
+      "grep '.servers[].ip' inventory.json"
+    ],
+    "correct_choice": "jq '.servers[].ip' inventory.json",
+    "accepted_commands": [
+      "jq '.servers[].ip' inventory.json",
+      "jq -r '.servers[].ip' inventory.json"
+    ],
+    "hint": "Use [] to iterate array elements in jq.",
+    "explanation": "jq '.servers[].ip' iterates over each element in the servers array and outputs its ip field (XK0-006 Domain 4.0)."
+  },
+  {
+    "id": "auto_53",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "hard",
+    "prompt": "Install the 'community.general' Ansible collection from Ansible Galaxy.",
+    "choices": [
+      "ansible-galaxy collection install community.general",
+      "ansible-playbook install community.general",
+      "pip install ansible-community.general",
+      "ansible-galaxy role add community.general"
+    ],
+    "correct_choice": "ansible-galaxy collection install community.general",
+    "accepted_commands": [
+      "ansible-galaxy collection install community.general"
+    ],
+    "hint": "Use ansible-galaxy collection install.",
+    "explanation": "ansible-galaxy collection install downloads and installs Ansible collections from Galaxy (XK0-006 Domain 4.0)."
+  },
+  {
+    "id": "auto_54",
+    "domain": "4.0 Automation, Orchestration, and Scripting",
+    "category": "Automation, Git & Scripting",
+    "difficulty": "hard",
+    "prompt": "Preview infrastructure changes in a Terraform workspace without applying them.",
+    "choices": [
+      "terraform plan",
+      "terraform apply --dry-run",
+      "terraform check",
+      "terraform init --plan"
+    ],
+    "correct_choice": "terraform plan",
+    "accepted_commands": [
+      "terraform plan"
+    ],
+    "hint": "Use terraform plan.",
+    "explanation": "terraform plan computes and displays the execution plan (creates, updates, destroys) before modifying infrastructure (XK0-006 Domain 4.0)."
   }
 ]

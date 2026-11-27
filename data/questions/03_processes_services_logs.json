@@ -538,7 +538,7 @@
       "sudo systemctl cat nginx.service"
     ],
     "hint": "Use the cat subcommand of systemctl.",
-    "explanation": "Domain 5.0 (Troubleshooting): `systemctl cat nginx` prints the full primary unit file followed by every `.conf` drop-in file in `/etc/systemd/system/nginx.service.d/` with path headers—essential when diagnosing overridden `ExecStart` or environment settings."
+    "explanation": "Domain 5.0 (Troubleshooting): `systemctl cat nginx` prints the full primary unit file followed by every `.conf` drop-in file in `/etc/systemd/system/nginx.service.d/` with path headers\u2014essential when diagnosing overridden `ExecStart` or environment settings."
   },
   {
     "id": "proc_25",
@@ -706,5 +706,444 @@
     ],
     "hint": "Pass -p <PID> to strace.",
     "explanation": "Domain 5.0 (Troubleshooting): `strace -p 3190` attaches to PID 3190 and streams kernel syscalls (`openat`, `read`, `connect`, `futex`) and `errno` returns. Running `strace 3190` without `-p` tries to execute a binary named `3190`."
+  },
+  {
+    "id": "proc_33",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "beginner",
+    "prompt": "List all running processes in BSD format showing user, PID, %CPU, %MEM, and command.",
+    "choices": [
+      "ps aux",
+      "ps -l",
+      "top -v",
+      "jobs -l"
+    ],
+    "correct_choice": "ps aux",
+    "accepted_commands": [
+      "ps aux",
+      "ps -aux"
+    ],
+    "hint": "Combine a, u, and x flags with ps.",
+    "explanation": "ps aux displays all users' processes including background daemons without a controlling terminal, with CPU/MEM columns (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "proc_34",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "beginner",
+    "prompt": "Display running processes as an indented parent-child hierarchy tree.",
+    "choices": [
+      "pstree",
+      "ps -ef",
+      "pgrep -a",
+      "systemctl status"
+    ],
+    "correct_choice": "pstree",
+    "accepted_commands": [
+      "pstree",
+      "ps -ejH",
+      "ps axjf"
+    ],
+    "hint": "A dedicated command ending in 'tree'.",
+    "explanation": "pstree visualizes parent/child relationships among running processes (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "proc_35",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "beginner",
+    "prompt": "List all stopped or background jobs started in the current terminal shell.",
+    "choices": [
+      "jobs",
+      "ps",
+      "bg",
+      "fg"
+    ],
+    "correct_choice": "jobs",
+    "accepted_commands": [
+      "jobs",
+      "jobs -l"
+    ],
+    "hint": "Use the shell builtin for listing current shell jobs.",
+    "explanation": "jobs displays job IDs ([1], [2], ...) and states (Running/Stopped) for the current shell session (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "proc_36",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "beginner",
+    "prompt": "Resume stopped job %1 in the background.",
+    "choices": [
+      "bg %1",
+      "fg %1",
+      "jobs %1",
+      "nohup %1"
+    ],
+    "correct_choice": "bg %1",
+    "accepted_commands": [
+      "bg %1",
+      "bg 1"
+    ],
+    "hint": "Use the 'bg' builtin.",
+    "explanation": "bg %1 continues a suspended job in the background (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "proc_37",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "beginner",
+    "prompt": "Bring background job %1 back to the foreground of the current terminal.",
+    "choices": [
+      "fg %1",
+      "bg %1",
+      "jobs %1",
+      "kill -CONT %1"
+    ],
+    "correct_choice": "fg %1",
+    "accepted_commands": [
+      "fg %1",
+      "fg 1"
+    ],
+    "hint": "Use the 'fg' builtin.",
+    "explanation": "fg %1 moves job 1 into the foreground so it receives terminal input (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "proc_38",
+    "domain": "5.0 Troubleshooting",
+    "category": "Processes, Services & Logs",
+    "difficulty": "beginner",
+    "prompt": "Terminate all running processes whose exact command name is 'httpd'.",
+    "choices": [
+      "killall httpd",
+      "kill httpd",
+      "pgrep httpd",
+      "systemctl kill httpd"
+    ],
+    "correct_choice": "killall httpd",
+    "accepted_commands": [
+      "killall httpd",
+      "pkill -x httpd"
+    ],
+    "hint": "Use killall with the process name.",
+    "explanation": "killall sends SIGTERM to every process matching the given command name (XK0-006 Domain 5.0)."
+  },
+  {
+    "id": "proc_39",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "beginner",
+    "prompt": "Stop the 'cups' service immediately and disable it from starting at boot.",
+    "choices": [
+      "systemctl disable --now cups",
+      "systemctl stop cups",
+      "systemctl mask cups",
+      "systemctl reset-failed cups"
+    ],
+    "correct_choice": "systemctl disable --now cups",
+    "accepted_commands": [
+      "systemctl disable --now cups",
+      "systemctl disable --now cups.service"
+    ],
+    "hint": "Combine disable with --now.",
+    "explanation": "systemctl disable --now stops the unit immediately and removes its boot symlinks (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "proc_40",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "intermediate",
+    "prompt": "List all installed systemd service unit files and their enablement states (enabled, disabled, static, masked).",
+    "choices": [
+      "systemctl list-unit-files --type=service",
+      "systemctl list-units --type=service",
+      "systemctl status --all",
+      "systemctl show --type=service"
+    ],
+    "correct_choice": "systemctl list-unit-files --type=service",
+    "accepted_commands": [
+      "systemctl list-unit-files --type=service",
+      "systemctl list-unit-files -t service"
+    ],
+    "hint": "Use list-unit-files with --type=service.",
+    "explanation": "list-unit-files shows every unit file on disk and whether it is enabled, disabled, static, or masked (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "proc_41",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "intermediate",
+    "prompt": "List all active systemd socket units currently loaded in memory.",
+    "choices": [
+      "systemctl list-units --type=socket",
+      "systemctl list-unit-files --type=socket",
+      "ss -tuln",
+      "systemctl status sockets.target"
+    ],
+    "correct_choice": "systemctl list-units --type=socket",
+    "accepted_commands": [
+      "systemctl list-units --type=socket",
+      "systemctl list-units -t socket"
+    ],
+    "hint": "Use list-units with --type=socket.",
+    "explanation": "systemctl list-units --type=socket lists active socket-activation units managed by systemd (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "proc_42",
+    "domain": "5.0 Troubleshooting",
+    "category": "Processes, Services & Logs",
+    "difficulty": "intermediate",
+    "prompt": "Display the dependency tree of units required or wanted by 'nginx.service'.",
+    "choices": [
+      "systemctl list-dependencies nginx.service",
+      "systemctl show nginx.service",
+      "systemctl cat nginx.service",
+      "systemd-analyze blame nginx.service"
+    ],
+    "correct_choice": "systemctl list-dependencies nginx.service",
+    "accepted_commands": [
+      "systemctl list-dependencies nginx.service",
+      "systemctl list-dependencies nginx"
+    ],
+    "hint": "Use list-dependencies.",
+    "explanation": "systemctl list-dependencies prints the tree of required/wanted units and targets for a service (XK0-006 Domain 5.0)."
+  },
+  {
+    "id": "proc_43",
+    "domain": "5.0 Troubleshooting",
+    "category": "Processes, Services & Logs",
+    "difficulty": "intermediate",
+    "prompt": "Print all low-level key=value properties of 'sshd.service' for scripting or inspection.",
+    "choices": [
+      "systemctl show sshd.service",
+      "systemctl status sshd.service",
+      "systemctl cat sshd.service",
+      "systemctl list-units sshd.service"
+    ],
+    "correct_choice": "systemctl show sshd.service",
+    "accepted_commands": [
+      "systemctl show sshd.service",
+      "systemctl show sshd"
+    ],
+    "hint": "Use systemctl show.",
+    "explanation": "systemctl show outputs machine-readable key=value runtime and unit configuration properties (XK0-006 Domain 5.0)."
+  },
+  {
+    "id": "proc_44",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "intermediate",
+    "prompt": "List all pending one-time scheduled jobs queued via the 'at' daemon.",
+    "choices": [
+      "atq",
+      "crontab -l",
+      "atrm",
+      "systemctl list-timers"
+    ],
+    "correct_choice": "atq",
+    "accepted_commands": [
+      "atq",
+      "at -l"
+    ],
+    "hint": "Short for 'at queue'.",
+    "explanation": "atq (or at -l) displays pending one-time jobs scheduled with the at command (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "proc_45",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "intermediate",
+    "prompt": "Delete pending 'at' job number 4 from the queue.",
+    "choices": [
+      "atrm 4",
+      "atq -d 4",
+      "kill 4",
+      "crontab -r 4"
+    ],
+    "correct_choice": "atrm 4",
+    "accepted_commands": [
+      "atrm 4",
+      "at -r 4"
+    ],
+    "hint": "Short for 'at remove'.",
+    "explanation": "atrm <job_id> removes a queued one-time job from the atd spool (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "proc_46",
+    "domain": "5.0 Troubleshooting",
+    "category": "Processes, Services & Logs",
+    "difficulty": "intermediate",
+    "prompt": "Check how much disk space systemd journal logs are currently consuming.",
+    "choices": [
+      "journalctl --disk-usage",
+      "journalctl --vacuum-size=0",
+      "df -h /var/log/journal",
+      "systemctl status systemd-journald"
+    ],
+    "correct_choice": "journalctl --disk-usage",
+    "accepted_commands": [
+      "journalctl --disk-usage"
+    ],
+    "hint": "Use journalctl with the --disk-usage flag.",
+    "explanation": "journalctl --disk-usage reports total bytes occupied by archived and active journal files (XK0-006 Domain 5.0)."
+  },
+  {
+    "id": "proc_47",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "hard",
+    "prompt": "Schedule a one-time command '/opt/bin/reindex.sh' to run at 02:00 using at.",
+    "choices": [
+      "echo '/opt/bin/reindex.sh' | at 02:00",
+      "at 02:00 /opt/bin/reindex.sh",
+      "crontab -e '0 2 * * * /opt/bin/reindex.sh'",
+      "atq 02:00 /opt/bin/reindex.sh"
+    ],
+    "correct_choice": "echo '/opt/bin/reindex.sh' | at 02:00",
+    "accepted_commands": [
+      "echo '/opt/bin/reindex.sh' | at 02:00",
+      "echo \"/opt/bin/reindex.sh\" | at 02:00"
+    ],
+    "hint": "at reads the command from standard input.",
+    "explanation": "at accepts commands on stdin and schedules a single execution at the specified time (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "proc_48",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "hard",
+    "prompt": "List system-wide drop-in cron job files placed in '/etc/cron.d'.",
+    "choices": [
+      "ls -la /etc/cron.d",
+      "crontab -l",
+      "ls -la /var/spool/cron",
+      "cat /etc/anacrontab"
+    ],
+    "correct_choice": "ls -la /etc/cron.d",
+    "accepted_commands": [
+      "ls -la /etc/cron.d",
+      "ls -l /etc/cron.d"
+    ],
+    "hint": "Inspect the /etc/cron.d directory.",
+    "explanation": "Package and admin drop-in cron files (which include a username column) live in /etc/cron.d (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "proc_49",
+    "domain": "1.0 System Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "hard",
+    "prompt": "Launch '/usr/local/bin/compress.sh' with a lower CPU priority (nice value +15).",
+    "choices": [
+      "nice -n 15 /usr/local/bin/compress.sh",
+      "renice -n 15 /usr/local/bin/compress.sh",
+      "ionice -n 15 /usr/local/bin/compress.sh",
+      "nice -n -15 /usr/local/bin/compress.sh"
+    ],
+    "correct_choice": "nice -n 15 /usr/local/bin/compress.sh",
+    "accepted_commands": [
+      "nice -n 15 /usr/local/bin/compress.sh",
+      "nice -15 /usr/local/bin/compress.sh"
+    ],
+    "hint": "Use nice (not renice) when starting a new command; higher numbers mean lower priority.",
+    "explanation": "nice -n 15 starts a process at niceness +15 (lower scheduling priority); renice adjusts already-running PIDs (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "proc_50",
+    "domain": "5.0 Troubleshooting",
+    "category": "Processes, Services & Logs",
+    "difficulty": "hard",
+    "prompt": "Print the critical-path chain of time-critical systemd units that delayed the most recent boot.",
+    "choices": [
+      "systemd-analyze critical-chain",
+      "systemd-analyze blame",
+      "systemctl --failed",
+      "journalctl -b -p err"
+    ],
+    "correct_choice": "systemd-analyze critical-chain",
+    "accepted_commands": [
+      "systemd-analyze critical-chain"
+    ],
+    "hint": "Use systemd-analyze with critical-chain.",
+    "explanation": "systemd-analyze critical-chain highlights the sequential dependency chain that determined total boot time (XK0-006 Domain 5.0)."
+  },
+  {
+    "id": "proc_51",
+    "domain": "5.0 Troubleshooting",
+    "category": "Processes, Services & Logs",
+    "difficulty": "hard",
+    "prompt": "Validate the syntax and unit references of '/etc/systemd/system/custom-api.service' without starting it.",
+    "choices": [
+      "systemd-analyze verify /etc/systemd/system/custom-api.service",
+      "systemctl check /etc/systemd/system/custom-api.service",
+      "systemctl test custom-api.service",
+      "visudo -cf /etc/systemd/system/custom-api.service"
+    ],
+    "correct_choice": "systemd-analyze verify /etc/systemd/system/custom-api.service",
+    "accepted_commands": [
+      "systemd-analyze verify /etc/systemd/system/custom-api.service",
+      "systemd-analyze verify custom-api.service"
+    ],
+    "hint": "Use systemd-analyze verify.",
+    "explanation": "systemd-analyze verify checks unit files for syntax errors, missing binaries, or broken dependencies (XK0-006 Domain 5.0)."
+  },
+  {
+    "id": "proc_52",
+    "domain": "5.0 Troubleshooting",
+    "category": "Processes, Services & Logs",
+    "difficulty": "hard",
+    "prompt": "Dry-run the logrotate configuration '/etc/logrotate.d/nginx' in debug mode without actually rotating files.",
+    "choices": [
+      "logrotate -d /etc/logrotate.d/nginx",
+      "logrotate -f /etc/logrotate.d/nginx",
+      "logrotate -t /etc/logrotate.d/nginx",
+      "journalctl --verify /etc/logrotate.d/nginx"
+    ],
+    "correct_choice": "logrotate -d /etc/logrotate.d/nginx",
+    "accepted_commands": [
+      "logrotate -d /etc/logrotate.d/nginx",
+      "logrotate --debug /etc/logrotate.d/nginx"
+    ],
+    "hint": "Use -d (--debug) for a non-destructive dry run.",
+    "explanation": "logrotate -d simulates rotation and prints diagnostic output without modifying log files (XK0-006 Domain 5.0)."
+  },
+  {
+    "id": "proc_53",
+    "domain": "2.0 Services and User Management",
+    "category": "Processes, Services & Logs",
+    "difficulty": "hard",
+    "prompt": "Force immediate rotation of logs configured in '/etc/logrotate.d/app' regardless of size or schedule.",
+    "choices": [
+      "logrotate -f /etc/logrotate.d/app",
+      "logrotate -d /etc/logrotate.d/app",
+      "systemctl reload rsyslog",
+      "journalctl --rotate"
+    ],
+    "correct_choice": "logrotate -f /etc/logrotate.d/app",
+    "accepted_commands": [
+      "logrotate -f /etc/logrotate.d/app",
+      "logrotate --force /etc/logrotate.d/app"
+    ],
+    "hint": "Use -f (--force) with logrotate.",
+    "explanation": "logrotate -f forces immediate rotation even if the configured interval or size threshold has not been reached (XK0-006 Domain 2.0)."
+  },
+  {
+    "id": "proc_54",
+    "domain": "5.0 Troubleshooting",
+    "category": "Processes, Services & Logs",
+    "difficulty": "hard",
+    "prompt": "Validate '/etc/rsyslog.conf' and '/etc/rsyslog.d/*' syntax before restarting rsyslogd.",
+    "choices": [
+      "rsyslogd -N1",
+      "rsyslogd -t",
+      "systemctl verify rsyslog",
+      "logger -t rsyslogd"
+    ],
+    "correct_choice": "rsyslogd -N1",
+    "accepted_commands": [
+      "rsyslogd -N1",
+      "rsyslogd -N 1"
+    ],
+    "hint": "Use rsyslogd with -N1.",
+    "explanation": "rsyslogd -N1 runs configuration validation at debug level 1 without starting the daemon (XK0-006 Domain 5.0)."
   }
 ]

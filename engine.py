@@ -26,6 +26,19 @@ MODE_EXACT_COMMAND = "exact_command"
 
 VALID_DIFFICULTIES = {"beginner", "intermediate", "hard"}
 DIFFICULTY_FILTERS = ("all", "beginner", "intermediate", "hard")
+QUIZ_LENGTH_PRESETS: dict[str, int | None] = {
+    "short": 10,
+    "medium": 20,
+    "long": 40,
+    "all": None,
+}
+CANONICAL_DOMAINS: tuple[str, ...] = (
+    "1.0 System Management",
+    "2.0 Services and User Management",
+    "3.0 Security",
+    "4.0 Automation, Orchestration, and Scripting",
+    "5.0 Troubleshooting",
+)
 REQUIRED_FIELDS = (
     "id",
     "domain",
@@ -203,6 +216,86 @@ def filter_questions_by_difficulty(
     return [q for q in questions if q.difficulty == normalized]
 
 
+def _normalize_primary_domain(domain: str) -> str:
+    raw = (domain or "").strip()
+    for canonical in CANONICAL_DOMAINS:
+        prefix = canonical.split(" ", 1)[0]
+        if raw == canonical or raw.startswith(prefix):
+            return canonical
+    return raw
+
+
+def select_practice_questions(
+    all_questions: list[Question],
+    categories: list[str] | None = None,
+    domains: list[str] | None = None,
+    difficulty: str = "all",
+    length: str | int | None = "all",
+    missed_ids: set[str] | list[str] | None = None,
+    answered_ids: set[str] | list[str] | None = None,
+    rng: random.Random | None = None,
+) -> list[Question]:
+    """Filter questions by categories, domains, difficulty, and optional length cap.
+
+    When a finite length (e.g. 10, 20, 40 or 'short'/'medium'/'long') is requested,
+    prioritizes unseen and missed questions before already-answered ones while
+    shuffling within each priority tier.
+    """
+    filtered = list(all_questions)
+
+    if categories:
+        allowed_cats = {c for c in categories if isinstance(c, str) and c.strip()}
+        if allowed_cats:
+            filtered = [q for q in filtered if q.category in allowed_cats]
+
+    if domains:
+        allowed_domains = {_normalize_primary_domain(d) for d in domains if isinstance(d, str) and d.strip()}
+        if allowed_domains:
+            filtered = [q for q in filtered if _normalize_primary_domain(q.domain) in allowed_domains]
+
+    filtered = filter_questions_by_difficulty(filtered, difficulty)
+
+    limit: int | None
+    if isinstance(length, int) and not isinstance(length, bool):
+        limit = length if length > 0 else None
+    elif length is None:
+        limit = None
+    else:
+        norm_len = normalize_command(str(length)).lower() or "all"
+        if norm_len not in QUIZ_LENGTH_PRESETS:
+            raise ValueError(
+                f"Unsupported quiz length {length!r}; expected one of {tuple(QUIZ_LENGTH_PRESETS)}"
+            )
+        limit = QUIZ_LENGTH_PRESETS[norm_len]
+
+    if limit is None:
+        return filtered
+
+    if limit >= len(filtered):
+        result = list(filtered)
+        (rng or random.Random()).shuffle(result)
+        return result
+
+    missed_set = set(missed_ids or ())
+    answered_set = set(answered_ids or ())
+    shuffler = rng or random.Random()
+
+    unseen_or_missed: list[Question] = []
+    seen_mastered: list[Question] = []
+    for q in filtered:
+        if q.id in missed_set or q.id not in answered_set:
+            unseen_or_missed.append(q)
+        else:
+            seen_mastered.append(q)
+
+    shuffler.shuffle(unseen_or_missed)
+    shuffler.shuffle(seen_mastered)
+    combined = unseen_or_missed + seen_mastered
+    selected = combined[:limit]
+    shuffler.shuffle(selected)
+    return selected
+
+
 def normalize_command(command: str) -> str:
     """Trim leading/trailing whitespace and collapse repeated whitespace runs to single spaces."""
     if not isinstance(command, str):
@@ -266,6 +359,8 @@ class ProgressTracker:
         self.categories: dict[str, dict[str, int]] = {}
         self.missed_question_ids: list[str] = []
         self.completed_labs: list[str] = []
+        self.difficulty_stats: dict[str, dict[str, dict[str, object]]] = {}
+        self.mock_exam_history: list[dict[str, object]] = []
         self._known_categories = list(categories or [])
         self._load_or_initialize()
 
@@ -308,10 +403,45 @@ class ProgressTracker:
                         if isinstance(lid, str) and lid.strip() and lid not in seen_labs:
                             seen_labs.add(lid)
                             self.completed_labs.append(lid)
+
+                raw_diff = raw.get("difficulty_stats", {})
+                if isinstance(raw_diff, dict):
+                    for cat, tiers in raw_diff.items():
+                        if not isinstance(cat, str) or not isinstance(tiers, dict):
+                            continue
+                        cat_entry: dict[str, dict[str, object]] = {}
+                        for diff_name, stats in tiers.items():
+                            if diff_name not in VALID_DIFFICULTIES or not isinstance(stats, dict):
+                                continue
+                            answered = max(0, int(stats.get("answered", 0)))
+                            correct = max(0, min(answered, int(stats.get("correct", 0))))
+                            raw_uids = stats.get("unique_ids", [])
+                            unique_ids: list[str] = []
+                            if isinstance(raw_uids, list):
+                                seen_uids: set[str] = set()
+                                for uid in raw_uids:
+                                    if isinstance(uid, str) and uid.strip() and uid not in seen_uids:
+                                        seen_uids.add(uid)
+                                        unique_ids.append(uid)
+                            cat_entry[diff_name] = {
+                                "answered": answered,
+                                "correct": correct,
+                                "unique_ids": unique_ids,
+                            }
+                        if cat_entry:
+                            self.difficulty_stats[cat] = cat_entry
+
+                raw_history = raw.get("mock_exam_history", [])
+                if isinstance(raw_history, list):
+                    for item in raw_history[-50:]:
+                        if isinstance(item, dict):
+                            self.mock_exam_history.append(dict(item))
             except (OSError, ValueError, TypeError, json.JSONDecodeError):
                 self.categories = {}
                 self.missed_question_ids = []
                 self.completed_labs = []
+                self.difficulty_stats = {}
+                self.mock_exam_history = []
                 needs_save = True
         else:
             needs_save = True
@@ -331,6 +461,10 @@ class ProgressTracker:
         }
         if self.completed_labs:
             payload["completed_labs"] = self.completed_labs
+        if self.difficulty_stats:
+            payload["difficulty_stats"] = self.difficulty_stats
+        if self.mock_exam_history:
+            payload["mock_exam_history"] = self.mock_exam_history
         tmp_path = self.progress_path.with_suffix(".tmp")
         tmp_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
         tmp_path.replace(self.progress_path)
@@ -351,7 +485,12 @@ class ProgressTracker:
         """Return True if the given lab ID is marked completed."""
         return lab_id in self.completed_labs
 
-    def record_attempt(self, question: Question, is_correct: bool) -> None:
+    def record_attempt(
+        self,
+        question: Question,
+        is_correct: bool,
+        difficulty: str | None = None,
+    ) -> None:
         """Record an answered or skipped question and persist progress."""
         entry = self.categories.setdefault(question.category, {"answered": 0, "correct": 0})
         entry["answered"] += 1
@@ -362,7 +501,48 @@ class ProgressTracker:
         else:
             if question.id not in self.missed_question_ids:
                 self.missed_question_ids.append(question.id)
+
+        diff = (difficulty or question.difficulty or "").strip().lower()
+        if diff in VALID_DIFFICULTIES:
+            cat_diffs = self.difficulty_stats.setdefault(question.category, {})
+            diff_entry = cat_diffs.setdefault(
+                diff, {"answered": 0, "correct": 0, "unique_ids": []}
+            )
+            diff_entry["answered"] = int(diff_entry["answered"]) + 1
+            if is_correct:
+                diff_entry["correct"] = int(diff_entry["correct"]) + 1
+            unique_ids = diff_entry["unique_ids"]
+            if isinstance(unique_ids, list) and question.id not in unique_ids:
+                unique_ids.append(question.id)
+
         self.save()
+
+    def record_answer(
+        self,
+        question: Question,
+        is_correct: bool,
+        difficulty: str | None = None,
+    ) -> None:
+        """Alias for record_attempt() supporting explicit difficulty tracking."""
+        self.record_attempt(question, is_correct=is_correct, difficulty=difficulty)
+
+    def get_category_difficulty_stats(
+        self, category: str, difficulty: str
+    ) -> dict[str, object]:
+        """Return answered, correct, unique_answered, unique_ids, and accuracy for a tier."""
+        cat_diffs = self.difficulty_stats.get(category, {})
+        raw = cat_diffs.get(difficulty, {})
+        answered = int(raw.get("answered", 0)) if isinstance(raw, dict) else 0
+        correct = int(raw.get("correct", 0)) if isinstance(raw, dict) else 0
+        unique_ids = list(raw.get("unique_ids", [])) if isinstance(raw, dict) else []
+        accuracy = (correct / answered * 100.0) if answered > 0 else 0.0
+        return {
+            "answered": answered,
+            "correct": correct,
+            "unique_answered": len(unique_ids),
+            "unique_ids": unique_ids,
+            "accuracy": accuracy,
+        }
 
     def get_missed_questions(self, all_questions: list[Question]) -> list[Question]:
         """Return Question objects matching missed_question_ids in preserved order."""
@@ -404,12 +584,33 @@ class ProgressTracker:
             "completed_labs_count": len(self.completed_labs),
         }
 
+    def get_all_answered_ids(self) -> set[str]:
+        """Return all unique question IDs recorded across per-difficulty stats."""
+        answered: set[str] = set()
+        for tiers in self.difficulty_stats.values():
+            for stats in tiers.values():
+                raw_uids = stats.get("unique_ids", [])
+                if isinstance(raw_uids, list):
+                    for uid in raw_uids:
+                        if isinstance(uid, str):
+                            answered.add(uid)
+        return answered
+
+    def record_mock_exam(self, entry: dict[str, object]) -> None:
+        """Append a completed mock exam summary entry and persist."""
+        self.mock_exam_history.append(dict(entry))
+        if len(self.mock_exam_history) > 50:
+            self.mock_exam_history = self.mock_exam_history[-50:]
+        self.save()
+
     def reset(self, categories: list[str] | None = None) -> None:
         """Clear all recorded statistics, missed questions, and completed labs, preserving category keys."""
         cats = list(categories or self._known_categories or self.categories.keys())
         self.categories = {cat: {"answered": 0, "correct": 0} for cat in cats}
         self.missed_question_ids = []
         self.completed_labs = []
+        self.difficulty_stats = {}
+        self.mock_exam_history = []
         self.save()
 
     def reset_category(self, category: str, all_questions: list[Question]) -> None:
@@ -422,6 +623,7 @@ class ProgressTracker:
         self.missed_question_ids = [
             qid for qid in self.missed_question_ids if qid not in cat_qids
         ]
+        self.difficulty_stats.pop(category, None)
         self.save()
 
 
@@ -625,7 +827,7 @@ def run_quiz_session(
 
             if meta == "skip":
                 summary.skipped += 1
-                tracker.record_attempt(question, is_correct=False)
+                tracker.record_answer(question, is_correct=False, difficulty=question.difficulty)
                 _render_feedback_panel(console, question, status="skipped")
                 break
 
@@ -642,7 +844,7 @@ def run_quiz_session(
                 summary.answered += 1
                 if is_correct:
                     summary.correct += 1
-                tracker.record_attempt(question, is_correct=is_correct)
+                tracker.record_answer(question, is_correct=is_correct, difficulty=question.difficulty)
                 _render_feedback_panel(
                     console,
                     question,
@@ -656,7 +858,7 @@ def run_quiz_session(
             summary.answered += 1
             if is_correct:
                 summary.correct += 1
-            tracker.record_attempt(question, is_correct=is_correct)
+            tracker.record_answer(question, is_correct=is_correct, difficulty=question.difficulty)
             _render_feedback_panel(
                 console,
                 question,

@@ -7,14 +7,88 @@
   <script>
     (function () {
       try {
+        var root = document.documentElement;
         var saved = localStorage.getItem("linux_plus_theme");
-        if (saved === "osrs" || saved === "cyberpunk" || saved === "oot") {
-          document.documentElement.dataset.theme = saved;
+        var validThemes = ["osrs", "cyberpunk", "oot", "halo", "nordic", "matrix", "custom1", "custom2"];
+        if (validThemes.indexOf(saved) !== -1) {
+          root.dataset.theme = saved;
+        }
+        var rawCustom = localStorage.getItem("linux_plus_custom_ui");
+        if (rawCustom) {
+          var cfg = JSON.parse(rawCustom);
+          if (cfg && typeof cfg === "object") {
+            if (cfg.effects === false) {
+              root.dataset.effects = "off";
+            }
+            if (cfg.density === "compact") {
+              root.dataset.density = "compact";
+            }
+            if (cfg.colors && typeof cfg.colors === "object") {
+              if (cfg.colors.bg) {
+                root.style.setProperty("--bg-page", cfg.colors.bg);
+                root.style.setProperty("--bg-page-accent", cfg.colors.bg);
+              }
+              if (cfg.colors.panel) {
+                root.style.setProperty("--bg-panel", cfg.colors.panel);
+                root.style.setProperty("--bg-panel-alt", cfg.colors.panel);
+                root.style.setProperty("--bg-card", cfg.colors.panel);
+              }
+              if (cfg.colors.accent) {
+                root.style.setProperty("--accent-primary", cfg.colors.accent);
+                root.style.setProperty("--border-light", cfg.colors.accent);
+                root.style.setProperty("--border-accent", cfg.colors.accent);
+                root.style.setProperty("--text-heading", cfg.colors.accent);
+              }
+              if (cfg.colors.text) {
+                root.style.setProperty("--text-primary", cfg.colors.text);
+              }
+            }
+            var uiFonts = {
+              "modern-sans": '"Space Grotesk", "Inter", system-ui, sans-serif',
+              humanist: '"Plus Jakarta Sans", "Noto Sans", "Segoe UI", sans-serif',
+              scifi: '"Orbitron", "Eurostile", "Rajdhani", sans-serif',
+              "rpg-serif": '"Cinzel", "Palatino Linotype", Georgia, serif',
+              editorial: '"Merriweather", Georgia, "Liberation Serif", serif',
+              arcade: '"VT323", "Silkscreen", "Courier New", monospace',
+              legible: '"Atkinson Hyperlegible", Verdana, Tahoma, sans-serif',
+              rounded: '"Nunito", ui-rounded, "Trebuchet MS", sans-serif',
+              "tech-mono": '"JetBrains Mono", "Fira Code", monospace'
+            };
+            var monoFonts = {
+              jetbrains: '"JetBrains Mono", "Noto Sans Mono", monospace',
+              fira: '"Fira Code", "DejaVu Sans Mono", monospace',
+              "source-code": '"Source Code Pro", Menlo, monospace',
+              "ibm-plex": '"IBM Plex Mono", "Liberation Mono", monospace',
+              hack: 'Hack, "DejaVu Sans Mono", monospace',
+              courier: '"Courier New", Courier, monospace',
+              "retro-crt": '"VT323", "Share Tech Mono", monospace'
+            };
+            if (cfg.uiFont && uiFonts[cfg.uiFont]) {
+              root.style.setProperty("--font-ui", uiFonts[cfg.uiFont]);
+              root.dataset.customFont = "true";
+            }
+            if (cfg.monoFont && monoFonts[cfg.monoFont]) {
+              root.style.setProperty("--font-mono", monoFonts[cfg.monoFont]);
+            }
+            if (typeof cfg.fontScale === "number" && cfg.fontScale >= 85 && cfg.fontScale <= 125) {
+              root.style.setProperty("--font-scale", String(cfg.fontScale / 100));
+            }
+            if (typeof cfg.radius === "number" && cfg.radius >= 0 && cfg.radius <= 16) {
+              root.style.setProperty("--radius-panel", cfg.radius + "px");
+              root.dataset.customRadius = "true";
+            }
+          }
         }
       } catch (e) {}
     })();
   </script>
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Cinzel:wght@600;700&family=Fira+Code:wght@400;600&family=IBM+Plex+Mono:wght@400;600&family=JetBrains+Mono:wght@400;700&family=Merriweather:wght@400;700&family=Nunito:wght@500;700&family=Orbitron:wght@600;800&family=Plus+Jakarta+Sans:wght@400;600;700&family=Share+Tech+Mono&family=Source+Code+Pro:wght@400;600&family=Space+Grotesk:wght@500;700&family=VT323&display=swap"
+    media="print"
+    onload="this.media='all'"
+  >
 </head>
 <body>
   <div class="crt-overlay" aria-hidden="true"></div>
@@ -55,7 +129,32 @@
           <button type="button" class="theme-btn" data-theme-target="oot" id="btn-theme-oot">
             &#9650; Ocarina of Time
           </button>
+          <button type="button" class="theme-btn" data-theme-target="halo" id="btn-theme-halo">
+            &#9670; Halo
+          </button>
+          <button type="button" class="theme-btn" data-theme-target="nordic" id="btn-theme-nordic">
+            &#10052; Nordic
+          </button>
+          <button type="button" class="theme-btn" data-theme-target="matrix" id="btn-theme-matrix">
+            &#9635; Matrix
+          </button>
+          <button type="button" class="theme-btn" data-theme-target="custom1" id="btn-theme-custom1">
+            &#9733; Custom 1
+          </button>
+          <button type="button" class="theme-btn" data-theme-target="custom2" id="btn-theme-custom2">
+            &#9733; Custom 2
+          </button>
         </div>
+
+        <button
+          type="button"
+          class="btn btn-sm customizer-trigger-btn"
+          id="btn-open-customizer"
+          aria-controls="customizer-drawer"
+          aria-expanded="false"
+        >
+          &#9881; Customize
+        </button>
       </div>
     </div>
   </header>
@@ -65,78 +164,176 @@
 
     <!-- DASHBOARD VIEW -->
     <section id="dashboard-view" class="view">
-      <div class="panel control-panel">
-        <div class="control-row">
-          <div class="mode-block">
-            <span class="section-label">Quiz Mode</span>
-            <div class="mode-toggle" role="group" aria-label="Quiz mode toggle">
-              <button type="button" class="mode-btn active" data-mode="multiple_choice" id="mode-mc-btn">
-                Multiple Choice (A–D)
+      <!-- HUB TABS -->
+      <div class="hub-tabs-bar" role="tablist" aria-label="Training sections">
+        <button type="button" class="hub-tab-btn active" role="tab" aria-selected="true" data-hub-tab="practice" id="tab-practice">
+          Practice
+        </button>
+        <button type="button" class="hub-tab-btn" role="tab" aria-selected="false" data-hub-tab="exams" id="tab-exams">
+          Mock Exams
+        </button>
+        <button type="button" class="hub-tab-btn" role="tab" aria-selected="false" data-hub-tab="labs" id="tab-labs">
+          Sandbox Labs (<span id="tab-labs-count">0/10</span>)
+        </button>
+      </div>
+
+      <!-- TAB 1: PRACTICE -->
+      <div id="hub-panel-practice" class="hub-panel">
+        <div class="panel control-panel">
+          <div class="control-row">
+            <div class="mode-block">
+              <span class="section-label">Quiz Mode</span>
+              <div class="mode-toggle" role="group" aria-label="Quiz mode toggle">
+                <button type="button" class="mode-btn active" data-mode="multiple_choice" id="mode-mc-btn">
+                  Multiple Choice (A–D)
+                </button>
+                <button type="button" class="mode-btn" data-mode="exact_command" id="mode-exact-btn">
+                  Exact Command Entry ($)
+                </button>
+              </div>
+            </div>
+
+            <div class="mode-block">
+              <span class="section-label">Difficulty</span>
+              <div class="difficulty-toggle" role="group" aria-label="Difficulty filter">
+                <button type="button" class="diff-btn active" data-difficulty="all">
+                  All (<span id="diff-count-all">0</span>)
+                </button>
+                <button type="button" class="diff-btn" data-difficulty="beginner">
+                  Beginner (<span id="diff-count-beginner">0</span>)
+                </button>
+                <button type="button" class="diff-btn" data-difficulty="intermediate">
+                  Intermediate (<span id="diff-count-intermediate">0</span>)
+                </button>
+                <button type="button" class="diff-btn" data-difficulty="hard">
+                  Hard (<span id="diff-count-hard">0</span>)
+                </button>
+              </div>
+            </div>
+
+            <div class="mode-block">
+              <span class="section-label">Quiz Length</span>
+              <div class="length-toggle" role="group" aria-label="Quiz length">
+                <button type="button" class="length-btn" data-length="short">10 Qs</button>
+                <button type="button" class="length-btn" data-length="medium">20 Qs</button>
+                <button type="button" class="length-btn" data-length="long">40 Qs</button>
+                <button type="button" class="length-btn active" data-length="all">All</button>
+              </div>
+            </div>
+
+            <div class="quick-actions">
+              <button type="button" class="btn btn-primary" id="btn-start-all">
+                All Categories (<span id="all-count">45</span>)
               </button>
-              <button type="button" class="mode-btn" data-mode="exact_command" id="mode-exact-btn">
-                Exact Command Entry ($)
+              <button type="button" class="btn btn-warning" id="btn-start-missed">
+                Review Missed (<span id="missed-count">0</span>)
+              </button>
+              <button type="button" class="btn btn-danger" id="btn-open-reset">
+                Reset Progress
               </button>
             </div>
           </div>
+        </div>
 
-          <div class="mode-block">
-            <span class="section-label">Difficulty</span>
-            <div class="difficulty-toggle" role="group" aria-label="Difficulty filter">
-              <button type="button" class="diff-btn active" data-difficulty="all">All</button>
-              <button type="button" class="diff-btn" data-difficulty="beginner">Beginner</button>
-              <button type="button" class="diff-btn" data-difficulty="intermediate">Intermediate</button>
-              <button type="button" class="diff-btn" data-difficulty="hard">Hard</button>
+        <!-- CUSTOM MIX BUILDER -->
+        <div class="panel custom-mix-panel">
+          <div class="panel-header custom-mix-header">
+            <div>
+              <h2 class="panel-title">Custom Practice Mix</h2>
+              <p class="panel-desc">Combine multiple categories or XK0-006 exam domains into a focused drill.</p>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-toggle-custom-mix" aria-expanded="false">
+              Configure Mix
+            </button>
+          </div>
+          <div id="custom-mix-body" class="custom-mix-body hidden">
+            <div class="custom-mix-columns">
+              <div class="custom-mix-col">
+                <span class="section-label">Categories</span>
+                <div id="custom-mix-categories" class="chip-grid"></div>
+              </div>
+              <div class="custom-mix-col">
+                <span class="section-label">XK0-006 Domains</span>
+                <div id="custom-mix-domains" class="chip-grid"></div>
+              </div>
+            </div>
+            <div class="custom-mix-footer">
+              <span class="custom-mix-summary" id="custom-mix-summary">Select categories or domains above to build a mix.</span>
+              <div class="action-buttons">
+                <button type="button" class="btn btn-ghost btn-sm" id="btn-clear-custom-mix">Clear</button>
+                <button type="button" class="btn btn-primary" id="btn-start-custom-mix" disabled>Start Custom Quiz</button>
+              </div>
             </div>
           </div>
-
-          <div class="quick-actions">
-            <button type="button" class="btn btn-primary" id="btn-start-all">
-              All Categories (<span id="all-count">45</span>)
-            </button>
-            <button type="button" class="btn btn-warning" id="btn-start-missed">
-              Review Missed (<span id="missed-count">0</span>)
-            </button>
-            <button type="button" class="btn btn-danger" id="btn-open-reset">
-              Reset Progress
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel skills-panel">
-        <div class="panel-header">
-          <div>
-            <h2 class="panel-title">Skill Disciplines &amp; Category Progress</h2>
-            <p class="panel-desc">Choose any XK0-006 discipline to train and level up your command mastery.</p>
-          </div>
-          <div class="overall-summary-text">
-            Answered: <strong id="overall-answered">0</strong> &bull;
-            Correct: <strong id="overall-correct">0</strong>
-          </div>
         </div>
 
-        <div id="categories-grid" class="categories-grid"></div>
-      </div>
-
-      <!-- SANDBOX LABS SECTION -->
-      <div class="panel labs-panel" id="sandbox-labs-panel">
-        <div class="panel-header">
-          <div>
-            <h2 class="panel-title">Sandbox Labs (Hands-On Terminal)</h2>
-            <p class="panel-desc">Practice real Bash commands inside an isolated temporary Linux workspace with live filesystem verification.</p>
-          </div>
-          <div class="sandbox-labs-meta">
+        <div class="panel skills-panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Skill Disciplines &amp; Category Progress</h2>
+              <p class="panel-desc">Choose any XK0-006 discipline to train and level up your command mastery.</p>
+            </div>
             <div class="overall-summary-text">
-              Labs Completed: <strong id="labs-completed-count">0</strong> / <strong id="labs-total-count">10</strong>
-            </div>
-            <div class="sandbox-backend-bar">
-              <span class="badge badge-backend" id="dashboard-backend-badge" title="Active sandbox backend">Native Bash</span>
-              <div class="backend-toggle" id="dashboard-backend-toggle" role="group" aria-label="Sandbox backend"></div>
+              Answered: <strong id="overall-answered">0</strong> &bull;
+              Correct: <strong id="overall-correct">0</strong>
             </div>
           </div>
+
+          <div id="categories-grid" class="categories-grid"></div>
+        </div>
+      </div>
+
+      <!-- TAB 2: MOCK EXAMS -->
+      <div id="hub-panel-exams" class="hub-panel hidden">
+        <div class="panel exams-intro-panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">CompTIA Linux+ (XK0-006) Weighted Mock Exams</h2>
+              <p class="panel-desc">
+                Timed, proctored-style exams matching official XK0-006 domain weights. Passing scaled score: <strong>720 / 900</strong>.
+              </p>
+            </div>
+            <div class="overall-summary-text">
+              Attempts: <strong id="exam-attempts-count">0</strong>
+            </div>
+          </div>
+          <div id="exam-weights-bar" class="exam-weights-bar"></div>
         </div>
 
-        <div id="labs-grid" class="labs-grid"></div>
+        <div id="exam-presets-grid" class="exam-presets-grid"></div>
+
+        <div class="panel exam-history-panel">
+          <div class="panel-header">
+            <div>
+              <h3 class="panel-title">Recent Mock Exam History</h3>
+              <p class="panel-desc">Your completed timed exams and scaled scores.</p>
+            </div>
+          </div>
+          <div id="exam-history-list" class="exam-history-list"></div>
+        </div>
+      </div>
+
+      <!-- TAB 3: SANDBOX LABS SECTION -->
+      <div id="hub-panel-labs" class="hub-panel hidden">
+        <div class="panel labs-panel" id="sandbox-labs-panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Sandbox Labs (Hands-On Terminal)</h2>
+              <p class="panel-desc">Practice real Bash commands inside an isolated temporary Linux workspace with live filesystem verification.</p>
+            </div>
+            <div class="sandbox-labs-meta">
+              <div class="overall-summary-text">
+                Labs Completed: <strong id="labs-completed-count">0</strong> / <strong id="labs-total-count">10</strong>
+              </div>
+              <div class="sandbox-backend-bar">
+                <span class="badge badge-backend" id="dashboard-backend-badge" title="Active sandbox backend">Native Bash</span>
+                <div class="backend-toggle" id="dashboard-backend-toggle" role="group" aria-label="Sandbox backend"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="labs-grid" class="labs-grid"></div>
+        </div>
       </div>
     </section>
 
@@ -360,7 +557,133 @@
         </div>
       </div>
     </section>
+
+    <!-- ACTIVE MOCK EXAM VIEW -->
+    <section id="exam-view" class="view hidden">
+      <div class="quiz-topbar panel exam-topbar">
+        <div class="quiz-topbar-row">
+          <button type="button" class="btn btn-ghost" id="btn-exam-exit">&larr; Exit Exam</button>
+          <div class="quiz-meta-tags">
+            <span class="badge badge-scope" id="exam-title-badge">Mock Exam A</span>
+            <span class="badge badge-domain" id="exam-domain-badge">1.0 System Management</span>
+            <span class="badge badge-difficulty" id="exam-difficulty-badge">Intermediate</span>
+          </div>
+          <div class="exam-timer-group">
+            <span id="exam-counter">Question 1 / 90</span>
+            <span class="exam-timer-pill" id="exam-timer-display">90:00</span>
+            <button type="button" class="btn btn-primary btn-sm" id="btn-exam-submit-open">Submit Exam</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="exam-workspace">
+        <div class="panel question-panel exam-question-panel">
+          <div class="exam-question-head">
+            <p class="scenario-label">EXAM QUESTION <span id="exam-q-num">1</span></p>
+            <button type="button" class="btn btn-ghost btn-sm" id="btn-exam-flag">
+              &#9873; Flag for Review
+            </button>
+          </div>
+          <p id="exam-question-prompt" class="question-prompt"></p>
+          <div id="exam-mc-options" class="mc-grid"></div>
+          <div class="exam-nav-actions">
+            <button type="button" class="btn btn-secondary" id="btn-exam-prev">&larr; Previous</button>
+            <button type="button" class="btn btn-primary" id="btn-exam-next">Next &rarr;</button>
+          </div>
+        </div>
+
+        <aside class="panel exam-navigator-panel">
+          <div class="exam-nav-header">
+            <h3 class="panel-title">Navigator</h3>
+            <span class="exam-nav-counts" id="exam-nav-counts">0 / 90 answered</span>
+          </div>
+          <div class="exam-nav-legend">
+            <span><i class="nav-dot current"></i> Current</span>
+            <span><i class="nav-dot answered"></i> Answered</span>
+            <span><i class="nav-dot flagged"></i> Flagged</span>
+          </div>
+          <div id="exam-navigator-grid" class="exam-navigator-grid"></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- MOCK EXAM SCORECARD VIEW -->
+    <section id="exam-scorecard-view" class="view hidden">
+      <div class="panel scorecard-hero-panel">
+        <div class="scorecard-hero-top">
+          <div>
+            <span class="section-label" id="scorecard-subtitle">Mock Exam Complete</span>
+            <h2 class="panel-title" id="scorecard-title">Mock Exam A</h2>
+          </div>
+          <div class="scorecard-badge-wrap">
+            <span class="scorecard-pass-badge" id="scorecard-pass-badge">PASS</span>
+            <div class="scorecard-scaled-score">
+              <strong id="scorecard-scaled">780</strong>
+              <span>/ 900 (720 to pass)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-stats-grid">
+          <div class="summary-stat-card">
+            <span class="stat-caption">Correct</span>
+            <strong class="stat-value" id="scorecard-correct">0 / 90</strong>
+          </div>
+          <div class="summary-stat-card">
+            <span class="stat-caption">Accuracy</span>
+            <strong class="stat-value" id="scorecard-accuracy">0.0%</strong>
+          </div>
+          <div class="summary-stat-card">
+            <span class="stat-caption">Answered</span>
+            <strong class="stat-value" id="scorecard-answered">90 / 90</strong>
+          </div>
+          <div class="summary-stat-card">
+            <span class="stat-caption">Time Used</span>
+            <strong class="stat-value" id="scorecard-time">00:00</strong>
+          </div>
+        </div>
+
+        <div class="scorecard-domains">
+          <h3 class="panel-title">XK0-006 Domain Breakdown</h3>
+          <div id="scorecard-domain-bars" class="scorecard-domain-bars"></div>
+        </div>
+
+        <div class="summary-actions">
+          <button type="button" class="btn btn-primary" id="btn-scorecard-retake">Retake This Exam</button>
+          <button type="button" class="btn btn-ghost" id="btn-scorecard-dashboard">Back to Mock Exams</button>
+        </div>
+      </div>
+
+      <div class="panel scorecard-review-panel">
+        <div class="panel-header">
+          <div>
+            <h3 class="panel-title">Question-by-Question Review</h3>
+            <p class="panel-desc">Inspect explanations for every item or filter to missed and flagged questions.</p>
+          </div>
+          <div class="review-filter-group" role="group" aria-label="Review filter">
+            <button type="button" class="diff-btn active" data-review-filter="all">All</button>
+            <button type="button" class="diff-btn" data-review-filter="missed">Missed</button>
+            <button type="button" class="diff-btn" data-review-filter="flagged">Flagged</button>
+          </div>
+        </div>
+        <div id="scorecard-review-list" class="scorecard-review-list"></div>
+      </div>
+    </section>
   </main>
+
+  <!-- EXAM SUBMIT CONFIRMATION MODAL -->
+  <div id="exam-submit-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="exam-submit-modal-title">
+    <div class="panel modal-card">
+      <h3 id="exam-submit-modal-title" class="panel-title">Submit Mock Exam?</h3>
+      <p id="exam-submit-modal-body" class="modal-body-text">
+        Are you ready to score your exam?
+      </p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="btn-cancel-exam-submit">Keep Reviewing</button>
+        <button type="button" class="btn btn-primary" id="btn-confirm-exam-submit">Submit &amp; Score</button>
+      </div>
+    </div>
+  </div>
 
   <!-- RESET CONFIRMATION MODAL -->
   <div id="reset-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="reset-modal-title">
@@ -375,6 +698,221 @@
       </div>
     </div>
   </div>
+
+  <!-- APPEARANCE CUSTOMIZER DRAWER -->
+  <div id="customizer-backdrop" class="customizer-backdrop hidden" aria-hidden="true"></div>
+  <aside
+    id="customizer-drawer"
+    class="customizer-drawer hidden"
+    role="dialog"
+    aria-modal="false"
+    aria-labelledby="customizer-title"
+  >
+    <div class="customizer-header">
+      <div>
+        <h2 id="customizer-title" class="panel-title">Appearance Customizer</h2>
+        <p class="customizer-subtitle">Live preview — changes apply without interrupting your session.</p>
+      </div>
+      <button type="button" class="btn btn-ghost btn-sm" id="btn-close-customizer" aria-label="Close customizer">
+        &#10005;
+      </button>
+    </div>
+
+    <div class="customizer-body">
+      <div class="customizer-section">
+        <span class="section-label">Color Theme Presets</span>
+        <div class="preset-grid" role="group" aria-label="Color theme presets">
+          <button type="button" class="preset-btn" data-theme-preset="osrs">&#9876; OSRS</button>
+          <button type="button" class="preset-btn" data-theme-preset="cyberpunk">&#9889; Cyberpunk</button>
+          <button type="button" class="preset-btn" data-theme-preset="oot">&#9650; Ocarina of Time</button>
+          <button type="button" class="preset-btn" data-theme-preset="halo">&#9670; Halo</button>
+          <button type="button" class="preset-btn" data-theme-preset="nordic">&#10052; Nordic Dark</button>
+          <button type="button" class="preset-btn" data-theme-preset="matrix">&#9635; Matrix Green</button>
+          <button type="button" class="preset-btn" data-theme-preset="custom1">&#9733; Custom 1</button>
+          <button type="button" class="preset-btn" data-theme-preset="custom2">&#9733; Custom 2</button>
+        </div>
+        <div class="save-slots-bar">
+          <span class="save-slots-label">Save Current Look To:</span>
+          <div class="save-slots-actions">
+            <button type="button" class="btn btn-sm save-slot-btn" id="btn-save-custom1">Custom 1</button>
+            <button type="button" class="btn btn-sm save-slot-btn" id="btn-save-custom2">Custom 2</button>
+          </div>
+          <span id="custom-slot-status" class="slot-status-msg" aria-live="polite"></span>
+        </div>
+      </div>
+
+      <div class="customizer-section">
+        <span class="section-label">Custom Color Overrides</span>
+        <div class="color-target-grid" role="group" aria-label="Color override target">
+          <button type="button" class="color-target-btn" data-color-target="bg">
+            <span class="color-swatch" id="swatch-bg"></span>
+            <span class="color-target-meta">
+              <span class="color-target-name">Background</span>
+              <code id="hex-bg">#060811</code>
+            </span>
+          </button>
+          <button type="button" class="color-target-btn" data-color-target="panel">
+            <span class="color-swatch" id="swatch-panel"></span>
+            <span class="color-target-meta">
+              <span class="color-target-name">Panel / Card</span>
+              <code id="hex-panel">#0c111e</code>
+            </span>
+          </button>
+          <button type="button" class="color-target-btn active" data-color-target="accent">
+            <span class="color-swatch" id="swatch-accent"></span>
+            <span class="color-target-meta">
+              <span class="color-target-name">Accent</span>
+              <code id="hex-accent">#00f0ff</code>
+            </span>
+          </button>
+          <button type="button" class="color-target-btn" data-color-target="text">
+            <span class="color-swatch" id="swatch-text"></span>
+            <span class="color-target-meta">
+              <span class="color-target-name">Primary Text</span>
+              <code id="hex-text">#e6f7ff</code>
+            </span>
+          </button>
+        </div>
+
+        <div class="inline-color-editor">
+          <div class="editor-top-row">
+            <span class="color-swatch editor-swatch" id="editor-color-swatch"></span>
+            <input
+              type="text"
+              id="editor-hex-input"
+              class="editor-hex-input"
+              value="#00f0ff"
+              maxlength="7"
+              spellcheck="false"
+              aria-label="Hex color code"
+            >
+            <div class="color-mode-toggle" role="group" aria-label="Color slider mode">
+              <button type="button" class="color-mode-btn active" data-color-mode="hsb">HSB</button>
+              <button type="button" class="color-mode-btn" data-color-mode="rgb">RGB</button>
+            </div>
+          </div>
+
+          <div id="color-sliders-hsb" class="slider-group">
+            <div class="customizer-field">
+              <div class="range-header">
+                <label for="slider-h">Hue</label>
+                <code id="val-h">184&deg;</code>
+              </div>
+              <input type="range" id="slider-h" class="customizer-range hue-slider" min="0" max="360" step="1" value="184">
+            </div>
+            <div class="customizer-field">
+              <div class="range-header">
+                <label for="slider-s">Saturation</label>
+                <code id="val-s">100%</code>
+              </div>
+              <input type="range" id="slider-s" class="customizer-range" min="0" max="100" step="1" value="100">
+            </div>
+            <div class="customizer-field">
+              <div class="range-header">
+                <label for="slider-b">Brightness</label>
+                <code id="val-b">100%</code>
+              </div>
+              <input type="range" id="slider-b" class="customizer-range" min="0" max="100" step="1" value="100">
+            </div>
+          </div>
+
+          <div id="color-sliders-rgb" class="slider-group hidden">
+            <div class="customizer-field">
+              <div class="range-header">
+                <label for="slider-r">Red</label>
+                <code id="val-r">0</code>
+              </div>
+              <input type="range" id="slider-r" class="customizer-range" min="0" max="255" step="1" value="0">
+            </div>
+            <div class="customizer-field">
+              <div class="range-header">
+                <label for="slider-g">Green</label>
+                <code id="val-g">240</code>
+              </div>
+              <input type="range" id="slider-g" class="customizer-range" min="0" max="255" step="1" value="240">
+            </div>
+            <div class="customizer-field">
+              <div class="range-header">
+                <label for="slider-b-rgb">Blue</label>
+                <code id="val-b-rgb">255</code>
+              </div>
+              <input type="range" id="slider-b-rgb" class="customizer-range" min="0" max="255" step="1" value="255">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="customizer-section">
+        <span class="section-label">Typography &amp; Sizing</span>
+        <div class="customizer-field">
+          <label for="custom-ui-font">UI Font Family</label>
+          <select id="custom-ui-font" class="customizer-select">
+            <option value="default">Theme Default</option>
+            <option value="modern-sans">Modern Sans (Space Grotesk)</option>
+            <option value="humanist">Clean Humanist (Jakarta Sans)</option>
+            <option value="scifi">Sci-Fi / HUD (Orbitron)</option>
+            <option value="rpg-serif">Fantasy / RPG Serif (Cinzel)</option>
+            <option value="editorial">Classic Editorial (Merriweather)</option>
+            <option value="arcade">Retro Arcade / Pixel (VT323)</option>
+            <option value="legible">High-Legibility (Atkinson)</option>
+            <option value="rounded">Rounded Friendly (Nunito)</option>
+            <option value="tech-mono">Tech Monospace (JetBrains Mono)</option>
+          </select>
+        </div>
+        <div class="customizer-field">
+          <label for="custom-mono-font">Terminal / Command Font</label>
+          <select id="custom-mono-font" class="customizer-select">
+            <option value="default">Theme Default</option>
+            <option value="jetbrains">JetBrains Mono</option>
+            <option value="fira">Fira Code</option>
+            <option value="source-code">Source Code Pro</option>
+            <option value="ibm-plex">IBM Plex Mono</option>
+            <option value="hack">Hack / DejaVu Mono</option>
+            <option value="courier">Classic Courier</option>
+            <option value="retro-crt">Retro CRT (VT323)</option>
+          </select>
+        </div>
+        <div class="customizer-field">
+          <div class="range-header">
+            <label for="custom-font-scale">Font Scale</label>
+            <code id="custom-font-scale-val">100%</code>
+          </div>
+          <input type="range" id="custom-font-scale" class="customizer-range" min="85" max="125" step="5" value="100">
+        </div>
+      </div>
+
+      <div class="customizer-section">
+        <span class="section-label">Layout &amp; Visual Effects</span>
+        <div class="customizer-field">
+          <div class="range-header">
+            <label for="custom-radius">Corner Roundness</label>
+            <code id="custom-radius-val">Default</code>
+          </div>
+          <input type="range" id="custom-radius" class="customizer-range" min="0" max="16" step="1" value="4">
+        </div>
+        <label class="toggle-row" for="custom-effects-toggle">
+          <span>CRT Scanlines &amp; Decorative Glows</span>
+          <input type="checkbox" id="custom-effects-toggle" checked>
+        </label>
+        <div class="customizer-field">
+          <span class="field-sub-label">Spacing Density</span>
+          <div class="density-toggle" role="group" aria-label="Spacing density">
+            <button type="button" class="density-btn active" data-density-target="comfortable">Comfortable</button>
+            <button type="button" class="density-btn" data-density-target="compact">Compact</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="customizer-footer">
+      <button type="button" class="btn btn-primary" id="btn-randomize-customizer">
+        &#127922; Randomize
+      </button>
+      <button type="button" class="btn btn-warning" id="btn-reset-customizer">
+        Reset Defaults
+      </button>
+    </div>
+  </aside>
 
   <script src="{{ url_for('static', filename='app.js') }}" defer></script>
 </body>

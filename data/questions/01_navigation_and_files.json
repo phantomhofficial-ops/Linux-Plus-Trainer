@@ -750,5 +750,423 @@
     ],
     "hint": "Redirect stdout to /dev/null first, then duplicate FD 1 onto FD 2 with 2>&1.",
     "explanation": "Domain 1.0 (System Management): POSIX redirections evaluate left to right. `> /dev/null 2>&1` redirects FD 1 to `/dev/null` and then copies FD 1 to FD 2, silencing both streams cleanly in `/bin/sh` as well as Bash."
+  },
+  {
+    "id": "nav_34",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "beginner",
+    "prompt": "Display detailed inode, size, and timestamp metadata for '/etc/ssh/sshd_config'.",
+    "choices": [
+      "stat /etc/ssh/sshd_config",
+      "file /etc/ssh/sshd_config",
+      "ls -i /etc/ssh/sshd_config",
+      "df /etc/ssh/sshd_config"
+    ],
+    "correct_choice": "stat /etc/ssh/sshd_config",
+    "accepted_commands": [
+      "stat /etc/ssh/sshd_config"
+    ],
+    "hint": "Use the utility that prints full filesystem status and timestamps.",
+    "explanation": "stat displays file size, blocks, inode number, permissions, and access/modify/change timestamps (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "nav_35",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "beginner",
+    "prompt": "Determine the actual file type and encoding of '/opt/bin/mystery_blob' regardless of its filename.",
+    "choices": [
+      "file /opt/bin/mystery_blob",
+      "stat /opt/bin/mystery_blob",
+      "head /opt/bin/mystery_blob",
+      "which /opt/bin/mystery_blob"
+    ],
+    "correct_choice": "file /opt/bin/mystery_blob",
+    "accepted_commands": [
+      "file /opt/bin/mystery_blob"
+    ],
+    "hint": "This command inspects magic bytes rather than the file extension.",
+    "explanation": "file inspects magic numbers and content headers to identify ELF binaries, scripts, archives, or text files (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "nav_36",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "beginner",
+    "prompt": "Display only the first 15 lines of '/var/log/boot.log'.",
+    "choices": [
+      "head -n 15 /var/log/boot.log",
+      "tail -n 15 /var/log/boot.log",
+      "cat -n 15 /var/log/boot.log",
+      "sed -n 15p /var/log/boot.log"
+    ],
+    "correct_choice": "head -n 15 /var/log/boot.log",
+    "accepted_commands": [
+      "head -n 15 /var/log/boot.log",
+      "head -15 /var/log/boot.log"
+    ],
+    "hint": "Use head with a line count flag.",
+    "explanation": "head -n 15 prints the first 15 lines of a file, whereas tail -n 15 prints the last 15 lines (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "nav_37",
+    "domain": "5.0 Troubleshooting",
+    "category": "Navigation & File Management",
+    "difficulty": "beginner",
+    "prompt": "Continuously monitor '/var/log/nginx/access.log' in real time as new lines are appended.",
+    "choices": [
+      "tail -f /var/log/nginx/access.log",
+      "head -f /var/log/nginx/access.log",
+      "cat -f /var/log/nginx/access.log",
+      "less /var/log/nginx/access.log"
+    ],
+    "correct_choice": "tail -f /var/log/nginx/access.log",
+    "accepted_commands": [
+      "tail -f /var/log/nginx/access.log",
+      "tail --follow /var/log/nginx/access.log"
+    ],
+    "hint": "Use tail with the follow flag.",
+    "explanation": "tail -f follows a growing log file and prints new lines as they are written (XK0-006 Domain 5.0)."
+  },
+  {
+    "id": "nav_38",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "beginner",
+    "prompt": "Extract only the filename portion from the path '/var/log/nginx/error.log'.",
+    "choices": [
+      "basename /var/log/nginx/error.log",
+      "dirname /var/log/nginx/error.log",
+      "readlink /var/log/nginx/error.log",
+      "realpath /var/log/nginx/error.log"
+    ],
+    "correct_choice": "basename /var/log/nginx/error.log",
+    "accepted_commands": [
+      "basename /var/log/nginx/error.log"
+    ],
+    "hint": "Opposite of dirname.",
+    "explanation": "basename strips leading directory components and returns just 'error.log' (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "nav_39",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "beginner",
+    "prompt": "Print only the parent directory path of '/etc/systemd/system/app.service'.",
+    "choices": [
+      "dirname /etc/systemd/system/app.service",
+      "basename /etc/systemd/system/app.service",
+      "pwd /etc/systemd/system/app.service",
+      "ls -d /etc/systemd/system/app.service"
+    ],
+    "correct_choice": "dirname /etc/systemd/system/app.service",
+    "accepted_commands": [
+      "dirname /etc/systemd/system/app.service"
+    ],
+    "hint": "Use the path utility that strips the final filename component.",
+    "explanation": "dirname removes the trailing filename and outputs '/etc/systemd/system' (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "nav_40",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "intermediate",
+    "prompt": "Create '/srv/app/dev', '/srv/app/stage', and '/srv/app/prod' in a single mkdir command using Bash brace expansion.",
+    "choices": [
+      "mkdir -p /srv/app/{dev,stage,prod}",
+      "mkdir /srv/app/[dev,stage,prod]",
+      "mkdir -r /srv/app/(dev,stage,prod)",
+      "mkdir -p /srv/app/dev;stage;prod"
+    ],
+    "correct_choice": "mkdir -p /srv/app/{dev,stage,prod}",
+    "accepted_commands": [
+      "mkdir -p /srv/app/{dev,stage,prod}",
+      "mkdir -p /srv/app/dev /srv/app/stage /srv/app/prod"
+    ],
+    "hint": "Combine mkdir -p with curly braces {a,b,c}.",
+    "explanation": "Bash brace expansion expands {dev,stage,prod} into three separate arguments before mkdir -p runs (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "nav_41",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "intermediate",
+    "prompt": "Convert all lowercase letters in '/tmp/raw.txt' to uppercase using tr and redirect to '/tmp/upper.txt'.",
+    "choices": [
+      "tr 'a-z' 'A-Z' < /tmp/raw.txt > /tmp/upper.txt",
+      "tr -u /tmp/raw.txt > /tmp/upper.txt",
+      "sed 'a-z/A-Z' /tmp/raw.txt > /tmp/upper.txt",
+      "awk '{upper($0)}' /tmp/raw.txt > /tmp/upper.txt"
+    ],
+    "correct_choice": "tr 'a-z' 'A-Z' < /tmp/raw.txt > /tmp/upper.txt",
+    "accepted_commands": [
+      "tr 'a-z' 'A-Z' < /tmp/raw.txt > /tmp/upper.txt",
+      "tr '[:lower:]' '[:upper:]' < /tmp/raw.txt > /tmp/upper.txt",
+      "cat /tmp/raw.txt | tr 'a-z' 'A-Z' > /tmp/upper.txt"
+    ],
+    "hint": "tr reads from standard input, not a filename argument.",
+    "explanation": "tr translates character sets from stdin; redirecting input with < and output with > converts lowercase to uppercase (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "nav_42",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "intermediate",
+    "prompt": "Extract only fields 1 and 3 (username and UID) from '/etc/passwd' using colon as the delimiter.",
+    "choices": [
+      "cut -d: -f1,3 /etc/passwd",
+      "cut -f1,3 /etc/passwd",
+      "grep -f1,3 /etc/passwd",
+      "sort -t: -k1,3 /etc/passwd"
+    ],
+    "correct_choice": "cut -d: -f1,3 /etc/passwd",
+    "accepted_commands": [
+      "cut -d: -f1,3 /etc/passwd",
+      "cut -d ':' -f 1,3 /etc/passwd",
+      "cut -d':' -f1,3 /etc/passwd"
+    ],
+    "hint": "Use cut with -d for delimiter and -f for fields.",
+    "explanation": "cut -d: -f1,3 splits each line on ':' and outputs the first and third columns (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "nav_43",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "intermediate",
+    "prompt": "Merge '/tmp/hosts.txt' and '/tmp/ports.txt' line-by-line side-by-side separated by tabs.",
+    "choices": [
+      "paste /tmp/hosts.txt /tmp/ports.txt",
+      "cat /tmp/hosts.txt /tmp/ports.txt",
+      "join /tmp/hosts.txt /tmp/ports.txt",
+      "diff /tmp/hosts.txt /tmp/ports.txt"
+    ],
+    "correct_choice": "paste /tmp/hosts.txt /tmp/ports.txt",
+    "accepted_commands": [
+      "paste /tmp/hosts.txt /tmp/ports.txt"
+    ],
+    "hint": "cat stacks files vertically; this command merges them horizontally.",
+    "explanation": "paste combines corresponding lines from multiple files side-by-side separated by tabs (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "nav_44",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "intermediate",
+    "prompt": "Split '/var/log/big_audit.log' into chunks of 1000 lines each with prefix 'audit_part_'.",
+    "choices": [
+      "split -l 1000 /var/log/big_audit.log audit_part_",
+      "cut -l 1000 /var/log/big_audit.log audit_part_",
+      "head -l 1000 /var/log/big_audit.log audit_part_",
+      "tar -l 1000 /var/log/big_audit.log audit_part_"
+    ],
+    "correct_choice": "split -l 1000 /var/log/big_audit.log audit_part_",
+    "accepted_commands": [
+      "split -l 1000 /var/log/big_audit.log audit_part_"
+    ],
+    "hint": "Use split with -l for line count per output file.",
+    "explanation": "split -l 1000 divides a large file into 1000-line pieces named audit_part_aa, audit_part_ab, etc. (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "nav_45",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "intermediate",
+    "prompt": "Compress '/var/log/messages.1' with gzip while keeping the original uncompressed file intact.",
+    "choices": [
+      "gzip -k /var/log/messages.1",
+      "gzip -d /var/log/messages.1",
+      "gzip -r /var/log/messages.1",
+      "gzip -f /var/log/messages.1"
+    ],
+    "correct_choice": "gzip -k /var/log/messages.1",
+    "accepted_commands": [
+      "gzip -k /var/log/messages.1",
+      "gzip --keep /var/log/messages.1"
+    ],
+    "hint": "By default gzip deletes the source file; pass the keep flag.",
+    "explanation": "gzip -k (--keep) creates messages.1.gz without deleting /var/log/messages.1 (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "nav_46",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "intermediate",
+    "prompt": "Decompress the bzip2-compressed file '/tmp/report.csv.bz2' in place.",
+    "choices": [
+      "bzip2 -d /tmp/report.csv.bz2",
+      "gzip -d /tmp/report.csv.bz2",
+      "xz -d /tmp/report.csv.bz2",
+      "bzip2 -z /tmp/report.csv.bz2"
+    ],
+    "correct_choice": "bzip2 -d /tmp/report.csv.bz2",
+    "accepted_commands": [
+      "bzip2 -d /tmp/report.csv.bz2",
+      "bunzip2 /tmp/report.csv.bz2"
+    ],
+    "hint": "Use bzip2 with -d (or bunzip2).",
+    "explanation": "bzip2 -d (or bunzip2) decompresses a .bz2 file back to /tmp/report.csv (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "nav_47",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "hard",
+    "prompt": "Find all regular files under '/etc/nginx' excluding any file ending in '.bak'.",
+    "choices": [
+      "find /etc/nginx -type f -not -name '*.bak'",
+      "find /etc/nginx -type f -exclude '*.bak'",
+      "find /etc/nginx -type f -v '*.bak'",
+      "find /etc/nginx -name '!*.bak'"
+    ],
+    "correct_choice": "find /etc/nginx -type f -not -name '*.bak'",
+    "accepted_commands": [
+      "find /etc/nginx -type f -not -name '*.bak'",
+      "find /etc/nginx -type f ! -name '*.bak'",
+      "find /etc/nginx -type f -not -name \"*.bak\"",
+      "find /etc/nginx -type f ! -name \"*.bak\""
+    ],
+    "hint": "Use find's -not (or !) negation operator before -name.",
+    "explanation": "find supports boolean negation with -not or ! to exclude matching filenames (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "nav_48",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "hard",
+    "prompt": "Find all files under '/var/www' ending in either '.html' or '.css' using find's OR operator.",
+    "choices": [
+      "find /var/www -type f \\( -name '*.html' -o -name '*.css' \\)",
+      "find /var/www -type f -name '*.html' -and -name '*.css'",
+      "find /var/www -type f -name '*.html|*.css'",
+      "find /var/www -type f -or '*.html' '*.css'"
+    ],
+    "correct_choice": "find /var/www -type f \\( -name '*.html' -o -name '*.css' \\)",
+    "accepted_commands": [
+      "find /var/www -type f \\( -name '*.html' -o -name '*.css' \\)",
+      "find /var/www -type f \\( -name '*.html' -or -name '*.css' \\)"
+    ],
+    "hint": "Group the two -name predicates in escaped parentheses with -o.",
+    "explanation": "Parentheses group precedence so -type f applies to both -name '*.html' and -name '*.css' joined by -o/-or (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "nav_49",
+    "domain": "5.0 Troubleshooting",
+    "category": "Navigation & File Management",
+    "difficulty": "hard",
+    "prompt": "Find regular files under '/var/log' that are both larger than 10MB and modified in the last 24 hours.",
+    "choices": [
+      "find /var/log -type f -size +10M -mtime -1",
+      "find /var/log -type f -size 10M -mtime +1",
+      "find /var/log -type f -size +10M -or -mtime -1",
+      "find /var/log -type f -gt 10M -age 1"
+    ],
+    "correct_choice": "find /var/log -type f -size +10M -mtime -1",
+    "accepted_commands": [
+      "find /var/log -type f -size +10M -mtime -1",
+      "find /var/log -type f -and -size +10M -and -mtime -1"
+    ],
+    "hint": "Adjacent find predicates are implicitly ANDed; -mtime -1 means less than 1 day ago.",
+    "explanation": "find combines predicates with implicit -and; +10M matches >10 MiB and -mtime -1 matches files modified within 24 hours (XK0-006 Domain 5.0)."
+  },
+  {
+    "id": "nav_50",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "hard",
+    "prompt": "Create an xz-compressed tar archive '/backup/etc.tar.xz' of '/etc/nginx'.",
+    "choices": [
+      "tar -cJf /backup/etc.tar.xz /etc/nginx",
+      "tar -czf /backup/etc.tar.xz /etc/nginx",
+      "tar -cjf /backup/etc.tar.xz /etc/nginx",
+      "tar -xJf /backup/etc.tar.xz /etc/nginx"
+    ],
+    "correct_choice": "tar -cJf /backup/etc.tar.xz /etc/nginx",
+    "accepted_commands": [
+      "tar -cJf /backup/etc.tar.xz /etc/nginx",
+      "tar -Jcf /backup/etc.tar.xz /etc/nginx"
+    ],
+    "hint": "Uppercase -J selects xz compression in tar.",
+    "explanation": "In tar, -z is gzip, -j is bzip2, and -J is xz compression (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "nav_51",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "hard",
+    "prompt": "Extract the bzip2-compressed tar archive '/backup/logs.tar.bz2' into '/tmp/restore'.",
+    "choices": [
+      "tar -xjf /backup/logs.tar.bz2 -C /tmp/restore",
+      "tar -xzf /backup/logs.tar.bz2 -C /tmp/restore",
+      "tar -cjf /backup/logs.tar.bz2 -C /tmp/restore",
+      "tar -xJf /backup/logs.tar.bz2 -C /tmp/restore"
+    ],
+    "correct_choice": "tar -xjf /backup/logs.tar.bz2 -C /tmp/restore",
+    "accepted_commands": [
+      "tar -xjf /backup/logs.tar.bz2 -C /tmp/restore",
+      "tar -xf /backup/logs.tar.bz2 -C /tmp/restore"
+    ],
+    "hint": "Use -j for bzip2 and -C for the destination directory.",
+    "explanation": "tar -xjf extracts a .tar.bz2 archive, and -C changes to /tmp/restore before extracting (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "nav_52",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "hard",
+    "prompt": "Perform a relational join on sorted files '/tmp/users.txt' and '/tmp/depts.txt' matching on their first field.",
+    "choices": [
+      "join /tmp/users.txt /tmp/depts.txt",
+      "paste /tmp/users.txt /tmp/depts.txt",
+      "merge /tmp/users.txt /tmp/depts.txt",
+      "comm /tmp/users.txt /tmp/depts.txt"
+    ],
+    "correct_choice": "join /tmp/users.txt /tmp/depts.txt",
+    "accepted_commands": [
+      "join /tmp/users.txt /tmp/depts.txt",
+      "join -1 1 -2 1 /tmp/users.txt /tmp/depts.txt"
+    ],
+    "hint": "This command combines lines of two sorted files on a common key field.",
+    "explanation": "join matches lines from two sorted files sharing a common key field (field 1 by default) (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "nav_53",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "hard",
+    "prompt": "Create a cpio archive '/backup/conf.cpio' from a list of '.conf' files found under '/etc/app'.",
+    "choices": [
+      "find /etc/app -name '*.conf' | cpio -o > /backup/conf.cpio",
+      "find /etc/app -name '*.conf' | cpio -i > /backup/conf.cpio",
+      "tar /etc/app -name '*.conf' | cpio -o > /backup/conf.cpio",
+      "cpio -c /etc/app/*.conf /backup/conf.cpio"
+    ],
+    "correct_choice": "find /etc/app -name '*.conf' | cpio -o > /backup/conf.cpio",
+    "accepted_commands": [
+      "find /etc/app -name '*.conf' | cpio -o > /backup/conf.cpio",
+      "find /etc/app -name '*.conf' | cpio -ov > /backup/conf.cpio"
+    ],
+    "hint": "Pipe filenames from find into cpio copy-out mode (-o).",
+    "explanation": "cpio -o reads a list of file paths from stdin and writes an archive to stdout (XK0-006 Domain 1.0)."
+  },
+  {
+    "id": "nav_54",
+    "domain": "1.0 System Management",
+    "category": "Navigation & File Management",
+    "difficulty": "hard",
+    "prompt": "Restore files from '/backup/conf.cpio' in copy-in mode, creating needed directories and preserving modification times.",
+    "choices": [
+      "cpio -idmv < /backup/conf.cpio",
+      "cpio -odmv < /backup/conf.cpio",
+      "cpio -xvf /backup/conf.cpio",
+      "cpio -p /backup/conf.cpio"
+    ],
+    "correct_choice": "cpio -idmv < /backup/conf.cpio",
+    "accepted_commands": [
+      "cpio -idmv < /backup/conf.cpio",
+      "cpio -idm < /backup/conf.cpio"
+    ],
+    "hint": "Use -i (extract), -d (make directories), -m (preserve mtime), and -v.",
+    "explanation": "cpio -idmv extracts from stdin, creates leading directories (-d), preserves modification times (-m), and lists files (-v) (XK0-006 Domain 1.0)."
   }
 ]
